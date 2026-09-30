@@ -1,0 +1,17 @@
+{
+ "id": "theophilenadiedjoa/knee-submit",
+ "title": "knee submit",
+ "code_file": "knee-submit.ipynb",
+ "language": "python",
+ "kernel_type": "notebook",
+ "is_private": true,
+ "enable_gpu": true,
+ "enable_internet": false,
+ "competition_sources": [
+  "rsna-knee-abnormality-detection"
+ ],
+ "dataset_sources": [
+  "theophilenadiedjoa/knee-models"
+ ],
+ "kernel_sources": []
+}

@@ -1,0 +1,13 @@
+{
+  "id": "theophilenadiedjoa/knee-env-probe",
+  "title": "knee env probe",
+  "code_file": "probe.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": false,
+  "competition_sources": ["rsna-knee-abnormality-detection"],
+  "dataset_sources": [],
+  "kernel_sources": []
+}
