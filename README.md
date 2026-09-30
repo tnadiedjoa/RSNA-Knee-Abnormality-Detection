@@ -1,74 +1,54 @@
-# RSNA Knee Abnormalities Detection
+# RSNA Knee Abnormality Detection
 
-Kaggle competition: https://www.kaggle.com/competitions/rsna-knee-abnormalities-detection
+Solution for the Kaggle competition
+[RSNA Knee Abnormality Detection](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection):
+predict, for every knee MRI study, the probability of 12 findings — ACL, MCL, medial and lateral
+meniscus tears, medial / lateral / patellofemoral osteoarthritis, effusion, synovitis, Baker's
+cyst, bone contusion and fracture. Metric: macro ROC AUC over the 12 findings.
 
-## Task
-Multimodal (image + radiology report text) multi-label classification of 12 knee MRI abnormalities:
-ACL, MCL, Medial Meniscus, Lateral Meniscus, Medial OA, Lateral OA, PF OA, Effusion, Synovitis, Baker's, Contusion, Fracture.
+The difficulty is the supervision: only **58** of the 4,407 training studies carry expert labels,
+the other 4,349 come with a free-text radiology report in one of a dozen languages, and the
+**test set has images only** (no report). The pipeline therefore has two stages:
 
-## Metric
-Macro-averaged AUC-ROC across the 12 targets.
+1. **Report → labels.** A local open-weights LLM grades each finding in every report
+   (absent / equivocal / mild / moderate / severe / not mentioned). Grades become soft labels.
+   Report text never leaves the cluster (competition rule on data security: no hosted LLM API).
+2. **Images → predictions.** A 2.5D multi-series network, trained on those soft labels, reads
+   the MRI series; it is the only thing that runs at test time.
 
-## Submission format
+## Pipeline
+
+| Step | Code | Notes |
+|---|---|---|
+| Remote archive access | [`knee/remote_zip.py`](knee/remote_zip.py), [`scripts/build_zip_index.py`](scripts/build_zip_index.py) | The archive is 265 GB zipped (570 GB of DICOMs); members are fetched with HTTP range requests, nothing but the cache is stored |
+| Image cache | [`scripts/build_cache.py`](scripts/build_cache.py), [`knee/dicom_io.py`](knee/dicom_io.py), [`knee/cache_io.py`](knee/cache_io.py) | Slices sorted by physical position, canonical orientation per plane, every knee mirrored into a right knee (one side per study), 150 mm centre crop, 256 px, JPEG q95 |
+| Report labels | [`scripts/llm_labels.py`](scripts/llm_labels.py), [`knee/labels.py`](knee/labels.py), [`scripts/eval_labels.py`](scripts/eval_labels.py) | Qwen3.6-27B (int4, vLLM) on one RTX 3090; agreement with the 58 gold studies: macro AUC 0.873 |
+| Folds | [`scripts/make_folds.py`](scripts/make_folds.py) | 5 folds, near-identical reports grouped, gold studies spread over folds |
+| Model | [`knee/data.py`](knee/data.py), [`knee/model.py`](knee/model.py), [`scripts/train.py`](scripts/train.py) | 5 series per study (sagittal/coronal/axial fat-suppressed fluid-sensitive + sagittal/coronal other), 3-slice windows through an ImageNet CNN, transformer over windows, one attention query per finding |
+| Submission | [`knee/infer.py`](knee/infer.py), [`scripts/package_kaggle.py`](scripts/package_kaggle.py), [`kaggle/submit/`](kaggle/submit/) | Offline Kaggle notebook; same preprocessing code as training (inputs checked byte-identical) |
+
+Every experiment — kept or not — is logged in [`experiments.md`](experiments.md) with the
+change, the commit and the before/after scores.
+
+## Running it
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # training / cache
+python -m scripts.build_zip_index                                     # needs Kaggle API credentials
+sbatch slurm/build_cache.sbatch 0 2; sbatch slurm/build_cache.sbatch 1 2
+python -m scripts.build_cache --fix-laterality
+# labels: separate venv with vLLM, one 24 GB GPU
+python -m scripts.llm_labels --name qwen36_27b_v1 --no-evidence
+python -m scripts.make_folds qwen36_27b_v1
+sbatch slurm/train_3090.sbatch --name r34_base --labels qwen36_27b_v1
+python -m scripts.package_kaggle runs/<run>          # private Kaggle dataset, then push kaggle/submit/
 ```
-StudyInstanceUID,ACL,MCL,Medial Meniscus,Lateral Meniscus,Medial OA,Lateral OA,PF OA,Effusion,Synovitis,Baker's,Contusion,Fracture
-```
 
-## Timeline
-- Start: 2026-07-30
-- Entry deadline: 2026-10-15
-- Team merger deadline: 2026-10-15
-- Final submission deadline: 2026-10-22
-- Winners' requirement deadline: 2026-11-05
+The first, text-only prototype (September 2026) is kept in [`legacy/`](legacy/): it could not be
+submitted, since the test set has no reports.
 
-## Constraints (code competition)
-- Submission via Kaggle Notebook only
-- Runtime <= 9h (CPU or GPU)
-- Internet access disabled during submission
-- Freely available external data / pretrained models allowed
-- Output file must be named `submission.csv`
+## Competition constraints
 
-## Prizes
-- Main leaderboard: 10 prizes, $9,000 to $5,000
-- Efficiency track: 3 prizes, $7,000 / $6,000 / $5,000 (score combines AUC and inference runtime vs. best/benchmark)
-
-## Structure
-- `data/` — competition data (not tracked in git, see .gitignore)
-- `notebooks/` — exploration / experiments only, not for reusable code
-- `src/` — reusable code (config, data loading, models)
-- `train.py` — entry point: cross-validate and fit models, save to `models/`
-- `predict.py` — entry point: generate `submissions/submission.csv`
-- `models/` — saved weights/checkpoints
-- `submissions/` — generated submission.csv files
-
-## Data notes
-- `train.csv` has 4407 rows (reports), but only **58 have all 12 labels filled in** —
-  the rest are unlabeled reports, candidates for semi-supervised / weak-supervision use.
-- The public `test.csv` is a 3-row stub with only `StudyInstanceUID` (no `Report`,
-  no images) — standard Kaggle code-competition pattern. The real hidden test set
-  (~1300 studies, per the official dataset description) is substituted when the
-  submission notebook runs on Kaggle's servers; `Report` is not provided at test time.
-- Images (`.dcm`) are intentionally not downloaded locally (disk quota) — the full
-  dataset is **819,640 files / 569.76 GB**. Image-based modeling should happen
-  directly in Kaggle Notebooks, where the data is mounted for free.
-- On Kaggle, competition data mounts at `/kaggle/input/competitions/<slug>/` (not
-  `/kaggle/input/<slug>/`).
-- The competition's "Models" tab lists community-shared pretrained checkpoints
-  (DINOv2, BiomedCLIP, EfficientNet...) usable as `dataset_sources`/`model_sources`
-  the same way we attached ResNet18's ImageNet weights — BiomedCLIP in particular
-  is pretrained on biomedical images, a likely better starting point than ImageNet
-  for MRI.
-- The competition's public "Code" tab and "Leaderboard" are expected to show other
-  participants' shared notebooks and scores — that's normal Kaggle transparency
-  (leaderboards are public by design), not a data leak. It does **not** expose raw
-  prediction files for participants who haven't chosen to share their notebook.
-
-## Experiment log
-Every validated run (local or Kaggle) gets a row in [`experiments.md`](experiments.md),
-so progress isn't lost between sessions. Add a row there whenever you get a new score.
-
-## Current baseline
-Text-only: TF-IDF (char n-grams, to stay robust across the reports' many languages) +
-per-label logistic regression, trained on the 58 labeled examples. Cross-validated
-macro AUC ≈ 0.58 — meant to validate the pipeline (loading → CV → submission format),
-not as a competitive model. Run with `python train.py` then `python predict.py`.
+Code competition: Kaggle notebook, ≤ 9 h, internet off, `submission.csv`. External data and
+pre-trained models must be public and free. Competition data is never versioned here (`data/` is
+git-ignored) and the repository stays private until the end of the competition.

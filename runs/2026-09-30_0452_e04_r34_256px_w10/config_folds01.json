@@ -1,0 +1,32 @@
+{
+ "name": "e04_r34_256px_w10",
+ "labels": "qwen36_27b_v1",
+ "backbone": "resnet34",
+ "img_size": 256,
+ "windows": 10,
+ "windows_eval": 14,
+ "epochs": 12,
+ "bs": 8,
+ "lr": 0.0002,
+ "lr_head": 0.001,
+ "wd": 0.02,
+ "dim": 256,
+ "depth": 2,
+ "drop_path": 0.1,
+ "aug": 1.0,
+ "silence_weight": 0.5,
+ "gold_weight": 3.0,
+ "folds": [
+  0,
+  1
+ ],
+ "workers": 4,
+ "seed": 42,
+ "run_dir": "2026-09-30_0452_e04_r34_256px_w10",
+ "bootstrap_run": null,
+ "bootstrap_alpha": 0.5,
+ "raw_dir": "/tmp/nadiedjoa-llm/knee_raw",
+ "debug_steps": 0,
+ "commit": "989da3d",
+ "gpu": "NVIDIA GeForce RTX 3090"
+}

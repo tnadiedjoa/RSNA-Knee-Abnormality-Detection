@@ -1,45 +1,138 @@
 # Experiment log
 
-Every run that produces a validation score gets a row here, so progress survives
-across sessions instead of living only in a terminal or a chat. Add a row whenever
-you get a new AUC number — commit it together with the code change that produced it.
+Every change tested on the project gets an entry here, kept or not: what changed, the commit,
+the result before and after (same conditions), and the conclusion. Scores are cross-validated
+on our own folds unless marked **LB** (Kaggle public leaderboard):
 
-Macro AUC = mean of per-label AUCs (same metric as the leaderboard), computed on
-our own local/CV validation split — not the real leaderboard score.
+- **silver AUC** — macro AUC against the confident report labels (grade absent vs moderate/severe),
+  out-of-fold over all ~4,400 training studies;
+- **gold AUC** — macro AUC against the 58 expert-labelled studies, out-of-fold (each gold study is
+  scored by the fold that did not train on it). Only 58 studies: ±0.03 is noise.
 
-## Current best (as of 2026-09-10, overnight run)
-- **Text**: char(4,6) TF-IDF + SGD(log_loss, alpha=1e-3) — macro AUC **0.601** (`src/text_baseline.py`, picked via `model_search.py`).
-- **Image**: ResNet18, 5 evenly-spaced slices/study averaged in feature space, ImageNet-pretrained, train-only flip+rotation augmentation, **per-label pos_weight in the BCE loss** — macro AUC **0.588** (`kaggle/image_baseline.ipynb`).
-- **Ensemble**: 50/50 text/image average — macro AUC **0.628** (`ensemble.py`), the best result of the night. The image model's raw score (0.588) looks flat vs the pre-pos_weight version (0.590), but it's now strong on exactly the labels text is weak on (Fracture 0.650, MCL 0.601) — that complementarity is what pushed the ensemble from 0.616 to 0.628, more than either model's own score would suggest.
-- All numbers are 5-fold CV on the 58 labeled studies — noisy at this sample size, treat differences under ~0.02-0.03 as inconclusive in isolation, but the ensemble trend (0.542 → 0.607 → 0.616 → 0.628 across the night) is a consistent, corroborated improvement, not a one-off fluctuation.
+## Summary
 
-| Date | Run | Where | Config | Macro AUC | Commit | Notes |
-|------|-----|-------|--------|-----------|--------|-------|
-| 2026-09-09 | Text baseline | Local | TF-IDF (char 3-5grams) + logistic regression per label, 58 labeled reports, stratified k-fold CV | 0.577 | `285d083` | Best label: Medial OA (0.752). Worst: Baker's (0.429), MCL (0.417). |
-| 2026-09-09 | Image baseline v1 | Kaggle (P100) | ResNet18, 1 mid-sagittal slice/study, random init (no pretrained weights, no internet) | — (crashed) | `678c2cd` | Failed: wrong data mount path (`/kaggle/input/<slug>/` instead of `/kaggle/input/competitions/<slug>/`). |
-| 2026-09-09 | Image baseline v2 | Kaggle (P100) | Same, path fixed | 0.476 | `31ece4f` | GPU (P100, sm_60) incompatible with installed PyTorch build → fell back to CPU. Random-init weights (no internet access to download ImageNet weights). Train loss 0.71→0.41 over 5 epochs. Worst: Baker's (0.350), Lateral Meniscus/Medial OA (0.375). |
-| 2026-09-09 | Image baseline v3 | Kaggle (CPU) | Same, + ImageNet-pretrained ResNet18 weights loaded from a Kaggle Dataset (`theophilenadiedjoa/resnet18-imagenet-weights`) instead of a live download | 0.509 | `1e07239` | Train loss converges lower/faster (0.67→0.25) than v2, confirming the pretrained weights help — macro AUC gain is small/noisy given only 58 labeled examples. Best: Medial Meniscus (0.714). Worst: PF OA (0.156). |
-| 2026-09-10 | Text baseline (unified folds) | Local | Same as above, but using the shared 5-fold split (`src/folds.make_folds`) so its OOF predictions align with the image model's, study for study | 0.564 | `917a730` | Comparable to the previous 0.577 — difference is fold-assignment noise at n=58, not a real change. Saved to `oof/text_oof.csv`. |
-| 2026-09-10 | Image baseline v4 (5-fold CV) | Kaggle (CPU) | Same as v3, but proper 5-fold CV (same folds as the text baseline) instead of a single 80/20 split, + refit on all labeled data for the submission model | 0.521 | `917a730` | More reliable than v3's 0.509 (pooled over all 58 studies instead of ~12). Saved to `oof/image_oof.csv`. |
-| 2026-09-10 | Text + image ensemble | Local | Simple 50/50 average of the two OOF prediction sets above (`ensemble.py`) | 0.542 | `917a730` | **Worse than text alone (0.564)** — equal weighting dilutes the stronger text signal with the weaker image one. Better than image alone (0.521). Next: try a weighted average favoring text, or hold off on ensembling until the image model itself improves. |
-| 2026-09-10 | Text model search | Local | Compared TF-IDF configs (char/word n-grams) × classifiers (LogisticRegression, SGD, RandomForest, MultinomialNB) under the same 5-fold CV (`model_search.py`) | 0.604 (best config) | `c48f6af` | Winner: char(4,6) n-grams + `SGDClassifier(loss="log_loss", alpha=1e-3)`. Made it the new default in `src/text_baseline.build_pipeline`. Full sweep results in `model_search.py`. |
-| 2026-09-10 | Image baseline v5 (multi-slice) | Kaggle (CPU) | Same as v4, but 5 evenly-spaced slices per study (was 1 mid-slice), fused by averaging per-slice ResNet18 features before the classification head (`MultiSliceResNet`) | 0.548 | `c48f6af` | Up from 0.521 (single-slice). Best: Medial OA (0.788), Effusion (0.713). Worst: Fracture (0.388), Contusion (0.409) — got noticeably worse than v4 for these two, maybe because averaging over slices blurs a very localized, slice-specific finding like a fracture line. |
-| 2026-09-10 | Text + image ensemble (weighted) | Local | Weight sweep over text/image blend ratio using the updated OOF (text 0.601, image 0.548) — `ensemble.py` | 0.607 (best, text_weight=0.7-0.8) | `bd49561` | Marginal gain over text alone (0.601) — picked 0.7 as a round, less-overfit choice over the exact peak (0.8). Given n=58 noise, treat this as "ensembling is roughly neutral to slightly positive," not a proven win. |
-| 2026-09-10 | Self-training / pseudo-labeling | Local | Fold-local text classifier pseudo-labels the ~4349 unlabeled reports above a confidence threshold, added to that fold's training data (`src/pseudo_label.py`, `pseudo_label_search.py`) | 0.567-0.597 (worse than 0.601 no-pseudo-labeling baseline, at every threshold tried: 0.95/0.9/0.8) | `19c2959` | **Negative result.** Hurts at every threshold tested — with only ~46 labeled examples per fold, the fold-local classifier isn't reliable enough to generate correct pseudo-labels, and its mistakes get compounded. Not pursuing this approach further unless the labeled seed set grows a lot, or we get an independent (non-self) source of pseudo-labels (e.g. keyword rules as originally considered, or a stronger classifier). |
+| ID | Date | Change | Result | Kept |
+|----|------|--------|--------|------|
+| E00 | 09-30 | Remote-zip cache, canonical frames, study-level laterality, JPEG cache, Kaggle chain | train/test parity byte-identical | ✓ |
+| E01 | 09-30 | Local LLM report labels (Qwen3.6-27B), synovitis-from-effusion prior | gold agreement 0.873 | ✓ |
+| E02 | 09-30 | ResNet34 2.5D, 5 series, 224 px, 8 windows | silver 0.894, gold 0.806; **LB 0.879** | ✓ (reference) |
+| E03 | 09-30 | Soft bootstrapping with E02 OOF (α=0.5) | silver 0.894→0.917, gold 0.806→0.865 (possible leak, see E05); **LB 0.882** | ✓ |
+| E04 | 09-30 | 256 px, 10 windows | folds 0–1: silver 0.897→0.896 | ✗ |
+| E05 | 09-30 | Leak-free nested check of E03 | fold 0 silver 0.895→0.908 (E03 showed 0.922) | ✓ gain real, ~half |
 
-| 2026-09-10 | Image baseline v6 (multi-plane) | Kaggle (CPU) | Same as v5, but 2 slices from each of Sagittal/Axial/Coronal (6 total) instead of 5 slices from one plane | 0.547 | `5c0b68a` | **No improvement over v5's 0.548** — essentially identical, despite ~40% longer runtime (18 vs 13 min). Reverted `kaggle/image_baseline.ipynb` back to the v5 single-plane multi-slice version (simpler, faster, same score) — this experiment's code is preserved in commit `19c2959` if revisited. Ensemble with text barely moved either (0.608, best weight now ~0.5-0.6). |
-| 2026-09-10 | Image baseline v7 (augmentation) | Kaggle (CPU) | Same as v5, + train-only random horizontal flip and ±10° rotation | **0.590** | `f11f11b` | **Clear improvement** over v5's 0.548 (+0.042) — the biggest single gain of the night for the image model. Train loss converges slower/higher than without augmentation (expected: harder training signal, less overfitting to 58 examples). Best label: Medial OA (0.808). Still weak: Fracture (0.417), ACL (0.516). |
-| 2026-09-10 | Text + image ensemble (post-augmentation) | Local | 50/50 average of text (0.601) + augmented image (0.590) OOF — `ensemble.py` | **0.616** | `7b3dfae` | Best ensemble result of the night — clearly above both individual models, unlike earlier attempts where the image model was too weak to add value. |
+## Phase 1 — new pipeline (from 2026-09-30)
 
-| 2026-09-10 | Image baseline v8 (15 epochs) | Kaggle (CPU) | Same as v7 (augmented), but 15 epochs instead of 5 | 0.571 | `eb701aa` | **Worse than v7's 0.590** — train loss drops to ~0.20-0.25 by epoch 15 (vs ~0.44-0.47 at epoch 5), i.e. it overfits the 58 (augmented) studies harder despite augmentation. Reverted to 5 epochs. |
-| 2026-09-10 | Image baseline v9 (8 epochs) | Kaggle (CPU) | Same as v7 (augmented), but 8 epochs instead of 5 | 0.567 | `6fd624a` | Also worse than v7's 0.590. **5/8/15 epochs -> 0.590/0.567/0.571 — 5 is clearly the best of the three, not just "smaller is better."** Settled on N_EPOCHS=5 for this architecture/data size; not spending more runs on this axis. |
-| 2026-09-10 | Image baseline v10 (pos_weight) | Kaggle (CPU) | Same as v7 (5 epochs, augmented), + per-label `pos_weight` in `BCEWithLogitsLoss` (= n_negative/n_positive) so rare findings weigh more in the loss | 0.588 (own score ~flat vs v7's 0.590) | `3ecf174` | **Own macro AUC barely moved, but the label-by-label shift is the real story**: Fracture 0.417→0.650, MCL →0.601, at the cost of ACL 0.516→0.478 and Synovitis/PF OA dropping. Made it noticeably more *complementary* to text (which is weak on exactly Fracture/MCL) — ensemble jumped from 0.616 to **0.628**, the best of the night. Kept as the new default. |
-| 2026-09-10 | Text + image ensemble (final) | Local | 50/50 average of text (0.601) + pos_weight image (0.588) OOF — `ensemble.py` | **0.628** | `d3bf7f9` | Best result of the night. Progression across the session: 0.542 → 0.607 → 0.616 → 0.628, driven less by either model's raw score and more by making them *complementary* (SGD text config, then augmentation, then pos_weight all pushed the ensemble up even when a given change looked flat on the image model alone). |
+The legacy pipeline below could not be submitted as such: the test set has **no reports**, so the
+text model (and the 0.628 text+image blend) has no input at test time, and the image model had
+only 58 labelled studies. Its code is kept in `legacy/`.
 
-## Ideas queued for the next runs
-- The pos_weight change traded some labels for others — worth trying an even higher pos_weight (more aggressive rebalancing) or a per-label weight search instead of the flat n_neg/n_pos formula, to see if the traded-off labels (ACL, Synovitis) can be recovered without losing the Fracture/MCL gains.
-- Swap ImageNet ResNet18 for a biomedical-pretrained backbone (e.g. BiomedCLIP, available in the competition's "Models" tab) as the image feature extractor — needs manual investigation of how to load it (likely `open_clip`/`transformers`, unclear if usable with internet disabled) before attempting a Kaggle run.
-- Now that ensembling is clearly paying off, consider a 3-way or per-label ensemble weight (some labels might want more image, others more text) instead of one global scalar weight.
-- The self-training / pseudo-labeling negative result (row above) was on the *pre-augmentation, pre-pos_weight* text/image models — could be worth one retry now that both models are stronger, though the fold-size argument (only ~46 labeled examples/fold) still applies.
-- If pseudo-labeling is revisited: try keyword-rule pseudo-labels (independent of our own classifier, so no self-reinforcing errors) instead of self-training, or only pseudo-label with a classifier trained on ALL 58 labeled studies (not just a fold's ~46) once we're not measuring CV on it.
-- Multi-plane fusion didn't help as a flat average across planes/slices — a smarter fusion (e.g. per-plane sub-model, or attention over slices instead of mean-pooling) might do better than just adding more inputs to the same averaging scheme.
+### E00 — Infrastructure (2026-09-30, night)
+
+- **Data access without storage.** The competition archive is 265 GB zipped (570 GB of DICOMs) and
+  the home quota is 100 GB. `knee/remote_zip.py` reads the zip's central directory over HTTP range
+  requests (signed Kaggle URL) and fetches one series per request; `scripts/build_cache.py` turns
+  every series into the cache directly (3 CPU jobs, ~40 min for 24,386 series, 0 errors).
+- **Canonical frames** (`knee/dicom_io.py`): slices sorted by physical position, in-plane axes
+  re-oriented to the radiological display of the plane, 150 mm centre crop, 256 px, p1–p99.5
+  window. Every knee is mirrored into a right knee (lateral on the image left / first sagittal
+  slices), checked visually on posterior coronal slices (fibular head always bottom-left).
+- **Laterality per study**: median knee x-position over the study's series (agrees with the DICOM
+  tag on 98.8% of 11,665 tagged series), then tags; 175 series in 55 studies had been mirrored
+  inconsistently series-by-series and were re-fetched. Test time decides the side the same way
+  from headers first.
+- **Cache format**: slices as JPEG q95 (mean error 0.9 grey level / 255), 16 GB instead of 34 GB
+  as zlib arrays — needed to fit the quota. The test pipeline applies the same round trip:
+  the Kaggle pipeline and the training cache were checked **byte-identical** on the 15 visible
+  test series.
+- **Kaggle chain** validated with a random-weight model (private dataset + private notebook,
+  offline wheels for JPEG/JPEG 2000 decoders, which the Kaggle image lacks): 0.7 min for the
+  3 visible studies.
+
+### E01 — Report labels with a local LLM (2026-09-30)
+
+Qwen3.6-27B (Intel int4 AutoRound, vLLM, one RTX 3090) grades each finding absent / equivocal /
+mild / moderate / severe / not mentioned (`scripts/llm_labels.py`); grades map to fixed soft
+labels (`knee/labels.py`). Reports never leave the cluster (rule 4.b). Agreement with the 58 gold
+studies (macro AUC of the soft label vs gold):
+
+| Label set | ACL | MCL | MM | LM | MOA | LOA | PFOA | Eff | Syn | Baker | Cont | Frac | **macro** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen3.6-27B v1 (silence prior 0.4 for synovitis) | .988 | .981 | .953 | .880 | .908 | .832 | .871 | .782 | .652 | .942 | .787 | .799 | 0.865 |
+| same, silence prior 0.1 | | | | | | | | | .711 | | | | 0.869 |
+| same + unmentioned synovitis from effusion | | | | | | | | | .751 | | | | **0.873** |
+| *reference: pilkwang v2 (hosted API — not used)* | | | | | | | | | | | | | 0.866 |
+| *reference: stevenleehans v2 (provenance unknown — not used)* | | | | | | | | | | | | | 0.887 |
+
+Weak spots are intrinsic to the reports: "small effusion" is split 13/23 between gold negatives
+and positives; the annotators mark synovitis on half the studies while reports rarely mention it;
+impaction injuries are "fracture" for the LLM and sometimes "contusion" for the annotators.
+**Kept**: synovitis-from-effusion prior. Public tables made with hosted APIs are only a reference.
+
+### E02 — First image model: ResNet34 2.5D, 5 series (2026-09-30)
+
+Run `2026-09-30_0257_e02_r34_base` (3 folds on P100, 2 on the RTX 3090). Five series per study
+(sagittal / coronal / axial fat-suppressed fluid-sensitive, sagittal and coronal other), 8 windows
+of 3 adjacent slices per series (12 at evaluation), 224 px, ImageNet ResNet34 shared by all
+windows, 2-layer transformer over the 40 tokens, one attention query per finding + max over
+windows; soft BCE, unmentioned findings weighted 0.5, gold studies weight 3; 12 epochs, AdamW
+2e-4 (head 1e-3), cosine. No flips (knees are canonical right knees).
+
+| | ACL | MCL | MM | LM | MOA | LOA | PFOA | Eff | Syn | Baker | Cont | Frac | **macro** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| silver (OOF, 4,407 studies) | .853 | .829 | .858 | .777 | .941 | .879 | .871 | .984 | .975 | .959 | .920 | .882 | **0.894** |
+| gold (OOF, 58 studies) | .737 | .789 | .875 | .611 | .969 | .799 | .743 | .940 | .739 | .920 | .810 | .744 | **0.806** |
+
+Silver AUC per fold plateaus from epoch ~8 (0.876–0.901 at epoch 12). Weakest: the fine structures
+(lateral meniscus, MCL, ACL, medial meniscus). Epoch time: 8.4 min on P100, 4.3 min on the 3090
+(data-bound with 4 CPUs; an unpacked copy of the cache on local disk now makes it GPU-bound).
+Packaged and run offline on Kaggle (private notebook `knee-submit` v3, 5 folds); the API token
+cannot create submissions (403), so the first **LB** submission is to be made from the web page.
+
+### E03 — Soft bootstrapping: labels = ½ report + ½ out-of-fold prediction of E02 (2026-09-30)
+
+Same model as E02; the report soft labels of the non-gold studies are averaged with E02's
+out-of-fold predictions (`--bootstrap-run`, α = 0.5), which pulls the labels towards what the
+images show (the gold labels are image reads, the reports are not). Folds 0–2 on P100, then
+3–4 (3090) — same folds as E02:
+
+| folds 0–2 | silver | gold (34 studies) |
+|---|---|---|
+| E02 (before) | 0.897 | 0.811 |
+| **E03 bootstrap α=0.5** | **0.918** | **0.864** |
+
+All 5 folds (OOF, same folds as E02): **silver 0.894 → 0.917, gold 0.806 → 0.865** (gold ACL
+0.737→0.837, lateral meniscus 0.611→0.739, contusion 0.810→0.907, fracture 0.744→0.858; medial
+meniscus 0.875→0.846). A rank blend E02+E03 adds nothing (silver 0.917, gold 0.850).
+**Caveat — possible leak:** the E02 model that produced the pseudo-labels of fold-j studies had
+been trained on fold-0 studies, so fold-0 validation labels reach fold-0 training targets
+indirectly. E05 measures the gain without that path. Kept provisionally.
+
+**Public LB: 0.882** (notebook `knee-submit` v4, 5 folds, ~33 min on Kaggle for the hidden test set)
+vs **0.879** for E02 (v3): +0.003, within LB noise — far less than the out-of-fold gains
+(silver +0.023, gold +0.059, leak-free silver +0.013). Neither the report labels (silver) nor the
+58 gold studies track the LB closely: E02 gold 0.806 → LB 0.879, E03 gold 0.865 → LB 0.882.
+
+### E04 — 256 px and 10 windows per series (2026-09-30)
+
+Same as E02 but `--img-size 256 --windows 10 --windows-eval 14` (native cache resolution),
+folds 0–1 on the RTX 3090: silver 0.896 vs 0.897 (E02, same folds), gold 0.845 vs 0.809 on 23
+studies (noise level). Fracture and ACL up, MCL and contusion down; 1.6× the compute.
+**Not kept** for now; worth retrying on top of better labels.
+
+### E05 — Leak-free check of E03 (2026-09-30)
+
+Nested CV around fold 0: four teachers trained without fold 0 (`--exclude-folds 0`, run
+`2026-09-30_0639_e05_inner_excl0`, each validated on one of folds 1–4) give out-of-fold labels
+for folds 1–4 that never saw fold 0; the student (`2026-09-30_0639_e05_student_f0`, α = 0.5) is
+evaluated on fold 0.
+
+| fold 0 | silver (882 studies) | gold (11 studies) |
+|---|---|---|
+| E02, report labels | 0.8946 | 0.844 |
+| **E05 student, leak-free bootstrap** | **0.9078** | 0.826 |
+| E03, bootstrap with the leak | 0.9223 | 0.874 |
+
+The gain is real but about **half** of what E03 showed (+0.013 instead of +0.028 silver); E03's
+out-of-fold scores are optimistic. Gold on 11 studies is noise. **Kept** (the leak only inflates
+the CV, not the submitted model); future comparisons use fold 0 with the E05 teachers' labels,
+which is leak-free.
