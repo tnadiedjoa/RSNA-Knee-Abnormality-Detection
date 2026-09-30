@@ -1,9 +1,19 @@
+# competition data, caches and labels derived from reports: never versioned (rule 2.4.b)
 data/
-models/*.pt
-models/*.pth
-models/*.ckpt
-models/*.pkl
-submissions/*.csv
+# local environments, logs, model weights (runs/ keeps configs, metrics and out-of-fold predictions)
+.venv/
+.venv-llm/
+.venv-p100/
+logs/
+runs/*/checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.pkl
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+# Kaggle upload staging and third-party wheels (rebuilt by scripts/package_kaggle.py / pip download)
+kaggle/_dataset/
+kaggle/wheels/
+runs/_smoke/

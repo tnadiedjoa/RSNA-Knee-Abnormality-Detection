@@ -1,0 +1,17 @@
+# training, cache, submission (Python 3.12); P100 GPUs need torch from the cu126 index
+torch
+torchvision
+timm
+numpy
+pandas
+pyarrow
+pydicom
+pylibjpeg
+pylibjpeg-libjpeg
+pylibjpeg-openjpeg
+python-gdcm
+opencv-python-headless
+scikit-learn
+requests
+kaggle
+# report labels (separate environment): vllm
