@@ -19,6 +19,25 @@ on our own folds unless marked **LB** (Kaggle public leaderboard):
 | E03 | 09-30 | Soft bootstrapping with E02 OOF (α=0.5) | silver 0.894→0.917, gold 0.806→0.865 (possible leak, see E05); **LB 0.882** | ✓ |
 | E04 | 09-30 | 256 px, 10 windows | folds 0–1: silver 0.897→0.896 | ✗ |
 | E05 | 09-30 | Leak-free nested check of E03 | fold 0 silver 0.895→0.908 (E03 showed 0.922) | ✓ gain real, ~half |
+| E06 | 09-30 | Backbone / slice density / span, fold 0 | ConvNeXt-tiny 0.908→0.931; span, density, CoAtNet-0 no gain | ✓ ConvNeXt |
+| E07 | 09-30 | ConvNeXt-tiny, 5 folds, E03 labels | silver 0.917→0.943, gold 0.865→0.888 (vs E03, same leak); **LB 0.882→0.918** | ✓ |
+| E08 | 09-30 | On ConvNeXt, fold 0: 130 mm FOV / 256 px / ConvNeXt-small / lr 1e-4 | FOV +0.012, others ≤ +0.006 | ✓ FOV (not confirmed by E09) |
+| E09 | 09-30 | ConvNeXt + 130 mm FOV, 5 folds | silver 0.9415 (E07 0.9429); blend E07+E09 0.9474, **LB 0.919** | ✓ as ensemble member |
+| E10 | 09-30 | Fold 0: 120 mm FOV, ConvNeXt-small + 130 mm; seed reruns | no stacking; seed reruns cancelled at epoch 6 | ✗ |
+| E11 | 09-30 | ConvNeXt-tiny 256 px, 5 folds | silver 0.9435, gold 0.895; blend E07+E09+E11+E12 0.9504 | ✓ as ensemble member |
+| E12 | 09-30 | E07 with seed 1, 5 folds (seed noise, ensemble member) | silver 0.9422 (E07 0.9429): 5-fold seed noise ~0.001; blend E07+E12 0.9479 | ✓ as ensemble member |
+| E13 | 09-30 | E07 recipe at 384 px on a 384 px cache (0.39 mm/px) | silver **0.9459** (224/256 px: 0.9415–0.9435), gold 0.901; blend E07+E09+E11+E12+E13 **0.9517**, **LB 0.922** | ✓ |
+| E14 | 10-01 | DINOv2 ViT-S/14 backbone (another family), E07 recipe, 5 folds on P100 | epoch 3: silver 0.79 / 0.70 (ConvNeXt ~0.91); cancelled | ✗ |
+| E15 | 10-01 | EfficientNetV2-S (IN-21k, another CNN family), E07 recipe, 5 folds on P100 | silver 0.9334, gold 0.872; lowers every blend it joins | ✗ |
+| E16 | 10-01 | E13 with seed 1 (384 px) | silver **0.9461**, gold 0.906 (E13 0.9459 / 0.901): 384 px holds across seeds; 6-model blend 0.9525 | ✓ |
+| E17 | 10-01 | Inference settings (more windows, wider span), no retraining | 24 windows: +0.0005 to +0.0015 on every model; 6-model blend 0.9533 (+0.0016 [+0.0011, +0.0021] vs Version 8) | ✓ |
+| E18 | 10-01 | E13 with seed 2 + weight EMA 0.998 | silver 0.9440 (EMA 0.9440), gold 0.904; 7-model blend 0.9529 at 12 windows | ✓ member, EMA ✗ |
+| E19 | 10-01 | 384 px, 12 training windows (batch 6), 24 at evaluation, seed 3, EMA | 5 folds at 24 eval windows: silver 0.9480, gold 0.908 (E13 0.9471 / 0.904, E16 0.9477 / 0.905); V9 set + E19: 0.9542 / 0.914 (V9 0.9536 / 0.913) | ✗ recipe, + member |
+| E20 | 10-01 | ResNet-50 pretrained on RadImageNet (medical images), E07 recipe, P100 | folds 0–3 silver 0.9437 / 0.9425 / 0.9439 / 0.9463 at epoch 12; fold 4 running | pending |
+| E21a | 10-01 | CoAtNet-0 with the public recipe's backbone lr 3e-5 (E06 fold-0 protocol) | silver 0.9269 (E06b 0.8860, E06a ConvNeXt 0.9311) | low lr closes most of the gap → E22 |
+| E22 | 10-01 | CoAtNet-0, lr 3e-5, 5 folds, E03 labels | fold 0 silver 0.9322; folds 1–4 stopped for E23 | paused |
+| E23 | 10-01 | E07 recipe with round-2 labels: 0.3 report + 0.7 mean OOF of 7 runs (labels' gold agreement 0.927 vs 0.897) | interim fold 0 epoch 10: silver 0.9524 / gold(fold) 0.927 vs E07 0.9407 / 0.879 (partly leaky, see E23) | running → LB |
+| E24 | 10-01 | E13 (384 px) with the round-2 labels of E23 | running (job 1017572, ~07:00) | |
 
 ## Phase 1 — new pipeline (from 2026-09-30)
 
@@ -136,3 +155,449 @@ The gain is real but about **half** of what E03 showed (+0.013 instead of +0.028
 out-of-fold scores are optimistic. Gold on 11 studies is noise. **Kept** (the leak only inflates
 the CV, not the submitted model); future comparisons use fold 0 with the E05 teachers' labels,
 which is leak-free.
+
+### E06 — Backbone, slice density and slice span (2026-09-30)
+
+Leak-free protocol: fold 0 only, labels bootstrapped from the E05 teachers (α = 0.5), so every
+variant compares with the E05 student (ResNet34, 224 px, 8 windows over 8–92%). One change each,
+same optimiser settings (backbone lr 2e-4, 12 epochs). All on RTX 3090s (`slurm/multi_gpu.sbatch`,
+cache unpacked to the node's local disk).
+
+| Variant | Change | silver fold 0 | gold (11) | Epoch time (3090) |
+|---|---|---|---|---|
+| E05 student (reference) | ResNet34, 8 windows over 8–92% | 0.9078 | 0.826 | 2.1 min |
+| **E06a** | **ConvNeXt-tiny (IN-22k), activation recomputation** | **0.9311** | 0.856 | 4.2 min |
+| E06b | CoAtNet-0, activation recomputation | 0.8860 | 0.798 | 5.5 min |
+| E06c | ResNet34, 16 windows (24 at eval) over 2–98% | 0.9081 | 0.830 | 3.4 min |
+| E06d | ResNet34, 8 windows over 2–98% (span alone) | 0.9029 | 0.785 | 2.1 min |
+
+ConvNeXt-tiny gains on every finding (MCL 0.831→0.908, medial meniscus 0.878→0.929, ACL
+0.889→0.905). Neither a wider slice span nor twice the windows helps the ResNet34. CoAtNet-0 learns
+slowly with the ResNet learning rate and ends below the reference; not retried for now.
+**Kept**: ConvNeXt-tiny. Without activation recomputation, ConvNeXt-tiny and CoAtNet-0 do not fit
+a 16 GB P100 with 8 studies × 40 windows per batch.
+
+### E07 — ConvNeXt-tiny on all 5 folds (2026-09-30)
+
+E06a's backbone with E03's label recipe (bootstrap from E02, α = 0.5), so the LB difference with
+E03 (0.882) measures the backbone alone. Run `2026-09-30_1213_e07_convnext_5f`, 4.0–4.6 min per
+epoch on RTX 3090s. Out-of-fold (same leaky recipe as E03, so comparable with it): **silver
+0.917 → 0.943, gold 0.865 → 0.888**. A rank blend with E02 and E03 is worse (silver 0.933).
+Packaged as notebook `knee-submit` v5 (0.8 min on the 3 visible test studies).
+
+**Public LB: 0.918** (E03: 0.882, +0.036). The silver gain (+0.026, 95% CI ±0.003) carried over
+to the LB — silver is a reliable guide for model-side changes (labels unchanged), unlike the
+label-side change of E03 (silver +0.023 in-leak / +0.013 leak-free, LB +0.003).
+
+### E08 — On top of ConvNeXt-tiny: field of view, resolution, size, learning rate (2026-09-30)
+
+Same leak-free fold-0 protocol as E06; reference E06a (ConvNeXt-tiny, silver 0.9311). Paired
+bootstrap on fold 0 (882 studies): differences below ~0.008 are noise.
+
+| Variant | Change |
+|---|---|
+| E08a | field of view 150 → 130 mm (`--zoom 1.154`, 0.58 mm/px instead of 0.67 at 224 px) |
+| E08b | 256 px (the cache's native 0.59 mm/px over 150 mm) |
+| E08c | ConvNeXt-small (IN-22k) |
+| E08d | backbone learning rate 2e-4 → 1e-4 |
+
+Results vs E06a (0.9311), paired bootstrap 95% CI: E08a **0.9430, +0.012 [+0.007, +0.018]**;
+E08b 0.9344, +0.003 [−0.002, +0.009]; E08c 0.9368 (+0.006, 1.7× the compute); E08d 0.9337,
++0.003 [−0.002, +0.008]. Kept: 130 mm field of view (but see E09).
+
+### E09 — ConvNeXt-tiny + 130 mm field of view on 5 folds (2026-09-30)
+
+Run `2026-09-30_1656_e09_convnext_zoom130_5f`, E03 label recipe (same as E07). Out-of-fold silver
+**0.9415 vs 0.9429 for E07** (−0.001, CI [−0.003, +0.001]): the field of view gain seen on fold 0
+does not hold (per fold: +0.0025, +0.001, +0.001, −0.004, −0.006). The paired bootstrap covers the
+choice of studies, not training randomness: **a single-run gain of ~0.01 on fold 0 can be seed
+noise** — from now on, confirm fold-0 gains with a second seed or more folds before a 5-fold run.
+
+The two models are complementary: **rank blend E07 + E09 = 0.9474, +0.0045 [+0.003, +0.005]**,
+better on every fold; gold 0.897. Submitted as notebook `knee-submit` v7 (10 networks, 1.2 min on
+the 3 visible test studies); v6 (E09 alone) not submitted.
+
+**Public LB: 0.919** (v5 / E07 alone: 0.918): +0.001, within LB noise (~±0.01). The +0.0045 silver
+gain of the blend is too small to show on the public LB.
+
+### E10 — Do the fold-0 gains stack? And how noisy is one training run? (2026-09-30)
+
+Fold 0, leak-free labels (E05 teachers), ConvNeXt family:
+
+| Run | Change | silver fold 0 |
+|---|---|---|
+| E06a (reference) | ConvNeXt-tiny, 150 mm | 0.9311 |
+| E08a | + 130 mm field of view | 0.9430 |
+| **E10a** | + 120 mm field of view | **0.9423** |
+| E08c | ConvNeXt-small, 150 mm | 0.9368 |
+| **E10b** | ConvNeXt-small + 130 mm | **0.9373** |
+
+120 mm ≈ 130 mm; ConvNeXt-small does not stack with the tighter field of view. Given E09 (the
+130 mm gain did not hold over 5 folds), E10c/E10d reran E06a and E08a with seed 1 (P100) to
+measure run-to-run noise. **Cancelled at epoch 6 of 12** (21:59) to free a Slurm job slot for the
+384 px cache (E13); the 5-fold seed comparison E12 vs E07 measures the noise that matters.
+Partial curves in `logs/e10cd_partial_summary.txt` (epoch 6: E10c 0.9314, E10d 0.9350).
+
+### E11 / E12 — More ensemble members (2026-09-30, running overnight)
+
+E11: ConvNeXt-tiny at 256 px, 5 folds (4 on P100, fold 2 on the 3090: silver 0.9415 vs 0.9419 for
+E07 and 0.9428 for E09 on fold 2). E12: exactly E07 with seed 1, 5 folds in sequence on the 3090.
+A Slurm job (`logs/chain_e11.sh`) packages E07 + E09 + E11 and pushes notebook v8 if the 3-model
+rank blend beats E07 + E09 by more than 0.001 silver.
+
+21:55: the interactive job holding the 3090 ended (its `srun` session closed); E12 kept running
+outside any allocation. After fold 2 it was stopped and folds 3–4 relaunched in the new
+interactive job (`logs/handoff_e12.sh`, `logs/e12b_local.log`), same run folder.
+
+**E12 result** (23:45): silver **0.9422**, gold 0.895 — E07 (seed 42) 0.9429, E09 0.9415. Over 5
+folds, one training run moves silver by ~0.001, so a 5-fold gain above ~0.003 is real. The E07+E09
+blend gain was seed averaging, not the field of view: E07+E12 (same recipe, two seeds) = **0.9479**,
+E07+E09 = 0.9474, E07+E09+E12 = **0.9493** (gold 0.904). On the LB, +0.0045 silver gave +0.001.
+
+### E13 — 384 px cache (2026-09-30, building)
+
+The best public single model reads 384 px at ~0.35 mm/px; our cache stores 256 px over 150 mm
+(0.59 mm/px). New cache `data/cache384`: same frames, 384 px (0.39 mm/px), only the 20,792 series
+the model reads (`scripts/build_cache.py --size 384 --sides-from-meta --slots-only`, study sides
+taken from the existing meta, so `data/series_meta.parquet` is untouched). Check on 20 series:
+downsized to 256 px it matches the 256 cache within 1.3 grey levels (a mirrored side would differ
+by ~30–60). Built by `slurm/build_cache384.sbatch` (3 shards, ~7 min each at 15–20 series/s):
+**20,792 series, 0 errors, 25 GB** (home: 76 of 100 GB used).
+
+Training (E13): exactly the E07 recipe with `--img-size 384` on this cache, run
+`2026-09-30_2230_e13_convnext_384_5f` — folds 3–4 in a 2-GPU 3090 Slurm job (`slurm/runs/e13_34.txt`,
+`RAW_GB=100` so the job unpacks the 384 cache to local disk), fold 2 in a 1-GPU job after it
+(`slurm/runs/e13_2.txt`), folds 0–1 on the interactive 3090 after E12 (`logs/chain_e13.sh`,
+`logs/launch_e13_local.sh`). Run configs now record `cache_dir`
+and `cache_size`.
+
+Inference: `knee/infer.py` decodes each test series once and writes one cache per `cache_size`
+the models need. Checked on a fake test folder (the 3 visible test studies + 3 train studies,
+fetched from the archive): with E07 alone the predictions equal the previous code's exactly (max
+difference 0.0); with a 256 px and a 384 px model, the test caches of the train studies are
+byte-identical to `data/cache` and `data/cache384` (15/15 series each).
+
+**E13 folds 3–4** (01:23): per-fold silver 0.9491 / 0.9371 (E07 0.9495 / 0.9404, E12 0.9421 / 0.9363).
+On the 1,762 studies of folds 3–4: E13 0.9434, E07 0.9455, E09 0.9402, E12 0.9395 — 384 px is not a
+clear single-model gain (better on the menisci, 0.944 / 0.905 vs ~0.93 / 0.86–0.90, worse on the MCL).
+As a blend member it helps a little more than another 224 px seed: E07+E13 **0.9493** vs E07+E12
+0.9475; E07+E09+E12+E13 0.9501. The E13 fold-2 Slurm job (pending behind other users' 3090 jobs) was
+cancelled; fold 2 runs on the interactive 3090 after folds 0–1 (`logs/chain_e13_f2.sh`).
+
+### E14 — DINOv2 ViT-S/14, another backbone family (2026-10-01, cancelled)
+
+The public 0.943 ensembles gain most from mixing families (CoAtNet, DINOv2, RadImageNet), while two
+seeds of one recipe give +0.005 silver and ~+0.001 LB. E14: `vit_small_patch14_dinov2.lvd142m`
+(22 M parameters, self-supervised LVD-142M pretraining, positions resampled to 224 px via timm's
+`dynamic_img_size`, enabled for `vit_*` backbones in `knee/model.py`), E07 recipe otherwise, backbone
+lr 5e-5. On P100s (free, and ViTs are matmul-bound rather than depthwise-conv-bound): folds 0–1 job
+1016103, folds 2–3 1016104 and fold 4 1016105 queued behind the per-user job limit. Decision rule:
+keep it if the blend with E07 beats E07+E12 (0.9479) by more than ~0.002.
+
+**E14 result**: 23.5 min/epoch on P100; silver after epochs 1–3: fold 0 0.739 → 0.762 → 0.787,
+fold 1 0.663 → 0.683 → 0.698 (ConvNeXt-tiny: ~0.84 → 0.89 → 0.91; loss 0.542 vs 0.478 at epoch 3).
+Cancelled at 02:46 with all its jobs: a model that far behind does not help a rank blend. Like
+CoAtNet-0 in E06, the attention backbone learns slowly in this setup (3 adjacent MRI slices as RGB,
+~40 windows per study, 12 epochs); making it work would need its own tuning (warm-up, layer-wise lr
+decay, longer schedule), not a night run.
+
+### E15 — EfficientNetV2-S, another CNN family (2026-10-01, running)
+
+Same goal as E14 with a CNN, since CNNs (ResNet, ConvNeXt) learn well in this setup:
+`tf_efficientnetv2_s.in21k_ft_in1k` (20 M parameters, ImageNet-21k like our ConvNeXt), E07 recipe
+unchanged (backbone lr 2e-4), 224 px, on P100s (`slurm/runs/e15_*.txt`). Stop if epoch 3 is far
+below ConvNeXt (~0.91); keep if the blend with E07 beats E07+E12 (0.9479) by more than ~0.002.
+Epochs 1–2 (14–16 min each on P100): fold 0 0.870 → 0.901, fold 1 0.851 → 0.893 — as fast as ConvNeXt.
+
+**E11 result** (fold runs ended ~03:45): silver **0.9435**, gold 0.895 (E07 0.9429 / 0.888). Rank blends
+over all 5 folds: E07+E11 0.9481, E07+E09+E11 0.9494, **E07+E09+E11+E12 0.9504** (gold 0.905).
+The `chain_e11` packaging job never started — the queued E15 jobs took the two freed job slots —
+and was cancelled at 05:30: a version with E13 and E15 replaces v8. `logs/push_version.sh` now
+does package → wait for the dataset → set `MODELS` → push → check the visible-test run.
+
+**Inference for larger ensembles** (05:30, test pending): the hidden test is ~1,300 studies and the
+visible-test log shows ~0.8 s of DICOM decoding per series on Kaggle (~1.7 h for the test), so ~30
+fold networks could approach the 9 h limit. `knee/infer.py` now (1) reads each batch once and runs
+all fold networks of a model on it (5× less JPEG decoding) and (2) takes `time_budget_s`: models are
+processed in order and one is skipped when, at the measured cost per pixel, it would end past the
+budget, so a submission is always written. To be checked against the previous code on the fake test
+folder once the 3090 is free (a first attempt ran out of GPU memory next to E13; E13 unaffected).
+**Checked at 07:00**: predictions identical to the previous code (max difference 0.0, alone and with a
+384 px model), 16 s → 7 s for E07 on the 6 studies; with a 1 s budget the second model is skipped and
+a complete submission is still written.
+
+### Results of the night (2026-10-01, 07:00) — all 5 folds, 4,407 studies
+
+| Model | silver | gold |
+|---|---|---|
+| E07 ConvNeXt-tiny 224 px | 0.9429 | 0.888 |
+| E09 same, 130 mm field of view | 0.9415 | 0.892 |
+| E11 same, 256 px | 0.9435 | 0.895 |
+| E12 E07 with seed 1 | 0.9422 | 0.895 |
+| **E13 384 px** | **0.9459** | **0.901** |
+| E15 EfficientNetV2-S | 0.9334 | 0.872 |
+| E07+E09 (v7, **LB 0.919**) | 0.9474 | 0.897 |
+| E07+E09+E11+E12 | 0.9504 | 0.905 |
+| **E07+E09+E11+E12+E13** | **0.9517** | 0.908 |
+| all six | 0.9513 | 0.906 |
+
+Over 5 folds, 384 px is the best single model (+0.003 over the 224/256 px runs, three times the
+seed spread) and carries the best blend. EfficientNetV2-S is 0.01 below and lowers every blend it
+joins: not kept. Exhaustive search over subsets: the best blend of each size always contains E13.
+
+**Notebook `knee-submit` version 8** (v8 was never pushed by `chain_e11`, so Kaggle numbers this one 8):
+E13, E11, E07, E12, E09 (25 fold networks) in that order of priority, with an 8 h time budget
+(`logs/push_version.sh`, output in `logs/push_1001_0703`). Visible-test run complete at 07:40: all
+five models used, 1.8 min for the 3 studies. **E16**: E13 with seed 1, folds
+1–2 and 3–4 on nodemm05 (jobs 1016204 / 1016205), fold 0 on the interactive 3090.
+
+### E17 — Inference settings, no retraining (2026-10-01)
+
+`scripts/eval_variants.py` re-predicts every fold's validation studies with the fold network under
+other inference settings (the first variant, the training settings, must reproduce the stored OOF);
+whatever wins transfers to the notebook as is. On E13: 12 windows (reference), 16, 24, and 16 over
+2–98% of the slices. Batch size scales down with the window count (4 studies × 12 windows, as in
+`knee/infer.py`): a first attempt at 8 studies × 24 windows of 384 px ran out of memory (job 1016220,
+with a smoke test of mine sharing its GPU), no fold lost elsewhere.
+
+**Weight EMA** (`--ema <decay>` in `scripts/train.py`): an exponential moving average of the weights,
+updated after each step. It does not change training, so each epoch evaluates both the raw and the
+EMA weights on the same run (`silver_auc_ema` in the history); EMA weights and OOF are saved apart
+(`checkpoints/ema_fold*.pt`, `oof_ema_fold*.csv`) so packaging and blends are unaffected unless chosen.
+
+**E17 result** (job 1016222, ~9 min per fold for the four settings):
+
+| E13 inference | silver | gold |
+|---|---|---|
+| stored OOF | 0.94594 | 0.9007 |
+| 12 windows (training setting) | 0.94593 | 0.9007 |
+| 16 windows | 0.94671 | 0.9022 |
+| 24 windows | **0.94715** | 0.9040 |
+| 16 windows over 2–98% | 0.94613 | 0.9045 |
+
+The reference reproduces the stored OOF (difference 1e-5). Denser windows help steadily: 24 vs 12,
+paired bootstrap over studies **+0.0012 [+0.0003, +0.0020]** — real but small, for twice the
+inference time of that model. A wider span adds nothing on silver.
+
+### E16 / E18 — More 384 px seeds (2026-10-01)
+
+**E16** (seed 1, jobs 1016204/1016205 + interactive fold 0, done 09:35): silver **0.9461**, gold 0.906 —
+the 384 px gain reproduces (E13 0.9459). E13+E16 0.9508; all six (E07, E09, E11, E12, E13, E16)
+**0.9525** (gold 0.911), i.e. +0.0008 [+0.0005, +0.0011] over Version 8's five (which is itself +0.0044
+[+0.0036, +0.0052] over v7). Too small to spend a submission on alone; it waits for E18 and for
+Version 8's runtime (to decide on denser inference windows).
+
+**E18** (seed 2, weight EMA 0.998, launched 09:35 by `logs/chain_e18.sh` after an EMA smoke test:
+`checkpoints/ema_fold0.pt` written, both AUCs printed): folds 1–2 / 3–4 jobs 1016280 / 1016281, fold
+0 on the interactive 3090.
+
+**Version 8 on the public LB: 0.922** (v7: 0.919). Submitted 07:50, scored by 09:46: the hidden-test
+run with 25 fold networks (five of them at 384 px) took under 2 h, far from the 9 h limit — room for
+more models and denser inference windows. Silver +0.0044 gave LB +0.003 here, a better transfer than
+the v7 blend (+0.0045 → +0.001): consistent with a model-side change (resolution).
+
+**Scheduling (11:50)**: the 2-GPU E18 jobs waited on Resources (Slurm kept the one free 3090 for the
+older 2-GPU job), so E18 folds 1–4 became 1-GPU jobs with `--time 3:30` (backfill). The 24-window
+check of the other members (`logs/e17b_w24.sh`) was stuck behind the 4-job limit and moved to the
+interactive 3090 after E18 fold 0. E18 at epochs 8–10: EMA ≥ raw by 0.000–0.0004 so far.
+
+### E19 — Denser training windows at 384 px (2026-10-01, running)
+
+Since 24 windows at inference beat 12 (E17), train on 12 windows per series instead of 8 (batch 6
+studies instead of 8 to fit 24 GB), evaluate on 24; seed 3, EMA 0.998. Folds 1–2 / 3–4 as 2-GPU jobs
+1016412 / 1016413, fold 0 on the interactive 3090 after the 24-window check (`logs/chain_e19.sh`).
+Compare with the mean of E13/E16/E18 evaluated at 24 windows.
+
+**24 windows on the other members** (`logs/e17b_w24.sh`, interactive 3090, 12:12–12:52), silver
+stored → 24 windows: E16 0.9461 → 0.9477, E11 0.9435 → 0.9445, E07 0.9429 → 0.9434, E12 0.9422 →
+0.9432, E09 0.9415 → 0.9427 — every model gains. Six-model blend (E07, E09, E11, E12, E13, E16):
+12 windows 0.9525, **24 windows 0.9533**, +0.0016 [+0.0011, +0.0021] over Version 8; doubling the
+weight of the 384 px models gives 0.9537 (not used: one more knob tuned on silver for +0.0004).
+
+**EMA (E18, folds 0–3)**: raw 0.9457, EMA 0.9457 (gold 0.893 / 0.893). With the cosine schedule the
+learning rate is already near zero over the last epochs, so the weight average adds nothing. Dropped.
+E13 on the same four folds: 0.9481 (seed spread). `knee/infer.py` takes `windows` (batch size
+48 // windows, so 4 studies × 12 windows as before).
+
+**E19 first attempt failed** (13:05, all five folds): out of memory in the end-of-epoch validation —
+6 studies × 5 series × 24 windows = 720 images of 384 px in one batch (training at 12 windows fitted).
+My watcher missed it for ~2 h (its `pgrep -f` pattern matched its own command line), so the
+interactive 3090 and two Slurm GPUs sat idle 13:05–14:55. Fix: the validation batch now scales down
+when `windows_eval` > 12 (`bs * 12 // windows_eval`; unchanged for every earlier run). Relaunched
+14:57: fold 0 on the interactive 3090, folds 1–4 as 1-GPU jobs 1016802–1016805.
+
+**E18 complete** (15:14): silver **0.9440**, EMA weights 0.9440 (gold 0.904 / 0.904). The three 384 px
+seeds span 0.9440–0.9461 (mean 0.9454 vs 0.9425 for the four 224/256 px runs): +0.003 on average,
+with a seed spread of 0.002. E13+E16+E18 0.9521 (gold 0.915); all seven at 12 windows 0.9529
+(six: 0.9525). Version 9 = these seven at 24 windows, pushed by `logs/chain_v9.sh`.
+
+**Notebook `knee-submit` version 9** (15:55): E13, E16, E18, E11, E07, E12, E09 (35 fold networks,
+384 px models first), 24 windows per series, 8 h budget. Visible-test run complete, all seven models
+used, 2.3 min for the 3 studies (Version 8: 1.8 min) — the hidden test should take ~2–3 h.
+Expected silver ≈ 0.9535 (six models at 24 windows 0.9533; E18 adds ~+0.0004 at 12 windows).
+
+## Public weights: provenance audit (2026-10-01, decision 1)
+
+Read-only audit of the public weight families behind the 0.94 notebooks (Kaggle CLI: dataset
+descriptions, small files, training notebooks; no weights downloaded; working files in the session
+scratchpad). Rule 4.b as we read it forbids sending report text to a hosted LLM.
+
+| Family (datasets) | Labels used | Origin of the labels | Verdict |
+|---|---|---|---|
+| pilkwang DINOv2-small ×20 (`rsna-knee-weights`) | `report_labels_v2.csv` (`rsna-knee-llm-labels`) | `api_labeler.py`: `anthropic.Anthropic`, default `claude-opus-5`, report text in the message | tainted (probable: no training log) |
+| RadImageNet heads: antoinegg1 e9/e11, prvsiyan V52, sofiaanjenje E11/E13 | mean of pilkwang + stevenleehans + lixin73 ("GPT-5.6-Sol") tables | includes the Anthropic table (`make_targets` requires it) | tainted |
+| dreaddevelopment CoAtNet-rmlp-2 384 (`raptor-knee-*`) | `labels_llm_soft` (`rsna-knee-labels`) | "an LLM", never named | unknown |
+| mattiaangeli CoAtNets and DINOv3 | unpublished `targets_dualsharp_soft.csv` | not documented | unknown |
+| marwanmath RadImageNet ResNet-50 (backbone only) | none from the competition | RadImageNet pretraining (upstream Lab-Rasool/RadImageNet, MIT) | clean |
+
+**Correction (2026-10-01 21:00): the premise is wrong.** The competition host (Po-Hao "Howard" Chen)
+posted "Use of Commercially Hosted LLMs" two months ago: hosted LLMs and external inference
+services are **permitted**; sending report text to an external LLM/API (e.g. to extract labels) is
+not, by itself, prohibited private sharing. Conditions (Section 2.6.b, External Data and Tools):
+the service/data/models must be reasonably accessible to all participants at minimal cost, and
+comply with their terms of use. The forum was unreadable from here (Kaggle API), so the audit
+rested on a strict reading of the data-security rule; it should have been checked with the user.
+So the public weights are **not** tainted by their labels. Licences (Kaggle metadata): CC0-1.0 for
+pilkwang weights + labels, dreaddevelopment raptor-knee-*, mattiaangeli CoAtNets; CC-BY-NC-SA-4.0
+for antoinegg1 e11 heads; "other" for prvsiyan v52. Original (superseded) conclusion follows.
+
+Conclusion (superseded): no competition-trained public weights are verifiably clean; using them would contradict
+the rule reading behind our own local-LLM labels. What is clean and reusable: generic or medical
+pretrained backbones (RadImageNet ResNet-50 → E20) and the public training recipes with our labels.
+The public CoAtNet trainer (`coatnet_rmlp_2_rw_384`, 384 px, 12 training / 24 eval windows,
+16 epochs, **backbone lr 3e-5**, head lr 1e-3, average of the 3 best epochs) trains its attention
+backbone at a learning rate ~7× below ours — a likely reason why CoAtNet-0 (E06b) and DINOv2 (E14)
+learned so slowly here.
+
+### E20 — RadImageNet ResNet-50 (2026-10-01, queued)
+
+`make_backbone("radimagenet_resnet50")` in `knee/model.py`: timm ResNet-50 loaded with the RadImageNet
+weights (pinned Hugging Face revision; the 318 tensors map one-to-one, strict load). E07 recipe,
+224 px, on P100s (jobs 1017022–1017024, waiting for a slot behind E19).
+
+**E19 folds 0–2** (done 19:03; folds 3–4 still running): silver at epoch 12, 24 eval windows: 0.9482 /
+0.9474 / 0.9519. On those 2,645 studies, all at 24 eval windows: E19 **0.9486**, E13 0.9495, E16 0.9481
+(gold 0.911 / 0.901 / 0.905). Training on 12 windows instead of 8 brings nothing beyond seed noise;
+only the denser *inference* helps (E17). EMA again equal to raw weights.
+
+### E21a — CoAtNet-0 at the public recipe's learning rate (2026-10-01)
+
+E06b (CoAtNet-0, backbone lr 2e-4) ended at 0.886 on the leak-free fold-0 protocol, far below
+ConvNeXt-tiny (0.931). The public CoAtNet trainer uses 3e-5. E21a reruns E06b with `--lr 3e-5`
+(interactive 3090, ~1 h): if it closes the gap, a CoAtNet-rmlp-2 at 384 px (the public best family)
+trained on our labels becomes worth its cost.
+
+E21a result (fold 0, 12 epochs, 5.6 min/epoch): silver **0.9269** (gold 0.840 on 11 studies), against
+0.8860 for E06b at lr 2e-4: the learning rate was the problem, +0.041. It stays 0.004 below
+ConvNeXt-tiny (E06a 0.9311), so CoAtNet-0 is not a better single model but becomes a credible
+non-ConvNeXt member for the blend. Silver still rose until epoch 8, then flat.
+
+### E22 — CoAtNet-0 at lr 3e-5, 5 folds (2026-10-01 20:35, running)
+
+E21a's settings with the E03 label recipe (bootstrap from E02, α = 0.5) on all 5 folds, 224 px,
+on the interactive 3090 (~70 min per fold → ~02:30). Goal: blend diversity (attention backbone).
+
+## Public pipeline + our ensemble (2026-10-01 evening, user's go on decision 1)
+
+The user gave the go ("oui intègre les") after the host's clarification. Best reproducible public
+notebook: `yamadan96/rsna-knee-d4-public0946` — **0.943** on the public LB (its author submitted it
+unchanged; the "0946" of the name comes from the parent `ryokucha/rsna-knee-d4-blend-0946-ours10`,
+which reaches 0.946 by blending its author's private ConvNeXt ensemble at 10%). Pipeline: DINOv2 ×20,
+A5 attention pooling ×5, RadImageNet heads, 4 Raptor views, 4 CoAtNet readers; 2×T4, pinned Kaggle
+image (timm 1.0.22), all sources public.
+
+`scripts/build_blend_nb.py` → `kaggle/blend/` (private kernel `theophilenadiedjoa/knee-blend`): our
+Version 9 ensemble runs first in a subprocess (4.5 h budget, decoders installed with `--target`
+so the public environment is untouched), then the public cells verbatim, then a per-label rank
+average (public 0.85 + ours 0.15; public alone if our part fails). Code review of the public cells:
+no network code (internet is off anyway); `exec`/`compile` only patch the CoAtNet inference modules
+shipped in the attached datasets, pinned by SHA-256; subprocesses are its own inference workers.
+The push from here was refused by my permission guard (third-party code under the user's
+account): the user pushes it.
+Pinned public image: Python 3.12 (cpython-312 caches in its outputs) → our cp312 decoder wheels install there.
+
+### Official label criteria vs our soft labels (2026-10-01 ~22:00)
+
+The user shared the challenge's clinical overview (label criteria: ACL/MCL high-grade only, effusion
+and Baker's moderate/large, OA > 50 % cartilage loss over ≥ 1 cm, meniscus signal reaching the
+surface on ≥ 2 images, "on the fence" → negative; reports are multilingual; ground truth = two MSK
+radiologists + adjudication, from the images). Read literally, report-"mild" findings should be
+negatives. The 58 gold studies say otherwise — P(gold positive | Qwen grade), pooled over labels:
+absent 0.04 (7/180), not mentioned 0.13 (23/176), equivocal 0.19 (14/72), **mild 0.57 (50/87)**,
+moderate 0.70 (69/98), severe 0.93 (77/83). Effusion "mild" (small) is gold-positive 22/34 times:
+reports under-grade relative to the image annotators. Our a-priori mapping (0.02 / 0.10 / 0.25 /
+0.6 / 0.85 / 0.97) is already close to these rates, so no remapping. Fracture: 4/29 gold positives
+are not mentioned in the report (image-only signal). The model's five slots already put the three
+fluid-sensitive fat-suppressed planes first, as the overview recommends.
+
+**22:00 SSH drop**: the interactive job (1015856) ended with the SSH session and killed E22 during
+fold 1 (fold 0 done: silver 0.9322, gold(fold) 0.879). Relaunched 22:40: folds 1–2 on the new
+interactive 3090 (job 1017468), folds 3–4 as a batch job (`slurm/runs/e22_34.txt`, submitted by
+`logs/chain_e22.sh` when E19 fold 4 frees a slot) so they survive further drops. Slurm jobs were
+unaffected: E20 folds 0–1 done (silver 0.9437 / 0.9425 at epoch 12), folds 2–4 and E19 fold 4 running.
+
+### Forum: single models at 0.950–0.954, labels are the lever (2026-10-01 22:45)
+
+Threads shown by the user: a 5-fold ResNet at 224 px scores **0.954** LB (13th), a single-fold
+CoAtNet at 224 px 0.950 (43rd, Archit Konde), a Qwen 3.5 2B VLM with LoRA 0.950. So the gap between our
+0.922 ensemble and the top is not architecture or resolution. Archit Konde's recipe: his OOF on the
+58 gold studies beat the extracted labels, so he mixed OOF predictions into the labels (soft, never
+0/1; replacing was worse than mixing; masking noisy cells did nothing), with more weight on the model
+than "felt sane", which mattered most for silent cells (synovitis). Out-of-fold predictions are
+essential (in-fold ones parrot the labels). His single-model OOF on the 58: 0.930 (synovitis 0.797,
+lateral OA 0.816). One participant saw 50/50 bootstrapping lift CV but not the LB.
+
+Our E03 labels were exactly this, but with a weak teacher (E02 ResNet-34, gold 0.806) and α = 0.5.
+Gold agreement of candidate training labels (macro AUC on the 58, soft label vs gold):
+
+| Labels | Gold |
+|---|---|
+| report soft (Qwen) | 0.870 |
+| E03 = ½ report + ½ E02 OOF (current training labels) | 0.897 |
+| teacher = mean OOF of E13, E16, E18, E11, E07, E12, E09 | 0.914 |
+| (1 − α) report + α teacher, α = 0.25 / 0.5 / 0.6 / **0.7** / 0.8 / 0.9 | 0.913 / 0.922 / 0.926 / **0.927** / 0.926 / 0.923 |
+| same α on silent cells only (mentioned cells at 0.5), α = 0.7 | 0.924 |
+
+Uniform α = 0.7 (Archit's "heavier than sane" zone; 0.6–0.8 is a plateau, the 58 cannot separate
+them). The per-finding gain is largest for effusion, contusion, fracture, Baker's and medial OA.
+Teacher stored as a pseudo-run, `runs/2026-10-01_2300_teacher7_oof_mean/` (oof_fold*.csv = mean of the
+7 runs' OOF probabilities, `teacher.json` lists them), so `--bootstrap-run` takes it unchanged.
+
+### E23 — round-2 labels (2026-10-01 22:47, running)
+
+E07's exact recipe (ConvNeXt-tiny 224, 8/12 windows, seed 42, silence weight 0.5, gold weight 3) with
+`--bootstrap-run 2026-10-01_2300_teacher7_oof_mean --bootstrap-alpha 0.7`: only the labels change,
+so E23 vs E07 (gold 0.888, LB 0.918) measures the label effect, and E23 alone goes to the LB.
+Folds 0–1 on the interactive 3090; folds 2–4 as a batch job (`logs/chain_e23.sh`, after E19 fold 4).
+E22 (CoAtNet on the old labels) is stopped after fold 0 to free the GPU: if round-2 labels win, all
+old-label members lose value. Silver is not comparable across label sets (its targets come from the
+report only, but the student is pulled towards the teacher); judge on gold and the LB.
+E23 fold 0 epoch 1: silver 0.8675, gold(fold) 0.770, 4.7 min/epoch (validation passed).
+
+**E19 complete** (23:03): 5 folds at 24 eval windows silver 0.9480, gold 0.908 — level with E13/E16
+(0.9471 / 0.9477). Added to the Version 9 set (all at 24 windows except E18 at 12): silver 0.9536 →
+0.9542, gold 0.913 → 0.914. Its slot went to E23 folds 2–4 (job 1017537, nodemm05).
+
+**E20 folds 2–3** done (23:10): silver 0.9439 / 0.9463 at epoch 12 (fold 4 running, P100).
+
+### E24 — 384 px with round-2 labels (2026-10-01 23:12, running)
+
+Speculative follow-up to E23 on the slot E20 freed: E13's recipe (ConvNeXt-tiny 384 px, seed 42) with
+the round-2 labels (same teacher and α = 0.7 as E23), 2-GPU job 1017572 on node40 (folds 0–2 / 3–4,
+~8 h). If E23 shows the label gain on the LB, E24 is the strong version ready in the morning.
+E24 first epochs passed (23:30): 12.9 min/epoch (folds 0–2 ~07:00, folds 3–4 ~04:30).
+
+**E23 interim** (23:30) vs E07 at the same point: fold 0 epoch 10 silver **0.9524** / gold(fold) 0.927
+(E07: 0.9407 / 0.879); fold 2 epoch 5 0.9407 / 0.917 (E07: 0.9312 / 0.881). Caution: the student's
+evaluation is leaky in the E05 sense — its training labels come from teacher models that were trained
+on the student's validation fold (report labels and, at weight 3, its gold labels), so part of this
+gain is distilled from the validation fold itself (E05 found about half of E03's apparent gain real).
+The gold agreement of the labels themselves (0.927, table above) is clean: teacher OOF on a gold study
+never saw that study. The LB decides.
+
+**Version 9 runtime** (23:40): still running after ~4 h on the hidden test. My 2–3 h estimate was
+wrong: it scaled the 3-study visible run, where fixed overhead dominates. Compute vs Version 8:
+35 vs 25 networks, three 384 px models instead of one, 24 vs 12 windows → ~3.6× → ~5–6 h expected;
+the 8 h budget skips the last models if needed, so it cannot hit Kaggle's 9 h limit.
+
+**knee-blend version 1 pushed by the user** (23:40): public 0.85 + ours (Version 9 set) 0.15; visible-test run in progress, watched by `logs/watch_blend.sh`.

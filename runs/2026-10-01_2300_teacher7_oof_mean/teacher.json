@@ -1,0 +1,12 @@
+{
+ "what": "mean OOF probability of 7 runs trained on E03 labels (teacher for E23 soft bootstrapping)",
+ "runs": [
+  "2026-09-30_2230_e13_convnext_384_5f",
+  "2026-10-01_0705_e16_convnext_384_seed1_5f",
+  "2026-10-01_0950_e18_convnext_384_seed2_ema_5f",
+  "2026-09-30_1821_e11_convnext_256_5f",
+  "2026-09-30_1213_e07_convnext_5f",
+  "2026-09-30_1928_e12_convnext_seed1_5f",
+  "2026-09-30_1656_e09_convnext_zoom130_5f"
+ ]
+}
