@@ -17,9 +17,10 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 from sklearn.metrics import roc_auc_score
+from timm.utils import ModelEmaV3
 from torch.utils.data import DataLoader
 
-from knee.config import DATA_DIR, LABELS, RUNS_DIR
+from knee.config import CACHE_DIR, CACHE_SIZE, DATA_DIR, LABELS, RUNS_DIR
 from knee.data import StudyDataset, assign_slots, series_table
 from knee.labels import load_soft
 from knee.model import KneeNet
@@ -78,16 +79,21 @@ def predict(model, loader, device):
 def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir, device):
     tr, va = np.where(folds != fold)[0], np.where(folds == fold)[0]
     raw = Path(args.raw_dir) if args.raw_dir else None
+    span = tuple(args.span)
     ds_tr = StudyDataset(slots.iloc[tr], y[tr], w[tr], n_windows=args.windows, img_size=args.img_size, train=True,
-                         aug_strength=args.aug, seed=args.seed + fold, raw_dir=raw)
-    ds_va = StudyDataset(slots.iloc[va], n_windows=args.windows_eval, img_size=args.img_size, raw_dir=raw)
+                         aug_strength=args.aug, span=span, zoom=args.zoom, seed=args.seed + fold, raw_dir=raw)
+    ds_va = StudyDataset(slots.iloc[va], n_windows=args.windows_eval, img_size=args.img_size, span=span, zoom=args.zoom,
+                         raw_dir=raw)
     dl_tr = DataLoader(ds_tr, args.bs, shuffle=True, num_workers=args.workers, drop_last=True, pin_memory=True,
                        persistent_workers=True)
-    dl_va = DataLoader(ds_va, args.bs, num_workers=args.workers, pin_memory=True)
+    bs_va = args.bs if args.windows_eval <= 12 else max(1, args.bs * 12 // args.windows_eval)  # denser eval: smaller batches
+    dl_va = DataLoader(ds_va, bs_va, num_workers=args.workers, pin_memory=True)
 
     torch.manual_seed(args.seed + fold)
     model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path).to(device)
     model = model.to(memory_format=torch.channels_last)
+    if args.grad_ckpt:  # recompute backbone activations in the backward pass: bigger backbones fit a 16 GB P100
+        model.backbone.set_grad_checkpointing(True)
     backbone = list(model.backbone.parameters())
     ids = {id(p) for p in backbone}
     others = [p for p in model.parameters() if id(p) not in ids]
@@ -97,6 +103,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: lr_lambda(s, total, int(0.05 * total)))
 
     scaler = torch.amp.GradScaler(enabled=AMP_DTYPE == torch.float16)
+    # weight EMA: passive (training is unchanged), evaluated and saved next to the raw weights
+    ema = ModelEmaV3(model, decay=args.ema, use_warmup=True) if args.ema else None
     history = []
     for epoch in range(args.epochs):
         model.train()
@@ -116,6 +124,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
             scaler.step(opt)
             scaler.update()
             sched.step()
+            if ema is not None:
+                ema.update(model, step=epoch * len(dl_tr) + step)
             losses.append(loss.item())
         pred = predict(model, dl_va, device)
         silver_auc, _ = macro_auc(silver[va], pred)
@@ -123,11 +133,22 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
         gold_auc = macro_auc(silver[va][gold_va], pred[gold_va])[0] if gold_va.sum() >= 5 else float("nan")
         history.append({"epoch": epoch + 1, "loss": float(np.mean(losses)), "silver_auc": silver_auc,
                         "gold_auc_fold": gold_auc, "minutes": (time.time() - t) / 60})
-        print(f"fold {fold} epoch {epoch + 1}: loss {np.mean(losses):.4f} silver {silver_auc:.4f} "
+        ema_txt = ""
+        if ema is not None:
+            pred_ema = predict(ema.module, dl_va, device)
+            history[-1]["silver_auc_ema"] = macro_auc(silver[va], pred_ema)[0]
+            ema_txt = f" ema {history[-1]['silver_auc_ema']:.4f}"
+        print(f"fold {fold} epoch {epoch + 1}: loss {np.mean(losses):.4f} silver {silver_auc:.4f}{ema_txt} "
               f"gold(fold) {gold_auc:.4f} [{(time.time() - t) / 60:.1f} min]", flush=True)
     (run_dir / "checkpoints").mkdir(exist_ok=True)
     torch.save(model.state_dict(), run_dir / "checkpoints" / f"fold{fold}.pt")
     (run_dir / f"fold{fold}_history.json").write_text(json.dumps(history, indent=1))
+    if ema is not None:  # kept apart: package_kaggle and load_oof only pick fold*.pt / oof_fold*.csv
+        torch.save(ema.module.state_dict(), run_dir / "checkpoints" / f"ema_fold{fold}.pt")
+        oof = pd.DataFrame(pred_ema, columns=LABELS)
+        oof.insert(0, "StudyInstanceUID", studies["StudyInstanceUID"].to_numpy()[va])
+        oof.insert(1, "fold", fold)
+        oof.to_csv(run_dir / f"oof_ema_fold{fold}.csv", index=False)
     return va, pred
 
 
@@ -154,17 +175,22 @@ def main():
     p.add_argument("--workers", type=int, default=8)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--run-dir", default=None, help="resume/extend an existing run folder")
+    p.add_argument("--span", type=float, nargs=2, default=[0.08, 0.92], help="slice range covered by the windows")
+    p.add_argument("--grad-ckpt", action="store_true")
+    p.add_argument("--zoom", type=float, default=1.0, help="field of view = 150 mm / zoom (cache crop is 150 mm)")
     p.add_argument("--exclude-folds", type=int, nargs="*", default=[])
     p.add_argument("--bootstrap-run", default=None, help="run folder whose OOF predictions are mixed into the labels")
     p.add_argument("--bootstrap-alpha", type=float, default=0.5)
     p.add_argument("--raw-dir", default=None, help="unpacked cache on local disk (scripts/unpack_cache.py)")
     p.add_argument("--debug-steps", type=int, default=0, help="cap training steps per epoch (smoke tests)")
+    p.add_argument("--ema", type=float, default=0.0, help="weight EMA decay (e.g. 0.998), 0 = off")
     args = p.parse_args()
 
     run_dir = RUNS_DIR / (args.run_dir or f"{datetime.now():%Y-%m-%d_%H%M%S}_{args.name}")
     run_dir.mkdir(parents=True, exist_ok=True)
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
-    config = vars(args) | {"commit": commit, "gpu": torch.cuda.get_device_name(0)}
+    config = vars(args) | {"commit": commit, "gpu": torch.cuda.get_device_name(0),
+                           "cache_dir": str(CACHE_DIR), "cache_size": CACHE_SIZE}
     (run_dir / f"config_folds{''.join(map(str, args.folds))}.json").write_text(json.dumps(config, indent=1))
 
     train = pd.read_csv(DATA_DIR / "train.csv")

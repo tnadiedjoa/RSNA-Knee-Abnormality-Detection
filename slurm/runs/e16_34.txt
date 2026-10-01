@@ -1,0 +1,3 @@
+# E16: E13 (384 px on data/cache384) with seed 1 — submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e16_f3 --run-dir 2026-10-01_0705_e16_convnext_384_seed1_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --seed 1 --folds 3
+--name e16_f4 --run-dir 2026-10-01_0705_e16_convnext_384_seed1_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --seed 1 --folds 4

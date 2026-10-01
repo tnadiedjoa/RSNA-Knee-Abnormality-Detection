@@ -1,0 +1,2 @@
+# E15: EfficientNetV2-S (IN-21k, a CNN family other than ConvNeXt) with the E07 recipe (E03 labels, 224 px). P100.
+--name e15_f4 --run-dir 2026-10-01_0300_e15_effnetv2s_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone tf_efficientnetv2_s.in21k_ft_in1k --grad-ckpt --folds 4

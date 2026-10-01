@@ -1,0 +1,3 @@
+# E14: DINOv2 ViT-S/14 (self-supervised pretraining, another family than ConvNeXt) with the E07 recipe
+# (E03 labels, 224 px, 256 px cache), backbone lr 5e-5 (ViT fine-tuning). P100 partition.
+--name e14_f4 --run-dir 2026-10-01_0140_e14_dinov2s_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone vit_small_patch14_dinov2.lvd142m --grad-ckpt --lr 5e-5 --folds 4

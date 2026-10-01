@@ -1,0 +1,3 @@
+# E11: ConvNeXt-tiny at 256 px on 5 folds (third ensemble member), E03 label recipe
+--name e11_f3 --run-dir 2026-09-30_1821_e11_convnext_256_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 256 --folds 3
+--name e11_f4 --run-dir 2026-09-30_1821_e11_convnext_256_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 256 --folds 4

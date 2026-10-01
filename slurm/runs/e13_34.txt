@@ -1,0 +1,4 @@
+# E13: E07 recipe (ConvNeXt-tiny, E03 labels) at 384 px on data/cache384 — submit with
+# KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100; folds 0-1 run on the interactive 3090, fold 2 in slurm/runs/e13_2.txt
+--name e13_f3 --run-dir 2026-09-30_2230_e13_convnext_384_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 3
+--name e13_f4 --run-dir 2026-09-30_2230_e13_convnext_384_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 4

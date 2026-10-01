@@ -1,0 +1,2 @@
+# E10a: 120 mm field of view (fold 0, leak-free labels)
+--name e10a_zoom120 --run-dir 2026-09-30_1656_e10a_zoom120 --labels qwen36_27b_v1 --folds 0 --bootstrap-run 2026-09-30_0639_e05_inner_excl0 --bootstrap-alpha 0.5 --grad-ckpt --backbone convnext_tiny.fb_in22k_ft_in1k --zoom 1.25

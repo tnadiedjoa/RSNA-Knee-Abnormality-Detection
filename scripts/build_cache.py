@@ -8,6 +8,10 @@ Then data/series_meta.parquet gathers all the JSONs, and --fix-laterality (run a
 build) gives every series of a study the same knee side.
 
 --convert re-encodes an older zlib cache (<series>.npz with an "x" array) in place.
+
+Another resolution goes to its own folder and leaves data/series_meta.parquet untouched:
+    KNEE_CACHE_DIR=data/cache384 python -m scripts.build_cache --size 384 --sides-from-meta --slots-only
+(every study's side is read from the existing meta, so there is no --fix-laterality pass).
 """
 
 import argparse
@@ -21,6 +25,7 @@ import pandas as pd
 
 from knee.cache_io import SUFFIX, save_series
 from knee.config import CACHE_DIR, DATA_DIR
+from knee.data import SLOTS, assign_slots, series_table
 from knee.dicom_io import load_volume, study_side, to_uint8
 from knee.remote_zip import RemoteArchive, fetch_members
 
@@ -35,7 +40,7 @@ def _init():
 def process(item):
     study, series, members, side = item if len(item) == 4 else (*item, None)
     out = CACHE_DIR / study
-    if side is None and (out / f"{series}.json").exists():
+    if (out / f"{series}.json").exists() and (side is None or ARGS.sides_from_meta):
         return series, "skip"
     t = time.time()
     try:
@@ -67,12 +72,16 @@ def convert(path):
         return f"error {path}: {e}"
 
 
+def study_sides(meta: pd.DataFrame) -> dict:
+    infos = meta.assign(side=meta["laterality"], source=meta["laterality_source"])
+    return {st: study_side(g[["side", "source", "center_x"]].to_dict("records")) for st, g in infos.groupby("study")}
+
+
 def fix_laterality(index: pd.DataFrame) -> None:
     """Second pass: one knee side per study (dicom_io.study_side), re-fetching the series whose
     own evidence mirrored them differently. The test pipeline decides the side the same way."""
     meta = pd.read_parquet(DATA_DIR / "series_meta.parquet")
-    infos = meta.assign(side=meta["laterality"], source=meta["laterality_source"])
-    sides = {st: study_side(g[["side", "source", "center_x"]].to_dict("records")) for st, g in infos.groupby("study")}
+    sides = study_sides(meta)
     want = meta["study"].map(sides)
     todo = meta[(meta["laterality"] == "L") != (want == "L")]
     print(f"re-orienting {len(todo)} series in {todo['study'].nunique()} studies", flush=True)
@@ -103,6 +112,13 @@ def main():
     index = pd.read_parquet(DATA_DIR / "zip_index.parquet")
     dcm = index[index["name"].str.endswith(".dcm")]
     items = [(study, series, m[["lho", "csize", "method"]]) for (study, series), m in dcm.groupby(["study", "series"])]
+    if ARGS.sides_from_meta:
+        sides = study_sides(pd.read_parquet(DATA_DIR / "series_meta.parquet"))
+        items = [(st, se, m, sides[st]) for st, se, m in items if st in sides]
+    if ARGS.slots_only:
+        slots = assign_slots(series_table("train"))
+        keep = {se for name, _, _ in SLOTS for se in slots[name] if isinstance(se, str)}
+        items = [it for it in items if it[1] in keep]
     items = items[ARGS.shard :: ARGS.nshards]
     if ARGS.limit:
         items = items[: ARGS.limit]
@@ -118,7 +134,8 @@ def main():
             if i % 500 == 0 or i == len(items):
                 rate = i / (time.time() - t)
                 print(f"{i}/{len(items)} {counts} {rate:.1f} series/s, eta {(len(items) - i) / rate / 60:.0f} min", flush=True)
-    gather_meta()
+    if not ARGS.sides_from_meta:
+        gather_meta()
 
 
 if __name__ == "__main__":
@@ -132,5 +149,7 @@ if __name__ == "__main__":
     parser.add_argument("--nshards", type=int, default=1)
     parser.add_argument("--convert", action="store_true")
     parser.add_argument("--fix-laterality", action="store_true", help="after a full build: one side per study")
+    parser.add_argument("--sides-from-meta", action="store_true", help="final sides from data/series_meta.parquet")
+    parser.add_argument("--slots-only", action="store_true", help="only the train series the model reads")
     ARGS = parser.parse_args()
     main()

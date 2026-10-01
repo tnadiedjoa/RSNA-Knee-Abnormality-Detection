@@ -1,0 +1,4 @@
+# E06: backbone / slice density / slice span, fold 0, leak-free labels from the E05 teachers
+# (E06a, ConvNeXt-tiny, runs on the RTX 3090 of the interactive session)
+--name e06c_r34_w16_span --run-dir 2026-09-30_1128_e06c_r34_w16_span --labels qwen36_27b_v1 --folds 0 --bootstrap-run 2026-09-30_0639_e05_inner_excl0 --bootstrap-alpha 0.5 --windows 16 --windows-eval 24 --span 0.02 0.98
+--name e06d_r34_span --run-dir 2026-09-30_1128_e06d_r34_span --labels qwen36_27b_v1 --folds 0 --bootstrap-run 2026-09-30_0639_e05_inner_excl0 --bootstrap-alpha 0.5 --span 0.02 0.98

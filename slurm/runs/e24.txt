@@ -1,0 +1,3 @@
+# E24: E13 (384 px, data/cache384, seed 42) with round-2 labels (0.3 report + 0.7 mean OOF of 7 runs, as E23) — submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e24_f012 --run-dir 2026-10-01_2315_e24_convnext_384_labels_r2_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-01_2300_teacher7_oof_mean --bootstrap-alpha 0.7 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 0 1 2
+--name e24_f34 --run-dir 2026-10-01_2315_e24_convnext_384_labels_r2_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-01_2300_teacher7_oof_mean --bootstrap-alpha 0.7 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 3 4

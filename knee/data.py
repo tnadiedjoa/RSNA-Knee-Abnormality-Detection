@@ -66,10 +66,11 @@ def window_centers(n_slices: int, n_windows: int, lo: float, hi: float, jitter: 
     return np.clip(np.round(q * (n_slices - 1)).astype(int), 0, n_slices - 1)
 
 
-def _affine(rng, size_in: int, size_out: int, strength: float) -> np.ndarray:
-    """Input -> output pixel map: resize to size_out, plus a random rotation/zoom/shift in training."""
+def _affine(rng, size_in: int, size_out: int, strength: float, zoom: float = 1.0) -> np.ndarray:
+    """Input -> output pixel map: resize to size_out (zoom > 1 keeps only the central 1/zoom of the
+    cached field of view), plus a random rotation/zoom/shift in training."""
     angle = rng.uniform(-10, 10) * strength
-    scale = math.exp(rng.uniform(-0.1, 0.12) * strength) * size_out / size_in
+    scale = math.exp(rng.uniform(-0.1, 0.12) * strength) * size_out / size_in * zoom
     tx, ty = rng.uniform(-0.05, 0.05, 2) * size_out * strength
     m = cv2.getRotationMatrix2D((size_in / 2, size_in / 2), angle, scale)
     m[:, 2] += (size_out - size_in) / 2 + tx, (size_out - size_in) / 2 + ty
@@ -83,11 +84,12 @@ def _is_missing(series) -> bool:
 class StudyDataset(Dataset):
     def __init__(self, slots: pd.DataFrame, labels: np.ndarray | None = None, weights: np.ndarray | None = None,
                  n_windows: int = 10, img_size: int = 224, train: bool = False, aug_strength: float = 1.0,
-                 span: tuple[float, float] = (0.08, 0.92), seed: int = 0, cache_dir=CACHE_DIR, raw_dir=None):
+                 span: tuple[float, float] = (0.08, 0.92), zoom: float = 1.0, seed: int = 0, cache_dir=CACHE_DIR,
+                 raw_dir=None):
         self.slots = slots.reset_index(drop=True)
         self.labels, self.weights = labels, weights
         self.n_windows, self.img_size, self.train = n_windows, img_size, train
-        self.aug_strength, self.span, self.seed = aug_strength, span, seed
+        self.aug_strength, self.span, self.zoom, self.seed = aug_strength, span, zoom, seed
         self.cache_dir, self.raw_dir = cache_dir, raw_dir
         self.epoch = 0
 
@@ -119,7 +121,7 @@ class StudyDataset(Dataset):
             for z in needed:  # each slice decoded and transformed once, even when windows share it
                 img = vol.slice(z)
                 if m is None:
-                    m = _affine(rng, img.shape[-1], s, self.aug_strength if self.train else 0.0)
+                    m = _affine(rng, img.shape[-1], s, self.aug_strength if self.train else 0.0, self.zoom)
                 frames[z] = cv2.warpAffine(img, m, (s, s), flags=cv2.INTER_LINEAR, borderValue=0)
             for j, c in enumerate(centers):
                 for ch, z in enumerate(np.clip([c - 1, c, c + 1], 0, n - 1)):

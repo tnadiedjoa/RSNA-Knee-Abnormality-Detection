@@ -1,0 +1,2 @@
+# E13 fold 2 (1 GPU), after the folds 3-4 job — same env as slurm/runs/e13_34.txt
+--name e13_f2 --run-dir 2026-09-30_2230_e13_convnext_384_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 2

@@ -1,0 +1,2 @@
+# E19: 384 px with denser training windows (12 instead of 8, batch 6 to fit), 24 at evaluation, seed 3, EMA — env KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e19_f4 --run-dir 2026-10-01_1215_e19_convnext_384_w12_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --windows 12 --bs 6 --windows-eval 24 --seed 3 --ema 0.998 --folds 4

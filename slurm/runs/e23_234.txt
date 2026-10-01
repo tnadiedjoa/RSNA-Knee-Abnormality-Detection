@@ -1,0 +1,2 @@
+# E23 folds 2-4 (folds 0-1 on the interactive 3090): E07 recipe with round-2 labels (0.3 report + 0.7 mean OOF of 7 runs)
+--name e23_f234 --run-dir 2026-10-01_2310_e23_convnext_labels_r2_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-01_2300_teacher7_oof_mean --bootstrap-alpha 0.7 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --folds 2 3 4

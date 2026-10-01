@@ -13,12 +13,30 @@ MEAN = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1) * 255
 STD = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1) * 255
 
 
+# ResNet-50 pretrained on RadImageNet (1.35 M CT/MR/ultrasound images), MIT licence, pinned revision
+RADIMAGENET = ("Lab-Rasool/RadImageNet", "ResNet50.pt", "14460ee4c1276f6925611a63aa9a54a05d39eae0")
+
+
+def make_backbone(name: str, pretrained: bool, **kwargs) -> nn.Module:
+    if name != "radimagenet_resnet50":
+        return timm.create_model(name, pretrained=pretrained, num_classes=0, **kwargs)
+    model = timm.create_model("resnet50", pretrained=False, num_classes=0, **kwargs)
+    if pretrained:  # its keys are backbone.<i>.* of an nn.Sequential over the torchvision ResNet-50 children
+        from huggingface_hub import hf_hub_download
+        sd = torch.load(hf_hub_download(RADIMAGENET[0], RADIMAGENET[1], revision=RADIMAGENET[2]), map_location="cpu")
+        names = {"0": "conv1", "1": "bn1", "4": "layer1", "5": "layer2", "6": "layer3", "7": "layer4"}
+        model.load_state_dict({names[k.split(".")[1]] + k[len("backbone.") + len(k.split(".")[1]):]: v for k, v in sd.items()})
+    return model
+
+
 class KneeNet(nn.Module):
     def __init__(self, backbone: str = "resnet34", pretrained: bool = True, dim: int = 256, depth: int = 2,
                  heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1):
         super().__init__()
         kwargs = {"drop_path_rate": drop_path} if drop_path else {}
-        self.backbone = timm.create_model(backbone, pretrained=pretrained, num_classes=0, **kwargs)
+        if backbone.startswith("vit_"):  # ViTs (e.g. DINOv2) were pretrained at another size: resample positions
+            kwargs["dynamic_img_size"] = True
+        self.backbone = make_backbone(backbone, pretrained, **kwargs)
         self.proj = nn.Sequential(nn.Linear(self.backbone.num_features, dim), nn.LayerNorm(dim))
         self.slot_emb = nn.Parameter(torch.zeros(len(SLOTS), dim))
         self.pos_emb = nn.Sequential(nn.Linear(1, dim), nn.GELU(), nn.Linear(dim, dim))

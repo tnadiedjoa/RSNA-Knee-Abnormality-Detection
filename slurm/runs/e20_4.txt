@@ -1,0 +1,2 @@
+# E20: ResNet-50 pretrained on RadImageNet (medical images, MIT) with the E07 recipe (E03 labels, 224 px). P100.
+--name e20_f4 --run-dir 2026-10-01_1630_e20_radimagenet_r50_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone radimagenet_resnet50 --grad-ckpt --folds 4

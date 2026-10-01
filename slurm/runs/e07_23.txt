@@ -1,0 +1,3 @@
+# E07: ConvNeXt-tiny on all 5 folds, E03 label recipe (bootstrap from E02, alpha 0.5)
+--name e07_f2 --run-dir 2026-09-30_1213_e07_convnext_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --folds 2
+--name e07_f3 --run-dir 2026-09-30_1213_e07_convnext_5f --labels qwen36_27b_v1 --bootstrap-run 2026-09-30_0257_e02_r34_base --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --folds 3
