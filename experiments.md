@@ -737,3 +737,21 @@ mixed-architecture blend. Next: Version 12 = the five round-2 runs (E24, E28, E2
 Version 12 submitted by the user (12:17); knee-blend v2 (weight 0.3) pushed by the user, rehearsal running.
 knee-blend v2 rehearsal COMPLETE (12:30): public pipeline first (0.07 h), 14.7 GB free on both T4s after it, ours on GPU 1 with all five round-2 runs, blend public 0.70 + ours 0.30 written, 0.09 h in total (logs/blend_1002_1211/). Ready to submit.
 knee-blend v2 submitted by the user (12:35).
+
+**E30 complete** (14:05): round-3 labels, ConvNeXt 224: silver 0.9525, gold 0.922 (E23, round 2: 0.9516 /
+0.901). The gold jump is the kind the leak produces (two distillation hops); only the LB can tell →
+Version 13 = E30 alone, to compare with Version 10 (E23 alone, 0.921).
+
+### E32 — 384 px with round-3 labels (2026-10-02 14:15, folds 0–1 running)
+
+The 3090 nodes are busy (another user has 10+ jobs waiting), so only the interactive GPU: E24's recipe
+with the round-3 teacher, folds 0–1 (~5 h). Folds 2–4 only if Version 13 confirms round 3.
+E32 fold 0 epoch 1: silver 0.8414, 13.4 min/epoch (folds 0–1 ~19:40); validation passed.
+**Version 13** (knee-submit: E30 alone, round-3 labels, 24 windows) pushed and checked 14:48: 1.0 min for the 3 visible studies. Compare with Version 10 (E23 alone, 0.921).
+Version 13 submitted by the user (14:57); today's 5 submissions used (V10, V11, V12, knee-blend v2, V13).
+
+**E31 complete** (15:20): 4-table base labels (Qwen + 3 public CC0 tables), teacher7 at α = 0.5: silver
+0.9498, gold 0.906 (E23: 0.9516 / 0.901). Silver is lower by construction (its targets are Qwen's alone
+and E31 learns a different base); gold is level within noise. E23 + E31 rank blend 0.9545 / 0.911 — the
+two label sets give diverse members. LB test of E31 tomorrow. All 3090s are allocated (others' jobs),
+so the free slot stays unused for now.
