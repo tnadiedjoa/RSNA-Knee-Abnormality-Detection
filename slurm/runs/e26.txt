@@ -1,0 +1,2 @@
+# E26: CoAtNet-0 at lr 3e-5 (E21a/E22 recipe, 224 px) with the round-2 labels of E23 -> attention-backbone member on the new labels
+--name e26_coatnet_labels_r2 --run-dir 2026-10-02_0120_e26_coatnet0_labels_r2_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-01_2300_teacher7_oof_mean --bootstrap-alpha 0.7 --backbone coatnet_0_rw_224.sw_in1k --grad-ckpt --lr 3e-5

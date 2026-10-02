@@ -1,0 +1,2 @@
+# E31: E23 recipe (ConvNeXt-tiny 224) with base labels = mean of our Qwen labels and the 3 public CC0 tables (gold agreement 0.870 -> 0.884), bootstrap teacher7 at alpha 0.5
+--name e31_mixpub --run-dir 2026-10-02_1130_e31_convnext_mixpub_r2_5f --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-01_2300_teacher7_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt
