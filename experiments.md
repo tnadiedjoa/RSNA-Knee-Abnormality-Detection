@@ -799,7 +799,17 @@ E33 complete (20:45): silver 0.9467, gold 0.9085 (E25, same recipe on round-2 la
 Round-3 ensemble E32 + E30 + E33 (rank blend): 0.9572 / 0.9253; E32 + E30 alone 0.9571 / 0.9259; the
 round-2 analogue E24 + E23 + E25 (Version 11, LB 0.929): 0.9564 / 0.9157.
 
-### Round 4: E35 (224 px) and E36 (384 px) (2026-10-02 20:55)
+**knee-blend v2 scored (21:00): public LB 0.942** (public pipeline 0.7 + our five round-2 runs 0.3, rank
+average), against **0.943** for the public pipeline alone. It finished inside the 9 h limit this time
+(public part first, hard timeout on ours). The scoring run's log is hidden, so it is not certain that our
+part ran rather than timing out. If it had timed out, the public submission would have been kept alone, and a
+0.942 (not 0.943) suggests our part did run. So our 0.929 ensemble, at weight 0.3, adds nothing to a 0.943
+pipeline and may cost ~0.001. Our models are weaker and probably carry little that the public ensemble
+does not already have. Next try only with a clearly stronger ensemble of ours (round 3/4 at 384 px, if it
+beats 0.929 alone on the LB), at a lower weight (0.15–0.2), since each try costs a submission and ~9 h of
+Kaggle GPU.
+
+### Round 4: E35 (224 px) and E36 (384 px) (2026-10-02 20:48)
 
 Teacher = mean OOF of the round-3 runs E32, E30, E33 (`runs/2026-10-02_2050_teacher_r3_oof_mean/`, built
 with the new `scripts.make_teacher`, which rebuilds the round-2 teacher bit for bit). Three runs, not four:
