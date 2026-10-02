@@ -755,3 +755,7 @@ Version 13 submitted by the user (14:57); today's 5 submissions used (V10, V11, 
 and E31 learns a different base); gold is level within noise. E23 + E31 rank blend 0.9545 / 0.911 — the
 two label sets give diverse members. LB test of E31 tomorrow. All 3090s are allocated (others' jobs),
 so the free slot stays unused for now.
+
+**E29 complete** (15:25): E24 with seed 2: silver 0.9549, gold 0.929. Three 384 px seeds (E24+E28+E29)
+0.9579 / 0.929; with E23, E25, E27 0.9582 / 0.919; + E31 0.9585 / 0.921; E24+E28+E29+E25+E31 0.9585 / 0.925.
+Candidate Version 14 (after the Version 12/13 scores): the three seeds + E25 + E31 (+ E23, E27).
