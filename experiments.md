@@ -770,6 +770,16 @@ round-3 labels (1018663, pending). Next: round-3 ensemble (E32, E30, E33) and a 
 E32 folds 2–3 job: fold 2 epoch 1 silver 0.8591, 12.7 min/epoch (folds 2–3 ~21:30); validation passed.
 E32 fold 4 (job 1018662, started 17:02): epoch 1 silver 0.8535, 12.8 min/epoch (~19:45). E33 (job 1018663, started
 17:11): fold 0 epoch 1 silver 0.8991, 3.8 min/epoch (~21:00). Both passed validation.
+E32 folds 0–2 done (18:55), last epoch silver / gold(fold) against E30 (same round-3 labels, 224 px):
+fold 0 0.9567 / 0.932 vs 0.9547 / 0.935, fold 1 0.9570 / 0.927 vs 0.9519 / 0.894, fold 2 0.9569 / 0.941 vs
+0.9520 / 0.918 → 384 px adds +0.002 to +0.005 silver on round 3 as on round 2.
+
+### E34 — 256 px seed 1 with round-3 labels (2026-10-02 19:00)
+
+E27 recipe (ConvNeXt-tiny 256 px, seed 1) on the round-3 labels: folds 0–2 on the interactive GPU freed
+by E32 (`logs/launch_e34_local.sh`, ~22:15), folds 3–4 as job 1018988 (`slurm/runs/e34_34.txt`, pending
+until a slot frees, ~1 h per fold). Purpose: the round-4 teacher then mirrors the round-2 one (384 px,
+224 px, RadImageNet R50, 256 px seed 1 → E32, E30, E33, E34) and the round-3 ensemble gets a 4th member.
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.

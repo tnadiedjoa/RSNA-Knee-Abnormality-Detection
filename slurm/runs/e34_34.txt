@@ -1,0 +1,2 @@
+# E34 folds 3-4 (folds 0-2 run on the interactive GPU, logs/launch_e34_local.sh)
+--name e34_f34 --run-dir 2026-10-02_1900_e34_convnext_256_labels_r3_seed1_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-02_0950_teacher_r2_oof_mean --bootstrap-alpha 0.7 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 256 --seed 1 --folds 3 4
