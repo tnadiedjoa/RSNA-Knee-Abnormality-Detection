@@ -32,6 +32,12 @@ def build_targets(studies: pd.DataFrame, args):
     y = soft[LABELS].to_numpy(np.float32)
     mentioned = soft[[f"{l}__mentioned" for l in LABELS]].to_numpy(bool)
     w = np.where(mentioned, 1.0, args.silence_weight).astype(np.float32)
+    if args.mix_public:  # average with public report-label tables (CC0, data/public_labels/), missing cells keep ours
+        from scripts.eval_labels import public_sets
+        pub = public_sets()
+        tables = [pub[n].set_index("StudyInstanceUID").reindex(studies["StudyInstanceUID"])[LABELS].to_numpy(np.float32)
+                  for n in args.mix_public]
+        y = ((y + sum(np.where(np.isnan(t), y, t) for t in tables)) / (1 + len(tables))).astype(np.float32)
     if args.bootstrap_run:  # soft bootstrapping: pull report labels towards an earlier run's out-of-fold predictions
         oof = pd.concat([pd.read_csv(f) for f in sorted((RUNS_DIR / args.bootstrap_run).glob("oof_fold*.csv"))])
         oof = oof.set_index("StudyInstanceUID").reindex(studies["StudyInstanceUID"])[LABELS].to_numpy(np.float32)
@@ -181,6 +187,7 @@ def main():
     p.add_argument("--exclude-folds", type=int, nargs="*", default=[])
     p.add_argument("--bootstrap-run", default=None, help="run folder whose OOF predictions are mixed into the labels")
     p.add_argument("--bootstrap-alpha", type=float, default=0.5)
+    p.add_argument("--mix-public", nargs="*", default=[], help="public label tables averaged with ours (pilkwang_v2 steven_v2 lixin_sol56)")
     p.add_argument("--raw-dir", default=None, help="unpacked cache on local disk (scripts/unpack_cache.py)")
     p.add_argument("--debug-steps", type=int, default=0, help="cap training steps per epoch (smoke tests)")
     p.add_argument("--ema", type=float, default=0.0, help="weight EMA decay (e.g. 0.998), 0 = off")
