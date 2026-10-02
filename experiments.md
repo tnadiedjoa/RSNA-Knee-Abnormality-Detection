@@ -795,6 +795,23 @@ default and no node had that much unallocated; `scontrol update JobId=1018988 Mi
 started at 20:38 on nodemm05 (~22:50). 1-GPU jobs now pass `--mem=32G` (usage line of the script). Purpose: the round-4 teacher then mirrors the round-2 one (384 px,
 224 px, RadImageNet R50, 256 px seed 1 → E32, E30, E33, E34) and the round-3 ensemble gets a 4th member.
 
+E33 complete (20:45): silver 0.9467, gold 0.9085 (E25, same recipe on round-2 labels: 0.9455 / 0.8989).
+Round-3 ensemble E32 + E30 + E33 (rank blend): 0.9572 / 0.9253; E32 + E30 alone 0.9571 / 0.9259; the
+round-2 analogue E24 + E23 + E25 (Version 11, LB 0.929): 0.9564 / 0.9157.
+
+### Round 4: E35 (224 px) and E36 (384 px) (2026-10-02 20:55)
+
+Teacher = mean OOF of the round-3 runs E32, E30, E33 (`runs/2026-10-02_2050_teacher_r3_oof_mean/`, built
+with the new `scripts.make_teacher`, which rebuilds the round-2 teacher bit for bit). Three runs, not four:
+E34 would only be done at 22:50 and two GPUs were free at 20:50; E34 stays a round-3 ensemble member.
+Teacher OOF: silver 0.9576, gold 0.926 (round-2 teacher 0.9576 / 0.914; leak-inflated, direction only).
+Labels = 0.3 report + 0.7 teacher, as every round.
+- **E35** = E30 recipe (ConvNeXt-tiny 224 px) on round-4 labels, job 1019036 (2 GPUs: folds 0–2 / 3–4,
+  ~23:45) → its LB against E30 alone (Version 13, 0.927) measures round 4 against round 3.
+- **E36** = E32 recipe (384 px) on round-4 labels: folds 0–1 job 1019037 (~01:45), folds 2 and 3 job
+  1019038 (2 GPUs, pending a slot), fold 4 on the interactive GPU after E34 folds 0–2
+  (`logs/chain_e36_f4.sh`, ~00:40).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
