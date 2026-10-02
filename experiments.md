@@ -774,11 +774,25 @@ E32 folds 0–2 done (18:55), last epoch silver / gold(fold) against E30 (same r
 fold 0 0.9567 / 0.932 vs 0.9547 / 0.935, fold 1 0.9570 / 0.927 vs 0.9519 / 0.894, fold 2 0.9569 / 0.941 vs
 0.9520 / 0.918 → 384 px adds +0.002 to +0.005 silver on round 3 as on round 2.
 
+E32 complete (20:30), all 5 folds OOF (`scripts.eval_oof`):
+
+| run | labels | px | silver | gold |
+|---|---|---|---|---|
+| E32 | round 3 | 384 | **0.9563** | **0.9268** |
+| E30 | round 3 | 224 | 0.9525 | 0.9221 |
+| E24 | round 2 | 384 | 0.9551 | 0.9215 |
+| E32 + E30 + E24 rank blend | | | 0.9579 | 0.9284 |
+
+E32 vs E30 is the clean comparison (same labels): 384 px +0.004 silver, +0.005 gold. E32 vs E24 crosses
+label rounds, where the leak inflates the newer one (see the round-2 lesson): the LB decides.
+
 ### E34 — 256 px seed 1 with round-3 labels (2026-10-02 19:00)
 
 E27 recipe (ConvNeXt-tiny 256 px, seed 1) on the round-3 labels: folds 0–2 on the interactive GPU freed
 by E32 (`logs/launch_e34_local.sh`, ~22:15), folds 3–4 as job 1018988 (`slurm/runs/e34_34.txt`, pending
-until a slot frees, ~1 h per fold). Purpose: the round-4 teacher then mirrors the round-2 one (384 px,
+until a slot frees, ~1 h per fold). It pended on Resources for 1.5 h with GPUs free: `multi_gpu.sbatch` asks 96 GB by
+default and no node had that much unallocated; `scontrol update JobId=1018988 MinMemoryNode=32768` → it
+started at 20:38 on nodemm05 (~22:50). 1-GPU jobs now pass `--mem=32G` (usage line of the script). Purpose: the round-4 teacher then mirrors the round-2 one (384 px,
 224 px, RadImageNet R50, 256 px seed 1 → E32, E30, E33, E34) and the round-3 ensemble gets a 4th member.
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook

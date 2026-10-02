@@ -6,7 +6,8 @@
 #SBATCH --mem=96G
 #SBATCH --time=24:00:00
 #SBATCH --output=logs/%x_%j.out
-# usage: sbatch [-p P100] [--gres=gpu:N] slurm/multi_gpu.sbatch <runs file>   (Slurm here: <= 10 CPUs per job, <= 4 running jobs per user)
+# usage: sbatch [-p P100] [--gres=gpu:N --cpus-per-task=<4N> --mem=<32N>G] slurm/multi_gpu.sbatch <runs file>   (Slurm here: <= 10 CPUs per job, <= 4 running jobs per user;
+# nodes have 128 GB: a 1-GPU job keeping the 96G default pends on Resources while GPUs are free)
 # One training per GPU in a single job (Slurm allows few running jobs per user, not few GPUs).
 # Each line of the runs file holds the scripts.train arguments of one training. The cache is
 # unpacked once to the node's local disk when there is room: with 4 CPUs per GPU, JPEG decoding
