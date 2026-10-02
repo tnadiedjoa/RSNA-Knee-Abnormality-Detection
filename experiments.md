@@ -759,3 +759,18 @@ so the free slot stays unused for now.
 **E29 complete** (15:25): E24 with seed 2: silver 0.9549, gold 0.929. Three 384 px seeds (E24+E28+E29)
 0.9579 / 0.929; with E23, E25, E27 0.9582 / 0.919; + E31 0.9585 / 0.921; E24+E28+E29+E25+E31 0.9585 / 0.925.
 Candidate Version 14 (after the Version 12/13 scores): the three seeds + E25 + E31 (+ E23, E27).
+
+**Version 12 on the public LB: 0.929** (five round-2 runs; = Version 11): E28 and E27 add nothing visible.
+**Version 13 (E30 alone, round 3): 0.927** vs Version 10 (E23 alone, round 2): 0.921 → **+0.006 on the
+LB for one more labelling round** (round 1 → 2 gave ~+0.002 net at 224 px). One 224 px model on round-3
+labels nearly matches the three-model round-2 ensemble. Iterating the labels is the lever after all;
+the leak inflates the validation numbers but the direction holds.
+→ E32 folds 2–3 (job 1018661, running) and fold 4 (1018662, pending), E33 = RadImageNet ResNet-50 on
+round-3 labels (1018663, pending). Next: round-3 ensemble (E32, E30, E33) and a round-4 teacher.
+E32 folds 2–3 job: fold 2 epoch 1 silver 0.8591, 12.7 min/epoch (folds 2–3 ~21:30); validation passed.
+
+`kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
+version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
+The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
+versioned: rule on redistribution): `python -m scripts.eval_oof runs/<run>` on the cluster, from the
+committed out-of-fold predictions.

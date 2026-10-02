@@ -1,0 +1,2 @@
+# E33: E25 recipe (RadImageNet ResNet-50, 224 px) with round-3 labels
+--name e33_r50rad_r3 --run-dir 2026-10-02_1600_e33_radimagenet_r50_labels_r3_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-02_0950_teacher_r2_oof_mean --bootstrap-alpha 0.7 --backbone radimagenet_resnet50 --grad-ckpt

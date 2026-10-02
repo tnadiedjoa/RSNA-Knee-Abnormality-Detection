@@ -1,0 +1,14 @@
+# Kaggle submissions: ref = the id shown by `kaggle competitions submissions rsna-knee-abnormality-detection` (and on the Submissions page); versions are the notebook versions submitted. Scores are copied from the API, which remains the source of truth.
+ref,submitted_utc,notebook,version,content,public_lb,note
+56702157,2026-09-30 08:29,knee-submit,3,E02 (ResNet-34),0.879,
+56702360,2026-09-30 08:38,knee-submit,4,E03 (round-1 labels),0.882,
+56706480,2026-09-30 11:49,knee-submit,5,E07 (ConvNeXt-tiny 224),0.918,
+56714573,2026-09-30 17:30,knee-submit,7,E07 + E09,0.919,
+56744673,2026-10-01 05:50,knee-submit,8,"E13, E11, E07, E12, E09",0.922,
+56756985,2026-10-01 18:30,knee-submit,9,"E13, E16, E18, E11, E07, E12, E09 (24 windows)",0.924,
+56759653,2026-10-01 21:56,knee-blend,1,public pipeline 0.85 + Version 9 set 0.15,,Notebook Timeout (no score)
+56768629,2026-10-02 07:30,knee-submit,10,E23 (round-2 labels),0.921,
+56768631,2026-10-02 07:30,knee-submit,11,"E24, E23, E25 (round-2 labels)",0.929,
+56771647,2026-10-02 10:17,knee-submit,12,"E24, E28, E23, E25, E27 (round-2 labels)",0.929,
+56772106,2026-10-02 10:48,knee-blend,2,"public pipeline 0.7 + E24, E28, E23, E25, E27 0.3",,pending
+56774168,2026-10-02 12:56,knee-submit,13,E30 (round-3 labels),0.927,
