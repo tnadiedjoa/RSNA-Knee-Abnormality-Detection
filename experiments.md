@@ -768,6 +768,8 @@ the leak inflates the validation numbers but the direction holds.
 → E32 folds 2–3 (job 1018661, running) and fold 4 (1018662, pending), E33 = RadImageNet ResNet-50 on
 round-3 labels (1018663, pending). Next: round-3 ensemble (E32, E30, E33) and a round-4 teacher.
 E32 folds 2–3 job: fold 2 epoch 1 silver 0.8591, 12.7 min/epoch (folds 2–3 ~21:30); validation passed.
+E32 fold 4 (job 1018662, started 17:02): epoch 1 silver 0.8535, 12.8 min/epoch (~19:45). E33 (job 1018663, started
+17:11): fold 0 epoch 1 silver 0.8991, 3.8 min/epoch (~21:00). Both passed validation.
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
