@@ -36,8 +36,8 @@ on our own folds unless marked **LB** (Kaggle public leaderboard):
 | E20 | 10-01 | ResNet-50 pretrained on RadImageNet (medical images), E07 recipe, P100 | folds 0–3 silver 0.9437 / 0.9425 / 0.9439 / 0.9463 at epoch 12; fold 4 running | pending |
 | E21a | 10-01 | CoAtNet-0 with the public recipe's backbone lr 3e-5 (E06 fold-0 protocol) | silver 0.9269 (E06b 0.8860, E06a ConvNeXt 0.9311) | low lr closes most of the gap → E22 |
 | E22 | 10-01 | CoAtNet-0, lr 3e-5, 5 folds, E03 labels | fold 0 silver 0.9322; folds 1–4 stopped for E23 | paused |
-| E23 | 10-01 | E07 recipe with round-2 labels: 0.3 report + 0.7 mean OOF of 7 runs (labels' gold agreement 0.927 vs 0.897) | interim fold 0 epoch 10: silver 0.9524 / gold(fold) 0.927 vs E07 0.9407 / 0.879 (partly leaky, see E23) | running → LB |
-| E24 | 10-01 | E13 (384 px) with the round-2 labels of E23 | running (job 1017572, ~07:00) | |
+| E23 | 10-01 | E07 recipe with round-2 labels: 0.3 report + 0.7 mean OOF of 7 runs (labels' gold agreement 0.927 vs 0.897) | silver 0.9516, gold 0.901 (E07: 0.9429 / 0.888); partly leaky, see E23 | Version 10 → LB |
+| E24 | 10-01 | E13 (384 px) with the round-2 labels of E23 | silver **0.9551**, gold **0.922** (E13: 0.9459 / 0.901) — alone above the whole V9 ensemble (0.9536 / 0.913) | ✓ (LB pending) |
 
 ## Phase 1 — new pipeline (from 2026-09-30)
 
@@ -592,8 +592,9 @@ E24 first epochs passed (23:30): 12.9 min/epoch (folds 0–2 ~07:00, folds 3–4
 evaluation is leaky in the E05 sense — its training labels come from teacher models that were trained
 on the student's validation fold (report labels and, at weight 3, its gold labels), so part of this
 gain is distilled from the validation fold itself (E05 found about half of E03's apparent gain real).
-The gold agreement of the labels themselves (0.927, table above) is clean: teacher OOF on a gold study
-never saw that study. The LB decides.
+The gold agreement of the labels themselves (0.927, table above) has no first-order leak (teacher OOF on a
+gold study never saw that study), but a second-order one remains: the teacher runs were trained on E03
+labels, which mix in E02 OOF from models that did see it. The LB decides.
 
 **Version 9 runtime** (23:40): still running after ~4 h on the hidden test. My 2–3 h estimate was
 wrong: it scaled the 3-study visible run, where fixed overhead dominates. Compute vs Version 8:
@@ -601,3 +602,138 @@ wrong: it scaled the 3-study visible run, where fixed overhead dominates. Comput
 the 8 h budget skips the last models if needed, so it cannot hit Kaggle's 9 h limit.
 
 **knee-blend version 1 pushed by the user** (23:40): public 0.85 + ours (Version 9 set) 0.15; visible-test run in progress, watched by `logs/watch_blend.sh`.
+knee-blend v1 visible-test run COMPLETE (23:52): decoders ok, all 7 of our models (2.7 min), public pipeline COMPLETE, blend written (public 0.85 + ours 0.15), 7.0 min in total. Log: logs/blend_1001_2238/. Ready to submit.
+
+**E23 folds 0–2 done** (00:30): silver 0.9532 / 0.9513 / 0.9532, gold(fold) 0.922 / 0.888 / 0.916 (E07 fold
+0: 0.9414 / 0.881, fold 2: 0.9419). Folds 3–4 in job 1017537.
+
+### E25 — RadImageNet ResNet-50 with round-2 labels (2026-10-02 00:33, running)
+
+The interactive 3090 freed by E23 folds 0–1: E20's recipe (RadImageNet ResNet-50, 224 px; old labels
+~0.944 per fold, level with ConvNeXt-tiny 224) with the round-2 labels, 5 folds in sequence. A
+non-ConvNeXt member for the round-2 ensemble. Vulnerable to SSH drops (interactive job).
+Kaggle: Version 9 (submitted 20:30) and knee-blend v1 (23:56) are being scored.
+E25 fold 0 epoch 1: silver 0.8999, gold(fold) 0.890, 3.9 min/epoch on the 3090 (5 folds ~04:30); validation passed.
+
+**External knee-MRI data** (discussed 00:40): allowed by the host when access is a click-through
+(MRNet, fastMRI/fastMRI+, OAI, SKM-TEA). Deferred with the user's agreement: labels first; if time
+allows, MRNet as a cheap pretraining test; OAI only if its access really is one click. Registrations
+are in the user's name.
+
+**E20 complete** (01:15): silver 0.9420, gold 0.883 (E07: 0.9429 / 0.888) — RadImageNet pretraining is
+level with ImageNet-22k ConvNeXt-tiny at 224 px. Added to the 8 old-label ConvNeXt runs: silver 0.9542
+→ 0.9548, gold 0.914 → 0.914. Its slot goes to **E26**: CoAtNet-0 at lr 3e-5 (E22's recipe) with the
+round-2 labels, 5 folds in one 1-GPU 3090 job (1017787, ~07:30).
+
+**Version 9 on the public LB: 0.924** (Version 8: 0.922). Submitted 20:30, scored by 01:35 (~5 h on the
+hidden test, as re-estimated). Silver +0.0018 (0.9517 → 0.9535) gave LB +0.002: 24 inference windows and
+two more 384 px seeds transfer.
+
+**E23 complete** (01:40): silver **0.9516**, gold **0.901** (E07, same recipe on the old labels: 0.9429 /
+0.888; the 7-run old-label teacher: 0.9537 / 0.914). One 224 px model on round-2 labels nearly matches
+the 7-model ensemble that taught it. Gold per finding vs E07: medial meniscus 0.89 → 0.94, lateral
+meniscus 0.80 → 0.85, PF OA 0.79 → 0.83, contusion 0.89 → 0.95; ACL 0.94 → 0.92 and MCL 0.93 → 0.89
+(single-digit positives, noise). Leak caveat of E23 applies. → Version 10 = E23 alone (24 windows;
+E07 alone scored 0.918 at 12 windows, the window change is worth ~+0.001).
+**Version 10** (knee-submit, E23 alone, 24 windows) pushed and checked 02:20: visible-test run complete, 1.0 min. To submit.
+
+**E24 folds 3–4 done** (04:00, fold 4 silver 0.9473); folds 0–1 done, fold 2 running (~06:10). **E26** started
+02:55 on nodemm05.
+
+**E25 complete** (04:18): RadImageNet ResNet-50 on round-2 labels: silver **0.9455**, gold **0.899** (same
+model on old labels, E20: 0.9420 / 0.883). The label gain holds on a second architecture (+0.0035 silver,
++0.016 gold; ConvNeXt: +0.0087 / +0.013). E23 + E25 rank blend: 0.9536 / 0.906.
+Note for round 3: the round-2 students' OOF is leaky on gold too (their labels distil teacher runs that
+were trained on the student's validation fold, gold labels included at weight 3), so gold agreement can
+no longer rank round-3 label mixtures honestly — wait for the LB (Version 10) before iterating.
+
+### E27 — ConvNeXt 256 px, seed 1, round-2 labels (2026-10-02 04:25, running)
+
+E11's recipe with seed 1 on the round-2 labels, interactive 3090 (freed by E25), ~4.5 h: a member for
+the round-2 ensemble.
+E27 fold 0 epoch 1: silver 0.8591, 6.0 min/epoch (5 folds ~10:20); validation passed.
+
+**E24 complete** (06:10): ConvNeXt 384 px on round-2 labels: silver **0.9551**, gold **0.922** (E13, same
+recipe on old labels: 0.9459 / 0.901). One model beats the whole Version 9 ensemble (0.9536 / 0.913).
+Round-2 blends (rank average, common studies): E24+E23 0.9562 / 0.917; E24+E23+E25 0.9564 / 0.916;
+2·E24+E23+E25 0.9569 / 0.919. → Version 11 = E24, E23, E25 at 24 windows (equal weights), pushed now
+so it is ready once Version 10 confirms the label gain on the LB.
+
+### E28 — E24 with seed 1 (2026-10-02 06:15, running)
+
+A second seed of the best single model (384 px, round-2 labels): seed ensembles of the 384 px model gave
+the largest blend gains in round 1. node40 was idle with no one waiting: folds 0–1 / 2–3 in a 2-GPU job
+(1017917) and fold 4 in a 1-GPU job (1017918), ~5 h.
+E28 first epochs passed (06:34): 12.7–13.5 min/epoch on the three GPUs (~2.7 h per fold; folds 0–3 ~11:45, fold 4 ~09:15).
+**Version 11** (knee-submit: E24, E23, E25 at 24 windows) pushed and checked 06:54: all three models used, 1.6 min for the 3 visible studies. To submit after Version 10.
+
+**E26 complete** (08:25): CoAtNet-0 (lr 3e-5) on round-2 labels: silver 0.9430, gold 0.899 — the weakest
+round-2 member, and it lowers every round-2 blend (E24+E23+E25 0.9564 → 0.9555 with E26). Not used.
+
+### E29 — E24 with seed 2 (2026-10-02 08:30, running)
+
+Third seed of the best model; 5 GPUs were free on the 3090 nodes with nobody waiting. One 2-GPU job (1017959),
+folds 0–2 / 3–4, ~8 h. With E24 and E28: a three-seed 384 px ensemble on round-2 labels.
+E28 fold 4 done (08:38): silver 0.9448 at epoch 12 (E24 fold 4: 0.9473); 11.4 min/epoch, faster than estimated.
+E29 first epochs passed (08:47): 12.7–12.9 min/epoch (folds 3–4 ~14:00, folds 0–2 ~16:30).
+
+**knee-blend v1 submission** (submitted 23:56): status COMPLETE at ~09:00 but no public score through the API (checked until 09:22). Ran ~9 h — at Kaggle's limit; possible timeout or scoring error (asked the user what the page shows). Suspect: our part used most of its 4.5 h budget and the public pipeline's own time budget starts from its own T0, unaware of the time already spent.
+Versions 10 and 11 submitted by the user (~09:35).
+
+**knee-blend v1 = Notebook Timeout** (Kaggle page, confirmed by the user). Our part runs first under a
+4.5 h budget that includes DICOM decoding (`knee/infer.run` starts its clock before `prepare_cache`), so the
+public pipeline got ≤ 4.5 h while its own 8 h budget counts from its own start; on the ~1,300 hidden
+studies (> 48, so its CoAt readers run one at a time) it needs more than that. Fix in
+`scripts/build_blend_nb.py` (v2): public cells first (their budget is then right), ours after them with the
+time left before 8.6 h (skipped below 0.75 h), our own budget = time left − 20 min, a hard timeout that
+kills the process group 10 min before the end, on the GPU with the most free memory, 12 windows; the
+public submission goes alone if ours is missing. Default models: round-2 E24, E23, E25. Weight set after
+the Version 11 score.
+
+**E27 complete** (09:45): ConvNeXt 256 px seed 1 on round-2 labels: silver 0.9530, gold 0.907. Round-2
+blends: E24+E23+E25 0.9564 / 0.916 → + E27 0.9571 / 0.914.
+
+### E30 — round-3 labels (2026-10-02 09:55, running, speculative)
+
+Teacher = mean OOF of the round-2 runs E24, E23, E25, E27 (`runs/2026-10-02_0950_teacher_r2_oof_mean/`);
+labels = 0.3 report + 0.7 teacher; student = E07/E23 recipe (ConvNeXt-tiny 224) on the interactive 3090
+(~4.5 h). Its silver/gold are leakier still (two distillation hops through the validation fold), so only
+the LB can judge it against E23 (Version 10). Started before the Version 10 score to keep the GPU busy.
+E30 fold 0 epoch 1: silver 0.8493, 4.8 min/epoch (5 folds ~14:45); validation passed.
+
+**Version 10 (E23 alone) on the public LB: 0.921** (scored 10:15; the first of the two 09:30 submissions,
+the single 224 px model being the fastest). E07 alone (Version 5, same recipe on old labels, 12 windows):
+0.918. Net of the 24-window gain (~+0.001, E17) the round-2 labels bring **~+0.002 on the LB**, against
++0.0087 silver and +0.013 gold in validation: most of the apparent gain was the distillation leak (as
+E03 → LB +0.003 for gold +0.06, and as reported on the forum). Lesson: label recipes need a leak-free
+check (E05-style nested teacher) before they are trusted; silver and gold of bootstrapped students are
+not evidence. E30 (round 3) stays running but is deprioritised.
+
+**E28 complete** (11:10): E24 with seed 1: silver 0.9542, gold 0.920. E24+E28 0.9571 / 0.926; the five
+round-2 runs (E24, E28, E23, E25, E27) 0.9577 / 0.917.
+
+### Public report-label tables (2026-10-02 11:05)
+
+Three public label tables are CC0 (Kaggle metadata): pilkwang v2 (Claude), stevenleehans v2, lixin73
+(GPT-5.6-Sol). Agreement of the raw report labels with the 58 gold studies (no trained model involved,
+so no distillation leak): Qwen 0.870, pilkwang 0.867, **steven 0.887**, lixin 0.835; mean of all four
+0.884 (rank 0.886); best pair steven + lixin 0.893. Through the teacher mix the base matters less:
+α = 0.5 0.9224 (Qwen base) vs 0.9263 (4-table base); α = 0.7 0.9273 vs 0.9285.
+`scripts/train.py --mix-public <names>` averages the tables with ours before bootstrapping (missing
+cells keep ours).
+
+### E31 — 4-table base labels (2026-10-02 11:12, running)
+
+E23 with `--mix-public pilkwang_v2 steven_v2 lixin_sol56` and α = 0.5 (the base weighs more), 1-GPU job
+1018179 (~16:30). Compare with E23 on the LB (0.921).
+E31 fold 0 epoch 1: silver 0.8527, 4.7 min/epoch (~16:00); validation passed.
+
+**Version 11 on the public LB: 0.929** (scored 11:30) — E24, E23, E25 (round-2 labels) at 24 windows, three
+models: +0.005 over Version 9 (0.924, seven old-label models). Silver 0.9536 → 0.9564 (+0.003) transferred
+in full here, unlike E23 alone at 224 px (+0.002 LB): the round-2 labels pay off at 384 px and in a
+mixed-architecture blend. Next: Version 12 = the five round-2 runs (E24, E28, E23, E25, E27; silver
+0.9577), and knee-blend v2 with these as our part.
+**Version 12** (knee-submit: E24, E28, E23, E25, E27 at 24 windows) pushed and checked 12:10: all five used, 1.8 min for the 3 visible studies. knee-models dataset now holds only the five round-2 runs. knee-blend v2 built (weight 0.3, same five runs at 12 windows), to be pushed by the user.
+Version 12 submitted by the user (12:17); knee-blend v2 (weight 0.3) pushed by the user, rehearsal running.
+knee-blend v2 rehearsal COMPLETE (12:30): public pipeline first (0.07 h), 14.7 GB free on both T4s after it, ours on GPU 1 with all five round-2 runs, blend public 0.70 + ours 0.30 written, 0.09 h in total (logs/blend_1002_1211/). Ready to submit.
+knee-blend v2 submitted by the user (12:35).
