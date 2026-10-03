@@ -963,6 +963,10 @@ user at 20:45 (ref 56804782, confirmed as Version 18 on the Submissions page).
 + E44 (rank blend) 0.9595 / 0.919. **E46** (23:30) = E45 at 384 px (E42 recipe, public-table teacher E41 + E42):
 folds 0–1 job 1020382, folds 2–3 job 1020383 and fold 4 job 1020384 queued (`slurm/runs/e46_*.txt`).
 
+**E45 complete** (00:35, public-table family, next round, 224 px): silver 0.9496, gold 0.898 (E41: 0.9510 / 0.906) —
+the family drifts away from the Qwen labels our validation scores against, as expected; E45 alone vs E41
+alone on the LB decides whether this family keeps gaining per round.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
