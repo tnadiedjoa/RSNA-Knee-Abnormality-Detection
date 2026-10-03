@@ -921,6 +921,10 @@ LB decides (E38 alone against Version 15, 0.930). E41 started 14:49 on node40 (~
 E39 folds 0–1 done (14:55): silver 0.9559 / 0.9580 at epoch 12 (E36 same folds, round 4: 0.9594 / 0.9543).
 Folds 2–3 job 1020034 (~17:40), fold 4 queued (`slurm/runs/e39_4.txt`, starts when a job slot frees).
 
+**Version 16 (six runs, rounds 3 + 4: E36, E32, E35, E34, E30, E33): public LB 0.933** (scored 15:45) — new best
+with our own labels, +0.001 over the round-3 four (Version 14). Today's fifth submission: Version 18 (Version 16 +
+E37) rather than Version 19 (the two round-4 runs alone), since more members of the latest rounds keep helping.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
