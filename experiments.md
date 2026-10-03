@@ -822,6 +822,24 @@ Labels = 0.3 report + 0.7 teacher, as every round.
   1019038 (2 GPUs, pending a slot), fold 4 on the interactive GPU after E34 folds 0–2
   (`logs/chain_e36_f4.sh`, ~00:40).
 
+**Night of 2026-10-02/03.** E34 (256 px seed 1, round 3) and E35 (224 px, round 4) complete, E36 folds 0–3
+complete. The SSH session dropped ~22:40 and took the interactive job down with E36 fold 4 at epoch 1
+(the memory rule again: long runs only in batch jobs, the chain to the interactive GPU was a mistake);
+fold 4 rerun as job 1019403 at 03:25 (~06:05).
+
+| run | labels | px | silver | gold |
+|---|---|---|---|---|
+| E35 | round 4 | 224 | 0.9530 | 0.9207 |
+| E30 | round 3 | 224 | 0.9525 | 0.9221 |
+| E34 | round 3 | 256 seed 1 | 0.9540 | 0.9217 |
+| E27 | round 2 | 256 seed 1 | 0.9530 | 0.9065 |
+| E32 + E30 + E33 + E34 | round 3 | | 0.9580 | 0.9250 |
+| E32 + E30 + E34 | round 3 | | 0.9579 | 0.9274 |
+
+Round 4 is flat against round 3 on our own validation (E35 vs E30: +0.0005 silver, −0.001 gold), where
+round 3 had moved +0.015 gold over round 2 (E34 vs E27). With the leak, flat here may mean flat or worse
+on the LB: Version 15 (E35 alone) against Version 13 (E30 alone, 0.927) decides whether a round 5 is worth it.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
