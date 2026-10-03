@@ -951,6 +951,14 @@ E42 folds 0, 1, 4 done (20:04; last-epoch silver 0.9577 / 0.9550 / 0.9486). **E4
 the 256 px seed-1 recipe, 2-GPU job 1020225 (~23:00) → third member of the public-table family, used if E41
 wins on the LB tomorrow.
 
+**E42 complete** (22:05, public-table base + round-4 teacher, 384 px): silver 0.9552, gold 0.914 (E41, 224 px:
+0.9510 / 0.906; E39, round 5 Qwen base, 384 px: 0.9566 / 0.922). Version 18 (Version 16 + E37) submitted by the
+user at 20:45 (ref 56804782, confirmed as Version 18 on the Submissions page).
+
+**E45** (22:10) = next round of the public-table family: teacher = mean OOF of E41 and E42
+(`runs/2026-10-03_2210_teacher_mixpub_r5_oof_mean/`), E41 recipe (224 px, 4-table base, α 0.5), job 1020318
+(~00:55). Launched ahead of E41's LB so that it is ready if the public-table family wins.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

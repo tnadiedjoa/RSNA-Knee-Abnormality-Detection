@@ -1,0 +1,7 @@
+{
+ "what": "mean OOF probability of the public-table runs E41 and E42 (teacher for E45, next round of the public-table family)",
+ "runs": [
+  "2026-10-03_1340_e41_convnext_mixpub_r5_5f",
+  "2026-10-03_1640_e42_convnext_384_mixpub_r5_5f"
+ ]
+}
