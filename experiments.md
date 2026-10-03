@@ -967,6 +967,23 @@ folds 0–1 job 1020382, folds 2–3 job 1020383 and fold 4 job 1020384 queued (
 the family drifts away from the Qwen labels our validation scores against, as expected; E45 alone vs E41
 alone on the LB decides whether this family keeps gaining per round.
 
+**E43 complete** (01:05, round 5, 256 px seed 1): silver 0.9553, gold 0.923. E46 folds 2–3 moved to one GPU,
+sequential (job 1020456, ~06:30; no node had two free). Ensembles on our validation: Version 16's six 0.9585,
+Version 18's seven 0.9590, rounds 3–5 with our labels (10 runs) 0.9594, public-table four 0.9596, all 14 runs
+**0.9604**.
+
+knee-submit versions for 2026-10-04 (dataset of 01:10: the 14 runs E30, E32–E39, E41–E45), one question each:
+
+| version | MODELS | question |
+|---|---|---|
+| 20 | E38 | round 5 vs round 4 (E35 alone, 0.930) |
+| 21 | E41 | public-table base + round-4 teacher vs our base (E38, E35) |
+| 22 | E45 | one more public-table round (vs E41) |
+| 23 | E39, E36, E38, E43, E35, E37, E32, E34, E30, E33 | best ensemble on our own labels (vs Version 16, 0.933) |
+| 24 | the 14 runs, latest first | does the public-table family add to it (vs Version 23)? |
+
+Order in 23/24 = latest rounds first, since `knee.infer.run` skips the last models if the 8 h budget runs out.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
