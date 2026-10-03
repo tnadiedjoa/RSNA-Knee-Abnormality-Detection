@@ -925,6 +925,11 @@ Folds 2–3 job 1020034 (~17:40), fold 4 queued (`slurm/runs/e39_4.txt`, starts 
 with our own labels, +0.001 over the round-3 four (Version 14). Today's fifth submission: Version 18 (Version 16 +
 E37) rather than Version 19 (the two round-4 runs alone), since more members of the latest rounds keep helping.
 
+**E40 fold 0** (16:15, ConvNeXt-small 384 px on round-4 labels): silver 0.9540, gold(fold) 0.938 — below E36 (tiny,
+round 4) 0.9594 and E37 (small, round 3) 0.9571 on the same fold, and it lowers the blends it joins (E36 + E35
+0.9608 → with E40 0.9605; E40 + E36 0.9597 vs E37 + E36 0.9611). One fold, but no sign of a gain: stopped
+there (the other four folds would cost ~17 GPU-hours). E39 fold 4 took the freed slot (job 1020036, ~18:50).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
