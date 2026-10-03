@@ -947,6 +947,10 @@ E23 (0.9516 / 0.901) by 0.007 on the LB. Our validation scores against Qwen's la
 E42 fold 4 done (19:40); folds 2–3 started 19:42 on node40 (~22:20). **E43** (19:45) = E34 recipe (256 px, seed 1)
 on round-5 labels, all five folds on the one free GPU (job 1020210, ~01:30) → round-5 ensemble member.
 
+E42 folds 0, 1, 4 done (20:04; last-epoch silver 0.9577 / 0.9550 / 0.9486). **E44** (20:05) = E41's labels with
+the 256 px seed-1 recipe, 2-GPU job 1020225 (~23:00) → third member of the public-table family, used if E41
+wins on the LB tomorrow.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
