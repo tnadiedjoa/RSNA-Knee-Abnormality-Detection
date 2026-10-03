@@ -1,0 +1,3 @@
+# E41: E31 recipe (4-table base = mean of Qwen + 3 public tables, alpha 0.5; Version 17 LB 0.928 vs E23 0.921) with the round-4 teacher (E35, E36) -> against E35 (0.930) and E38 (round 5, Qwen base)
+--name e41_mixpub_r5_f012 --run-dir 2026-10-03_1340_e41_convnext_mixpub_r5_5f --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --folds 0 1 2
+--name e41_mixpub_r5_f34 --run-dir 2026-10-03_1340_e41_convnext_mixpub_r5_5f --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --folds 3 4

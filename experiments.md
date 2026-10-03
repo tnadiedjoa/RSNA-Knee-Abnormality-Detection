@@ -900,6 +900,15 @@ Teacher = mean OOF of the round-4 runs E35 and E36 (`runs/2026-10-03_1220_teache
 - **E40** = E37 recipe (ConvNeXt-small 384) on round-4 labels, the round the LB has validated: fold 0
   job 1019856 (~16:45; one GPU, no node had two free), other folds as slots free.
 
+**Version 17 (E31 alone): public LB 0.928** (scored 13:30) vs Version 10 (E23 alone) 0.921, same teacher
+(round-1 OOF), same 224 px recipe → **+0.007 for the 4-table base** (mean of Qwen + pilkwang_v2 + steven_v2 +
+lixin_sol56, α 0.5 instead of 0.7: both changed, so the split between base and α is unknown). As much as a
+whole bootstrapping round, and our validation said −0.002 silver (silver is scored against Qwen's labels).
+→ **E41** = E31 recipe with the round-4 teacher (E35, E36), `slurm/runs/e41.txt`, job 1019919 (queued behind
+the job limit, starts when E38 ends ~15:00, ~17:45). Against E35 (0.930) and E38 (round 5, Qwen base).
+CV note: a score from public-table labels is still our model, but the labels are no longer only ours —
+say so if it ever reaches the CV line.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
