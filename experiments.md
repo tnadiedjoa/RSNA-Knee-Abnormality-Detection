@@ -846,6 +846,20 @@ Version 15 (E35 alone) only changes MODELS (`SKIP_PACKAGE=1 bash logs/push_versi
 versions stay supersets, so older notebook versions find their runs whether or not Kaggle pins the
 dataset version.
 
+**E36 complete** (05:45, fold 4 rerun as a batch job): round 4, 384 px: silver 0.9559, gold 0.9287 (E32, round 3,
+384 px: 0.9563 / 0.9268) — flat, like E35 vs E30 at 224 px. Rank blends: E36 + E35 0.9570 / 0.9278; the six
+round-3/4 runs (E36, E32, E35, E34, E30, E33) **0.9585** / 0.9283; round-3 four (Version 14) 0.9580 / 0.9250.
+
+knee-submit versions ready for 2026-10-03 (all checked on the visible test; the dataset version of 06:00
+holds E31, E32, E30, E33, E34, E35, E36, a superset of what Versions 14–15 need):
+
+| version | MODELS | question it answers |
+|---|---|---|
+| 14 | E32, E30, E34, E33 | round-3 ensemble vs Version 11 (round 2, 0.929) |
+| 15 | E35 | round 4 vs round 3 (Version 13, E30 alone, 0.927) |
+| 16 | E36, E32, E35, E34, E30, E33 | best ensemble on our validation (2.3 min on 3 studies) |
+| 17 | E31 | public-table base labels vs ours (Version 10, E23 alone, 0.921) |
+
 ### E37 — ConvNeXt-small at 384 px, round-3 labels (2026-10-03 04:10, folds 0–1)
 
 E32 recipe with `convnext_small.fb_in22k_ft_in1k` instead of tiny (`slurm/runs/e37_01.txt`, 2-GPU job
