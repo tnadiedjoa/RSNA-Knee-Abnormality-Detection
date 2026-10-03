@@ -873,6 +873,13 @@ But it blends better than another tiny run (same 1,764 studies): E36 + E32 0.958
 **0.9597**; the six of Version 16 0.9595 → seven with E37 0.9600. Folds 2–3 (job 1019580, 2 GPUs) and 4
 (1019581) launched 08:05 (~12:30), for the ensemble.
 
+**E37 complete** (11:55): silver 0.9553, gold 0.9247 over 5 folds (E32 0.9563 / 0.9268) — a bit weaker alone,
+still the better blend partner: E37 + E32 0.9584 vs E36 + E32 0.9580; the three 384 px runs E37 + E36 + E32
+0.9590 / 0.9316; Version 16's six + E37 **0.9590** / 0.9289 (six: 0.9585 / 0.9283). Subsets of the seven
+reach 0.9592, not chosen (+0.0002 tuned on silver). **Version 18** = Version 16 + E37, so its LB against
+Version 16 measures E37 alone. Versions 14–17 submitted by the user at 11:23 (ledger refs 56794645–51,
+matched to versions through the `scriptVersionId` the API returns).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
