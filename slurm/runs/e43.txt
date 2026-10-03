@@ -1,0 +1,2 @@
+# E43: E34 recipe (ConvNeXt-tiny 256 px, seed 1) with round-5 labels, all folds on one GPU (one free at 19:45) -> another round-5 ensemble member
+--name e43_convnext256_r5_seed1 --run-dir 2026-10-03_1945_e43_convnext_256_labels_r5_seed1_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.7 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 256 --seed 1
