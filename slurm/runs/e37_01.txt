@@ -1,0 +1,4 @@
+# E37: E32 recipe (384 px, round-3 labels) with ConvNeXt-small (IN-22k) instead of tiny; folds 0 and 1 in parallel to compare with E32 on the same folds (E08c at 224 px: +0.006 on fold 0 for 1.7x the compute)
+# submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e37_small384_r3_f0 --run-dir 2026-10-03_0410_e37_convnext_small_384_labels_r3_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-02_0950_teacher_r2_oof_mean --bootstrap-alpha 0.7 --backbone convnext_small.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 0
+--name e37_small384_r3_f1 --run-dir 2026-10-03_0410_e37_convnext_small_384_labels_r3_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-02_0950_teacher_r2_oof_mean --bootstrap-alpha 0.7 --backbone convnext_small.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 1

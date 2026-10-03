@@ -840,6 +840,19 @@ Round 4 is flat against round 3 on our own validation (E35 vs E30: +0.0005 silve
 round 3 had moved +0.015 gold over round 2 (E34 vs E27). With the leak, flat here may mean flat or worse
 on the LB: Version 15 (E35 alone) against Version 13 (E30 alone, 0.927) decides whether a round 5 is worth it.
 
+knee-submit **Version 14** pushed (04:00): `['*e32*', '*e30*', '*e34*', '*e33*']` (round-3 ensemble), all four
+runs ran on the visible test in 1.8 min. The dataset version holds E32, E30, E33, E34, E35 so that
+Version 15 (E35 alone) only changes MODELS (`SKIP_PACKAGE=1 bash logs/push_version.sh …`). Later dataset
+versions stay supersets, so older notebook versions find their runs whether or not Kaggle pins the
+dataset version.
+
+### E37 — ConvNeXt-small at 384 px, round-3 labels (2026-10-03 04:10, folds 0–1)
+
+E32 recipe with `convnext_small.fb_in22k_ft_in1k` instead of tiny (`slurm/runs/e37_01.txt`, 2-GPU job
+1019430, ~08:30). At 224 px on older labels, small gave +0.006 on fold 0 (E08c) for 1.7× the compute,
+within seed noise. With cleaner labels and 384 px, capacity may matter more. Compare with E32 folds
+0–1 (silver 0.9567 / 0.9570, gold(fold) 0.932 / 0.927); folds 2–4 only if both folds gain.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
