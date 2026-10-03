@@ -1,0 +1,3 @@
+# E38: E35 recipe (ConvNeXt-tiny 224) with round-5 labels = 0.3 report + 0.7 mean OOF of the round-4 runs (E35, E36) -> LB against E35 alone (Version 15, 0.930)
+--name e38_r5_f012 --run-dir 2026-10-03_1225_e38_convnext_labels_r5_5f --labels qwen36_27b_v1 --bootstrap-alpha 0.7 --grad-ckpt --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --backbone convnext_tiny.fb_in22k_ft_in1k --folds 0 1 2
+--name e38_r5_f34 --run-dir 2026-10-03_1225_e38_convnext_labels_r5_5f --labels qwen36_27b_v1 --bootstrap-alpha 0.7 --grad-ckpt --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --backbone convnext_tiny.fb_in22k_ft_in1k --folds 3 4

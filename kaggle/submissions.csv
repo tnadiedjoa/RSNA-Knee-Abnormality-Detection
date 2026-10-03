@@ -13,6 +13,6 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56772106,2026-10-02 10:48,knee-blend,2,"public pipeline 0.7 + E24, E28, E23, E25, E27 0.3",0.942,public pipeline alone: 0.943
 56774168,2026-10-02 12:56,knee-submit,13,E30 (round-3 labels),0.927,
 56794645,2026-10-03 09:23,knee-submit,14,"E32, E30, E34, E33 (round-3 labels)",,pending
-56794648,2026-10-03 09:23,knee-submit,15,E35 (round-4 labels),,pending
+56794648,2026-10-03 09:23,knee-submit,15,E35 (round-4 labels),0.930,
 56794649,2026-10-03 09:24,knee-submit,16,"E36, E32, E35, E34, E30, E33 (round-3/4 labels)",,pending
 56794651,2026-10-03 09:24,knee-submit,17,E31 (4-table base labels),,pending

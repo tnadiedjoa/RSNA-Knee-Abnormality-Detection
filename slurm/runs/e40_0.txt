@@ -1,0 +1,2 @@
+# E40: E37 recipe (ConvNeXt-small 384) with round-4 labels (validated on the LB by Version 15), fold 0 (one GPU: no node had two free at 12:25) — submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e40_small384_r4_f0 --run-dir 2026-10-03_1225_e40_convnext_small_384_labels_r4_5f --labels qwen36_27b_v1 --bootstrap-alpha 0.7 --grad-ckpt --bootstrap-run 2026-10-02_2050_teacher_r3_oof_mean --backbone convnext_small.fb_in22k_ft_in1k --img-size 384 --folds 0

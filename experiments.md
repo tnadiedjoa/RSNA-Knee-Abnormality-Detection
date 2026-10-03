@@ -880,6 +880,21 @@ reach 0.9592, not chosen (+0.0002 tuned on silver). **Version 18** = Version 16 
 Version 16 measures E37 alone. Versions 14–17 submitted by the user at 11:23 (ledger refs 56794645–51,
 matched to versions through the `scriptVersionId` the API returns).
 
+**Version 15 (E35 alone, round 4): public LB 0.930** (scored 12:15) vs Version 13 (E30 alone, round 3) 0.927 →
+**+0.003 for round 4**, which our validation called flat (+0.0005 silver, −0.001 gold). One 224 px model on
+round-4 labels beats the round-2 three-model ensemble (Version 11, 0.929). LB gains per labelling round so far:
+~+0.002 (1→2: E07 0.918 → E23 0.921, ~0.001 of it from 24-window inference), +0.006 (2→3), +0.003 (3→4). Our validation can no longer see
+label gains: silver is scored against the report labels the rounds move away from, and gold has 58 studies.
+
+### Round 5: E38 (224 px), E39 (384 px); E40 = ConvNeXt-small 384 on round 4 (2026-10-03 12:25)
+
+Teacher = mean OOF of the round-4 runs E35 and E36 (`runs/2026-10-03_1220_teacher_r4_oof_mean/`; OOF silver
+0.9572, gold 0.928). Only round-4 runs, so the labels keep moving one round at a time (E37, round 3, left out).
+- **E38** = E35 recipe on round-5 labels, job 1019853 (folds 0–2 / 3–4, ~15:00) → LB against Version 15 (0.930).
+- **E39** = E36 recipe (384 px) on round-5 labels, folds 0–1 job 1019854 (~15:00); folds 2–4 after.
+- **E40** = E37 recipe (ConvNeXt-small 384) on round-4 labels, the round the LB has validated: fold 0
+  job 1019856 (~16:45; one GPU, no node had two free), other folds as slots free.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
