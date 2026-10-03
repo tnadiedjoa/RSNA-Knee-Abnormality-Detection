@@ -910,9 +910,9 @@ CV note: a score from public-table labels is still our model, but the labels are
 say so if it ever reaches the CV line.
 
 **Version 14 (round-3 ensemble E32, E30, E34, E33): public LB 0.932** (scored 14:45) — our best with our own
-labels: +0.005 over E30 alone (0.927), +0.003 over the round-2 ensemble (Version 11, 0.929). The ensemble
-gain (+0.005) is larger than at round 2 (Version 11 vs Version 10: +0.008 but with 384 px newly in), and a
-round-4 single model (0.930) does not reach a round-3 ensemble: ensembles of the latest round are the target.
+labels: +0.005 over E30 alone (0.927), +0.003 over the round-2 ensemble (Version 11, 0.929). At round 2 the
+ensemble added +0.008 over its 224 px member alone (Version 11 vs Version 10, 384 px included). A round-4
+single model (0.930) does not reach a round-3 ensemble: ensembles of the latest round are the target.
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
