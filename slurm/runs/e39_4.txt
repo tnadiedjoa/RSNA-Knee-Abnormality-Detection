@@ -1,0 +1,2 @@
+# E39 fold 4 — submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e39_384_r5_f4 --run-dir 2026-10-03_1225_e39_convnext_384_labels_r5_5f --labels qwen36_27b_v1 --bootstrap-alpha 0.7 --grad-ckpt --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --backbone convnext_tiny.fb_in22k_ft_in1k --img-size 384 --folds 4

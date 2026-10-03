@@ -918,6 +918,9 @@ single model (0.930) does not reach a round-3 ensemble: ensembles of the latest 
 0.9525 / 0.922) — our validation barely moves across rounds while the LB did (+0.006, +0.003), so only the
 LB decides (E38 alone against Version 15, 0.930). E41 started 14:49 on node40 (~17:35).
 
+E39 folds 0–1 done (14:55): silver 0.9559 / 0.9580 at epoch 12 (E36 same folds, round 4: 0.9594 / 0.9543).
+Folds 2–3 job 1020034 (~17:40), fold 4 queued (`slurm/runs/e39_4.txt`, starts when a job slot frees).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
