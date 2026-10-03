@@ -934,6 +934,11 @@ there (the other four folds would cost ~17 GPU-hours). E39 fold 4 took the freed
 (`slurm/runs/e42_01.txt`, `e42_23.txt`, `e42_4.txt`, jobs 1020095–97, start as E41/E39 free their slots).
 Launched before E41's LB because the 4-table base gave +0.007 at round 2 and 384 px helped at every round.
 
+**E41 complete** (17:15, 4-table base + round-4 teacher, 224 px): silver 0.9510, gold 0.906 — below E38 (0.9542 /
+0.923) and E35 (0.9530 / 0.921) on our validation, the same profile as E31 (0.9498 / 0.906), which still beat
+E23 (0.9516 / 0.901) by 0.007 on the LB. Our validation scores against Qwen's labels (silver) and 58 studies
+(gold), so it cannot judge the public-table base: E41 alone goes to the LB against E38 and E35.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
