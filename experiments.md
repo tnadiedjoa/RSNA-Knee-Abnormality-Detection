@@ -888,6 +888,11 @@ label gains: silver is scored against the report labels the rounds move away fro
 
 ### Round 5: E38 (224 px), E39 (384 px); E40 = ConvNeXt-small 384 on round 4 (2026-10-03 12:25)
 
+knee-submit **Version 18** (V16 + E37, 7 runs, 3.1 min on 3 studies) and **Version 19** (`['*e36*', '*e35*']`, the
+two round-4 runs, 1.3 min) pushed 12:40–12:44; the dataset of 12:00 holds E31–E37. Only one submission
+is left today: Version 19 if Versions 14/16 show that mixing round-3 runs in does not help (Version 15
+says one round-4 model beats one round-3 model by 0.003), otherwise Version 18.
+
 Teacher = mean OOF of the round-4 runs E35 and E36 (`runs/2026-10-03_1220_teacher_r4_oof_mean/`; OOF silver
 0.9572, gold 0.928). Only round-4 runs, so the labels keep moving one round at a time (E37, round 3, left out).
 - **E38** = E35 recipe on round-5 labels, job 1019853 (folds 0–2 / 3–4, ~15:00) → LB against Version 15 (0.930).
