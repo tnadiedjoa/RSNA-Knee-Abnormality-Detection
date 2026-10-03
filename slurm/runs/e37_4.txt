@@ -1,0 +1,2 @@
+# E37 fold 4 — submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e37_small384_r3_f4 --run-dir 2026-10-03_0410_e37_convnext_small_384_labels_r3_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-02_0950_teacher_r2_oof_mean --bootstrap-alpha 0.7 --backbone convnext_small.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 4

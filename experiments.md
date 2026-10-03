@@ -867,6 +867,12 @@ E32 recipe with `convnext_small.fb_in22k_ft_in1k` instead of tiny (`slurm/runs/e
 within seed noise. With cleaner labels and 384 px, capacity may matter more. Compare with E32 folds
 0–1 (silver 0.9567 / 0.9570, gold(fold) 0.932 / 0.927); folds 2–4 only if both folds gain.
 
+**E37 folds 0–1 done** (08:00): ConvNeXt-small alone = tiny alone (folds 0–1 pooled: silver 0.9567 vs E32
+0.9566, gold 0.927 vs 0.926; per fold 0.9571 / 0.9565 vs 0.9567 / 0.9570) — capacity is not the lever.
+But it blends better than another tiny run (same 1,764 studies): E36 + E32 0.9583 → E36 + E32 + E37
+**0.9597**; the six of Version 16 0.9595 → seven with E37 0.9600. Folds 2–3 (job 1019580, 2 GPUs) and 4
+(1019581) launched 08:05 (~12:30), for the ensemble.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
