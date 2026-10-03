@@ -939,6 +939,11 @@ Launched before E41's LB because the 4-table base gave +0.007 at round 2 and 384
 E23 (0.9516 / 0.901) by 0.007 on the LB. Our validation scores against Qwen's labels (silver) and 58 studies
 (gold), so it cannot judge the public-table base: E41 alone goes to the LB against E38 and E35.
 
+**E39 complete** (18:40, round 5, 384 px): silver 0.9566, gold 0.922 (E36, round 4: 0.9559 / 0.929; E32, round 3:
+0.9563 / 0.927) — flat on our validation, as every round since 3. Blends: E39 + E38 0.9579; rounds 3–5 at
+384 px + 224 px (E39, E38, E36, E35, E37, E32) **0.9594** / 0.931; all ten runs 0.9595. E42 folds 2–3 (job
+1020096) wait for two free GPUs on one node (none had two at 18:40; ~20:10 when fold 4 frees node40).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
