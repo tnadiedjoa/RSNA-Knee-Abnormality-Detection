@@ -959,6 +959,10 @@ user at 20:45 (ref 56804782, confirmed as Version 18 on the Submissions page).
 (`runs/2026-10-03_2210_teacher_mixpub_r5_oof_mean/`), E41 recipe (224 px, 4-table base, α 0.5), job 1020318
 (~00:55). Launched ahead of E41's LB so that it is ready if the public-table family wins.
 
+**E44 complete** (23:25, public-table base, 256 px seed 1): silver 0.9522, gold 0.906. Public-table family E41 + E42
++ E44 (rank blend) 0.9595 / 0.919. **E46** (23:30) = E45 at 384 px (E42 recipe, public-table teacher E41 + E42):
+folds 0–1 job 1020382, folds 2–3 job 1020383 and fold 4 job 1020384 queued (`slurm/runs/e46_*.txt`).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
