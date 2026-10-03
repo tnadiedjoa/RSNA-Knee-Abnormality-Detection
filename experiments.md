@@ -930,6 +930,10 @@ round 4) 0.9594 and E37 (small, round 3) 0.9571 on the same fold, and it lowers 
 0.9608 → with E40 0.9605; E40 + E36 0.9597 vs E37 + E36 0.9611). One fold, but no sign of a gain: stopped
 there (the other four folds would cost ~17 GPU-hours). E39 fold 4 took the freed slot (job 1020036, ~18:50).
 
+**E42** queued (16:40): E41's labels (4-table base, α 0.5, round-4 teacher) at 384 px, the E39 recipe
+(`slurm/runs/e42_01.txt`, `e42_23.txt`, `e42_4.txt`, jobs 1020095–97, start as E41/E39 free their slots).
+Launched before E41's LB because the 4-table base gave +0.007 at round 2 and 384 px helped at every round.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
