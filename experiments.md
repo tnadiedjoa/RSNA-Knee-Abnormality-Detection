@@ -989,6 +989,9 @@ E46 folds 0–1 done (02:00). **E47** (02:05) = E38 recipe on round-6 labels, te
 E38, E39, E43 (`runs/2026-10-04_0205_teacher_r5_oof_mean/`), job 1020474 (~04:50) — ready if Version 20 says
 round 5 still helps.
 
+Versions 23 (10 runs, 3.1 min on 3 studies) and 24 (14 runs, 5.8 min) pushed and checked at 02:05: every run
+loaded and predicted, none skipped. All five versions of the 2026-10-04 plan are ready.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
