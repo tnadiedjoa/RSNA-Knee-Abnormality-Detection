@@ -1,0 +1,8 @@
+{
+ "what": "mean OOF probability of the round-5 runs E38, E39, E43 (teacher for round-6 labels)",
+ "runs": [
+  "2026-10-03_1225_e38_convnext_labels_r5_5f",
+  "2026-10-03_1225_e39_convnext_384_labels_r5_5f",
+  "2026-10-03_1945_e43_convnext_256_labels_r5_seed1_5f"
+ ]
+}
