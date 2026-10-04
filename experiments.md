@@ -1056,6 +1056,12 @@ output with a max over the feature map passed through the same head norm (ConvNe
 (job 1021332, ~35 min/epoch, ~06:00) — the only free GPUs. Against E41 folds 0–1 (same labels, 3090/bf16 vs
 P100/fp16: precision differences are within seed noise, E11 on P100 vs E07).
 
+knee-submit **Version 25** pushed and checked (22:45): all 16 runs loaded and predicted, 4.6 min on the 3 visible
+studies (dataset of 22:07). `logs/push_version.sh` waited 30 min for nothing: `kaggle datasets files` lists 20
+files per page, so the last run's fold4 was never seen; now `--page-size 200`. Two blend notebooks ready for
+the user to push (third-party code): `kaggle/blend/` (v3, our weight 0.15) and `kaggle/blend_w25/` (same kernel,
+weight 0.25), both with Version 24's 14 runs at 12 windows → one LB run each brackets the weight.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

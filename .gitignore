@@ -20,3 +20,4 @@ runs/_smoke/
 # blend notebook: built by scripts/build_blend_nb.py from a public notebook (third-party code, Apache 2.0):
 # kaggle kernels pull yamadan96/rsna-knee-d4-public0946 -p kaggle/blend && mv kaggle/blend/rsna-knee-d4-public0946.ipynb kaggle/blend/public_src.ipynb
 kaggle/blend/*.ipynb
+kaggle/blend_w25/*.ipynb
