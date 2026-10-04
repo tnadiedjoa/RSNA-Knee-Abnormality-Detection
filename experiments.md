@@ -1092,6 +1092,11 @@ fold 0.9567 / 0.923, E46 0.9580 / 0.922: one fold of seed noise, −0.002. On th
 0.9596 vs E42 + E46 0.9608; the 16-run blend 0.9607 → 0.9609 with E50 (+0.0002). A seed replicate adds little;
 E51 folds 2–3 took the freed slot (job 1021394, node19, P100, ~07:30).
 
+knee-blend version 4 checked (00:35): 14 runs predicted, "BLEND written: public 0.75 + ours 0.25", 0.14 h
+(`logs/blend_1005_0017/`). Plan for 2026-10-05 (from 02:00 Paris): knee-blend v3 (0.15) and v4 (0.25) — the two
+weights bracket the blend against the public 0.943 —, knee-submit Version 25 (Version 24 + E46 + E47, vs 0.935);
+two submissions kept for E51 (full 5 folds alone vs E41, 0.931) if folds 0–1 hold.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
