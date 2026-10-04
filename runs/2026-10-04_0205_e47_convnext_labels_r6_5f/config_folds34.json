@@ -1,0 +1,43 @@
+{
+ "name": "e47_r6_f34",
+ "labels": "qwen36_27b_v1",
+ "backbone": "convnext_tiny.fb_in22k_ft_in1k",
+ "img_size": 224,
+ "windows": 8,
+ "windows_eval": 12,
+ "epochs": 12,
+ "bs": 8,
+ "lr": 0.0002,
+ "lr_head": 0.001,
+ "wd": 0.02,
+ "dim": 256,
+ "depth": 2,
+ "drop_path": 0.1,
+ "aug": 1.0,
+ "silence_weight": 0.5,
+ "gold_weight": 3.0,
+ "folds": [
+  3,
+  4
+ ],
+ "workers": 4,
+ "seed": 42,
+ "run_dir": "2026-10-04_0205_e47_convnext_labels_r6_5f",
+ "span": [
+  0.08,
+  0.92
+ ],
+ "grad_ckpt": true,
+ "zoom": 1.0,
+ "exclude_folds": [],
+ "bootstrap_run": "2026-10-04_0205_teacher_r5_oof_mean",
+ "bootstrap_alpha": 0.7,
+ "mix_public": [],
+ "raw_dir": "/tmp/knee_raw",
+ "debug_steps": 0,
+ "ema": 0.0,
+ "commit": "d9d81dd",
+ "gpu": "NVIDIA GeForce RTX 3090",
+ "cache_dir": "/home/infres/nadiedjoa-24/RSNA-Knee-Abnormality-Detection/data/cache",
+ "cache_size": 256
+}

@@ -999,6 +999,26 @@ still helps.
 **Version 18 (Version 16 + E37): public LB 0.934** (scored 03:05) — +0.001 for E37 (ConvNeXt-small, 384 px),
 as its blend gain on our validation suggested. New best with our own labels.
 
+E47 complete (04:45, round 6, 224 px): silver 0.9551, gold 0.930. E46 complete (05:50, public-table family next
+round, 384 px): silver 0.9578, gold 0.920. E48 folds 0–1 done (07:40, round 6, 384 px): silver 0.9597 / 0.9571 per
+fold (E39, round 5: 0.9559 / 0.9580; E36, round 4: 0.9594 / 0.9543). No job ran after 07:40: the session on
+nodemm01 ended at 03:10 (node no longer reachable for the user), so nothing launched the next steps.
+
+**LB of the 2026-10-04 plan** (all five submitted by the user at 07:30 UTC, refs 56817552–73; versions matched
+through `scriptVersionId`, pushed in order 20 → 24):
+
+| version | content | public LB | question → answer |
+|---|---|---|---|
+| 20 | E38 (round 5, 224 px) | 0.929 | round 5 vs round 4 (E35, 0.930): no gain — the Qwen-base rounds have saturated |
+| 21 | E41 (4-table base + round-4 teacher) | **0.931** | best single model, +0.001 over E35 |
+| 22 | E45 (4-table base, one more round) | 0.929 | no gain over E41: the public-table family saturates after one round too |
+| 23 | 10 runs, own labels, rounds 3–5 | 0.934 | = Version 18 (7 runs): round-5 members add nothing |
+| 24 | Version 23 + E41, E42, E44, E45 | **0.935** | new best: the public-table family adds +0.001 as ensemble members |
+
+Conclusions: label bootstrapping is done (rounds 5 and 6 are not worth more GPU-hours as single models);
+gains now come from ensemble diversity (another label base), +0.001 per batch. On our validation, Version 24's
+14 runs blend to 0.9604 / 0.927; + E46 + E47 0.9609 / 0.928 (+0.0005, the size of E37's gain that gave +0.001 LB).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
