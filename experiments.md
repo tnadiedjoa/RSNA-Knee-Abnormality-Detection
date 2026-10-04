@@ -1062,6 +1062,28 @@ files per page, so the last run's fold4 was never seen; now `--page-size 200`. T
 the user to push (third-party code): `kaggle/blend/` (v3, our weight 0.15) and `kaggle/blend_w25/` (same kernel,
 weight 0.25), both with Version 24's 14 runs at 12 windows → one LB run each brackets the weight.
 
+Slurm checks (22:15–22:30): `sbatch --test-only` on the 3090 partition gives a 2026-10-08 start even for a 1-GPU,
+14G, 3.5 h job — the backfill plan serialises revol-24's 64G jobs per node and hle-25's 1-day jobs before ours, so
+lowering memory/time does not help; only jobs ending early can free a slot sooner. The 2-GPU jobs stay queued in
+case. `scontrol show assoc_mgr`: no per-user GPU cap in qos-student, MaxJobsPU = 4 (the interactive job counts).
+
+E51 epochs 1–2 (P100, 33 min/epoch, end ~05:30): silver 0.8419 → 0.8960 (fold 0), 0.8285 → 0.8868 (fold 1); E41 on
+the same folds: 0.8445 → 0.9012, 0.8505 → 0.8893 (final 0.9518 / 0.9536) — early epochs, not a verdict.
+E51 folds 2–3 (job 1021394, 2 P100) and 4 (1021395, 1 P100) queued at 23:08 behind the job limit: they start when
+E50 fold 2 / E49 fold 4 end, so a full 5-fold E51 can go to the LB alone against E41 (0.931) if folds 0–1 hold.
+
+**Leaderboard snapshot** (2026-10-04 21:58 UTC, `kaggle competitions leaderboard -d`): 5,161 teams; ours rank 1,404
+with 0.942 (knee-blend v2 of 10-02; our own models alone: 0.935). Teams at or above 0.943: 1,352 — the public
+notebook score, copied by ~1,050 teams between 0.943 and 0.945; ≥ 0.945: 297; ≥ 0.950: 110; ≥ 0.955: 50;
+≥ 0.960: 5; first 0.963. Public notebooks sorted by score (`kaggle kernels list --sort-by scoreDescending`):
+the top four (pjmathematician `rsna-knee-d4-blend` / `d4-lite`, aastikrajan15 `knee-s75-w50`, evgendvorkin
+`rsna-versia-5`) all state 0.943 or less and use the same sources (sofiaanjenje e11/e13 kernels, DINOv2) as the
+yamadan96 notebook we blend with — no better public base exists; 0.945 (top 300) needs something of our own on top.
+
+**knee-blend version 3** (public 0.85 + Version 24's 14 runs 0.15) pushed by me at 00:01 on 2026-10-05 with the
+user's go ("pousse les blends"; from now on the user only clicks Submit, every push is mine); version 4 (weight
+0.25, `kaggle/blend_w25/`) follows once version 3's visible-test run is checked.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
