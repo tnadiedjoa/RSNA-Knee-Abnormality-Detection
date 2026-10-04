@@ -1097,6 +1097,13 @@ knee-blend version 4 checked (00:35): 14 runs predicted, "BLEND written: public 
 weights bracket the blend against the public 0.943 —, knee-submit Version 25 (Version 24 + E46 + E47, vs 0.935);
 two submissions kept for E51 (full 5 folds alone vs E41, 0.931) if folds 0–1 hold.
 
+**E49 fold 4 done** (01:53; ConvNeXt-small 384 px, E42 labels): silver 0.9454, gold(fold) 0.943 — below ConvNeXt-tiny
+on the same labels (E42 0.9486) and below E37 (small, round 3: 0.9499) on this fold. On the 881 fold-4 studies:
+E42 + E49 0.9529 vs E42 + E37 0.9538; the 16-run blend 0.9541 → 0.9544 with E49 (+0.0003). Second ConvNeXt-small
+fold weaker than tiny (E40 fold 0 was the first): the other E49 folds (3090 jobs 1021313 / 1021316, ~16 GPU-hours)
+cancelled; E50's queued 3090 folds kept (cheaper seed member). E51 fold 4 took the freed slot (job 1021395, P100).
+E51 at epoch 4: fold 0 0.9315, fold 1 0.9272 (E41: 0.9334 / 0.9331) — trailing so far.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
