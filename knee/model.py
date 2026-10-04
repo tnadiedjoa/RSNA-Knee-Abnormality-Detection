@@ -31,13 +31,17 @@ def make_backbone(name: str, pretrained: bool, **kwargs) -> nn.Module:
 
 class KneeNet(nn.Module):
     def __init__(self, backbone: str = "resnet34", pretrained: bool = True, dim: int = 256, depth: int = 2,
-                 heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1):
+                 heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1, pool: str = "avg"):
         super().__init__()
         kwargs = {"drop_path_rate": drop_path} if drop_path else {}
         if backbone.startswith("vit_"):  # ViTs (e.g. DINOv2) were pretrained at another size: resample positions
             kwargs["dynamic_img_size"] = True
         self.backbone = make_backbone(backbone, pretrained, **kwargs)
-        self.proj = nn.Sequential(nn.Linear(self.backbone.num_features, dim), nn.LayerNorm(dim))
+        # pool inside each window: "avg" (the backbone's own head) or "avgmax" (+ max over the feature map,
+        # through the head's norm when it has one: a small lesion is diluted by the average)
+        self.pool_type = pool
+        n_feats = self.backbone.num_features * (2 if pool == "avgmax" else 1)
+        self.proj = nn.Sequential(nn.Linear(n_feats, dim), nn.LayerNorm(dim))
         self.slot_emb = nn.Parameter(torch.zeros(len(SLOTS), dim))
         self.pos_emb = nn.Sequential(nn.Linear(1, dim), nn.GELU(), nn.Linear(dim, dim))
         layer = nn.TransformerEncoderLayer(dim, heads, dim * 2, dropout, batch_first=True, norm_first=True)
@@ -48,12 +52,22 @@ class KneeNet(nn.Module):
         self.head = nn.Linear(dim, 1)
         self.max_head = nn.Linear(dim, len(LABELS))  # max over windows: a focal lesion shows in few windows
 
+    def embed(self, imgs):
+        if self.pool_type == "avg":
+            return self.backbone(imgs)
+        fmap = self.backbone.forward_features(imgs)  # (N, C, h, w)
+        mx = fmap.amax((2, 3), keepdim=True)
+        norm = getattr(getattr(self.backbone, "head", None), "norm", None)  # ConvNeXt: LayerNorm2d after pooling
+        if norm is not None:
+            mx = norm(mx)
+        return torch.cat([self.backbone.forward_head(fmap, pre_logits=True), mx.flatten(1)], 1)
+
     def forward(self, x, pos, mask):
         # x: (B, S, T, 3, H, W) uint8; pos: (B, S, T); mask: (B, S)
         b, s, t = x.shape[:3]
         imgs = x.flatten(0, 2).float()
         imgs = (imgs - MEAN.to(imgs.device)) / STD.to(imgs.device)
-        feats = self.proj(self.backbone(imgs.contiguous(memory_format=torch.channels_last))).view(b, s, t, -1)
+        feats = self.proj(self.embed(imgs.contiguous(memory_format=torch.channels_last))).view(b, s, t, -1)
         tokens = feats + self.slot_emb[None, :, None] + self.pos_emb(pos.unsqueeze(-1))
         tokens = tokens.flatten(1, 2)  # (B, S*T, D)
         pad = ~mask.repeat_interleave(t, dim=1)  # True = ignore

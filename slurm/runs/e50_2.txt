@@ -1,0 +1,3 @@
+# E50: E42 recipe (ConvNeXt-tiny 384 px, 4-table base, round-4 teacher) with seed 1 -> ensemble member
+# submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e50_384mixpub_seed1_f2 --run-dir 2026-10-04_2210_e50_convnext_384_mixpub_r5_seed1_5f --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --seed 1 --folds 2

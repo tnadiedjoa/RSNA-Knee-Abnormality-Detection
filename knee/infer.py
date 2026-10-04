@@ -92,7 +92,8 @@ def predict_model(model_dir: Path, slots: pd.DataFrame, cache_dir: Path, device,
     dl = DataLoader(ds, batch_size=max(1, 48 // windows), num_workers=workers)
     models = []
     for ckpt in sorted(model_dir.glob("fold*.pt")):
-        model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0)
+        model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
+                         pool=cfg.get("pool", "avg"))
         model.load_state_dict(torch.load(ckpt, map_location="cpu"))
         models.append(model.to(device).eval().to(memory_format=torch.channels_last))
     out = [[] for _ in models]

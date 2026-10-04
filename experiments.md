@@ -1019,6 +1019,43 @@ Conclusions: label bootstrapping is done (rounds 5 and 6 are not worth more GPU-
 gains now come from ensemble diversity (another label base), +0.001 per batch. On our validation, Version 24's
 14 runs blend to 0.9604 / 0.927; + E46 + E47 0.9609 / 0.928 (+0.0005, the size of E37's gain that gave +0.001 LB).
 
+### E49 / E50 — public-table members at 384 px; queue blocked (2026-10-04 22:10)
+
+Leave-one-out on the 16-run blend (Version 24's 14 + E46 + E47, silver 0.9609): removing E46 costs −0.0005,
+E42 −0.0003, E44 −0.0002, E37 −0.0001, every other run ≤ 0 — the 384 px public-table runs are the most
+useful members. **E49** = E42's labels (LB-validated through E41) with ConvNeXt-small at 384 px (E37 recipe),
+**E50** = E42 recipe with seed 1 (`slurm/runs/e49_*.txt`, `e50_*.txt`). E50 fold 2 (job 1021315) and E49 fold 4
+(1021318) started at once as 1-GPU jobs (30G); the 2-GPU jobs for the other folds (1021313/14/16/17) are planned
+by Slurm for 2026-10-08 even at 28G and 3.5–5 h: our fairshare priority (2845) is the lowest on the 3090
+partition, behind 11 jobs of revol-24 (64G each, one per node) and 6 of hle-25. A 1-GPU test job submitted at
+22:12 also pended (cancelled). Training memory: ~3–6 GB anonymous per training; the cgroup fills with the
+page cache of the unpacked cache (reclaimable).
+
+knee-submit **Version 25** (Version 24 + E46 + E47, 16 runs, `['*e46*', '*e39*', '*e42*', '*e36*', '*e47*', ...]`)
+being pushed (dataset of 22:00). **knee-blend v3** built (not pushed: the user pushes third-party code):
+public 0.85 + Version 24's 14 runs 0.15 at 12 windows (v2: 0.929 set at 0.3 → 0.942, public alone 0.943).
+
+**Public pipeline vs ours** (code reading of `kaggle/blend/public_src.ipynb` and the receipts of our blend
+run, 2026-10-04): no input bug found on our side. Series are picked from the CSV plane / fat-sat flags (never
+from descriptions), laterality behaves (the 73 studies with unknown side score like the rest; swapping their
+medial/lateral predictions drops medial meniscus 0.969 → 0.907). The public CoAt readers score 0.90–0.93 on
+the 58 gold studies (checkpoints picked on them), and the notebook's own single Raptor model is 0.924 LB vs
+0.931 for E41: its 0.943 comes from blending five families with different inputs. Differences worth testing,
+most likely first: (1) pooling inside each window — their CoAt readers use per-finding gated attention over
+the 12×12 feature map, A5 label queries over patch tokens; we average-pool each window (`knee/model.py`);
+(2) our `sag_t` slot mixes T1 (38 %), PD (35 %) and T2 (25 %) — a contrast embedding from TR/TE; (3) 0.34
+mm/px (384 px over 130 mm) vs our 0.39; (4) depth as channels (A5: 16 slices as 16 channels) — for
+diversity; (5) top-3 checkpoint averaging; (6) intensity clip p2–p98.
+
+### E51 — avg + max pooling inside each window (2026-10-04 22:45, P100)
+
+`--pool avgmax` (`knee/model.py`): the window embedding concatenates the backbone's own average-pooled head
+output with a max over the feature map passed through the same head norm (ConvNeXt's LayerNorm2d); timm's
+`catavgmax` breaks ConvNeXt's NormMlpClassifierHead. Default stays `avg` (old checkpoints load unchanged;
+`knee/infer.py` reads `pool` from config.json). E51 = E41 recipe with `--pool avgmax`, folds 0–1, on two P100s
+(job 1021332, ~35 min/epoch, ~06:00) — the only free GPUs. Against E41 folds 0–1 (same labels, 3090/bf16 vs
+P100/fp16: precision differences are within seed noise, E11 on P100 vs E07).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

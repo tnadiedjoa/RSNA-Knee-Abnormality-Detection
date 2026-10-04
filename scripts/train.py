@@ -96,7 +96,7 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
     dl_va = DataLoader(ds_va, bs_va, num_workers=args.workers, pin_memory=True)
 
     torch.manual_seed(args.seed + fold)
-    model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path).to(device)
+    model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path, pool=args.pool).to(device)
     model = model.to(memory_format=torch.channels_last)
     if args.grad_ckpt:  # recompute backbone activations in the backward pass: bigger backbones fit a 16 GB P100
         model.backbone.set_grad_checkpointing(True)
@@ -174,6 +174,7 @@ def main():
     p.add_argument("--dim", type=int, default=256)
     p.add_argument("--depth", type=int, default=2)
     p.add_argument("--drop-path", type=float, default=0.1)
+    p.add_argument("--pool", default="avg", choices=["avg", "avgmax"], help="pooling inside each window (knee/model.py)")
     p.add_argument("--aug", type=float, default=1.0)
     p.add_argument("--silence-weight", type=float, default=0.5)
     p.add_argument("--gold-weight", type=float, default=3.0)
