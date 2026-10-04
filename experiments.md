@@ -992,6 +992,10 @@ round 5 still helps.
 Versions 23 (10 runs, 3.1 min on 3 studies) and 24 (14 runs, 5.8 min) pushed and checked at 02:05: every run
 loaded and predicted, none skipped. All five versions of the 2026-10-04 plan are ready.
 
+E46 fold 4 done (03:00). **E48** (03:05) = E39 recipe (384 px) on round-6 labels (same teacher as E47), folds 0
+then 1 on the one free GPU (`slurm/runs/e48_01.txt`, ~08:20); folds 2–4 once Version 20 shows whether round 5
+still helps.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

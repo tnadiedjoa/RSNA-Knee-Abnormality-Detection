@@ -1,0 +1,2 @@
+# E48: E39 recipe (384 px) with round-6 labels (teacher E38, E39, E43), folds 0 then 1 on one GPU (one free at 03:05) — submit with KNEE_CACHE_DIR=$PWD/data/cache384 KNEE_CACHE_SIZE=384 RAW_GB=100
+--name e48_384_r6_f01 --run-dir 2026-10-04_0305_e48_convnext_384_labels_r6_5f --labels qwen36_27b_v1 --bootstrap-run 2026-10-04_0205_teacher_r5_oof_mean --bootstrap-alpha 0.7 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --folds 0 1
