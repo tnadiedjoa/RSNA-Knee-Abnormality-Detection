@@ -1084,6 +1084,14 @@ yamadan96 notebook we blend with — no better public base exists; 0.945 (top 30
 user's go ("pousse les blends"; from now on the user only clicks Submit, every push is mine); version 4 (weight
 0.25, `kaggle/blend_w25/`) follows once version 3's visible-test run is checked.
 
+knee-blend version 3 checked (00:17): public pipeline then our 14 runs on GPU (2.4 min), "BLEND written: public 0.85 +
+ours 0.15", 0.11 h in total (`logs/blend_1005_0001/`). Version 4 (weight 0.25) pushed at 00:17.
+
+**E50 fold 2 done** (00:19; E42 recipe, seed 1, 384 px): silver 0.9543, gold(fold) 0.919 — E42 (seed 42) on the same
+fold 0.9567 / 0.923, E46 0.9580 / 0.922: one fold of seed noise, −0.002. On the 881 fold-2 studies: E42 + E50
+0.9596 vs E42 + E46 0.9608; the 16-run blend 0.9607 → 0.9609 with E50 (+0.0002). A seed replicate adds little;
+E51 folds 2–3 took the freed slot (job 1021394, node19, P100, ~07:30).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
