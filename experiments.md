@@ -996,6 +996,9 @@ E46 fold 4 done (03:00). **E48** (03:05) = E39 recipe (384 px) on round-6 labels
 then 1 on the one free GPU (`slurm/runs/e48_01.txt`, ~08:20); folds 2–4 once Version 20 shows whether round 5
 still helps.
 
+**Version 18 (Version 16 + E37): public LB 0.934** (scored 03:05) — +0.001 for E37 (ConvNeXt-small, 384 px),
+as its blend gain on our validation suggested. New best with our own labels.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

@@ -16,4 +16,4 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56794648,2026-10-03 09:23,knee-submit,15,E35 (round-4 labels),0.930,
 56794649,2026-10-03 09:24,knee-submit,16,"E36, E32, E35, E34, E30, E33 (round-3/4 labels)",0.933,
 56794651,2026-10-03 09:24,knee-submit,17,E31 (4-table base labels),0.928,
-56804782,2026-10-03 18:45,knee-submit,18,"E36, E32, E37, E35, E34, E30, E33 (Version 16 + E37)",,pending
+56804782,2026-10-03 18:45,knee-submit,18,"E36, E32, E37, E35, E34, E30, E33 (Version 16 + E37)",0.934,
