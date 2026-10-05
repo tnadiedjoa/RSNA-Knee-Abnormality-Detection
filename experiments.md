@@ -1104,6 +1104,20 @@ fold weaker than tiny (E40 fold 0 was the first): the other E49 folds (3090 jobs
 cancelled; E50's queued 3090 folds kept (cheaper seed member). E51 fold 4 took the freed slot (job 1021395, P100).
 E51 at epoch 4: fold 0 0.9315, fold 1 0.9272 (E41: 0.9334 / 0.9331) — trailing so far.
 
+**E51 folds 0–1 done** (05:10; avg + max pooling, E41 recipe, P100): silver 0.9529 / 0.9470 (E41: 0.9518 / 0.9536);
+pooled over the 1,764 studies 0.9497 vs 0.9524 (−0.0027, paired bootstrap 95 % CI [−0.0054, +0.0003]), gold 0.894
+vs 0.906. Per finding: lateral meniscus −0.015, PF OA −0.012, MCL −0.009, medial meniscus −0.005; fracture +0.007,
+contusion +0.003, ACL +0.002. The 16-run blend 0.9618 → 0.9617 with E51 (folds 0–1 studies). **Max pooling inside
+the window does not help** (P100/fp16 vs 3090/bf16 is a confound, but not one that explains −0.007 on a fold):
+✗, folds 2–4 (jobs 1021394/95, half-way) cancelled at 05:15. `--pool avgmax` stays in the code, default `avg`.
+
+3090s free again at 05:10 (hle-25's jobs on node40 ended; 5 GPUs free): E50 folds 0–1 started on node40 (job
+1021314, 3.5 h limit) and folds 3–4 on nodemm01 (1021317) once the E51 jobs freed the slots.
+**E52** (05:20) = E42 recipe with **ConvNeXt V2-tiny** (`convnextv2_tiny.fcmae_ft_in22k_in1k_384`: masked-autoencoder
+pretraining, IN-22k fine-tune at 384 px) — a different pretraining for ensemble diversity, against E42 per fold
+(`slurm/runs/e52_*.txt`): fold 4 started on nodemm05 (job 1021713), folds 0–1 / 2–3 (1021711/12) queued behind the
+job limit (4 running jobs, the interactive one included).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
