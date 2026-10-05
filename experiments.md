@@ -1123,6 +1123,10 @@ E52 at bs 8 ran out of GPU memory at the first training step (05:19, job 1021713
 Relaunched at 05:22 with `--bs 6` and `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` (jobs 1021717–19; fold 4
 started on nodemm05, folds 0–1 and 2–3 queued) — a recipe difference against E42 (bs 8) to keep in mind.
 
+E52 at bs 6 ran out of memory too (05:25, backward pass: 21.2 GB in use, 3.2 GB more asked). Relaunched at
+**bs 4** (05:27, jobs 1021722–24): fold 4 trains on nodemm05 at 20.4 GB / 24.6 GB, GPU at 100 % after 2 min.
+E52 therefore differs from E42 by backbone and batch (4 vs 8, same lr, twice the steps).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
