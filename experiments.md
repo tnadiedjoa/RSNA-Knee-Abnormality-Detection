@@ -1118,6 +1118,11 @@ pretraining, IN-22k fine-tune at 384 px) — a different pretraining for ensembl
 (`slurm/runs/e52_*.txt`): fold 4 started on nodemm05 (job 1021713), folds 0–1 / 2–3 (1021711/12) queued behind the
 job limit (4 running jobs, the interactive one included).
 
+E52 at bs 8 ran out of GPU memory at the first training step (05:19, job 1021713: ConvNeXt V2's GRN layers allocate
+4.2 GB tensors at stage 1 for 8 × 5 × 8 windows of 384 px; 13.2 GB allocated, 6.6 GB reserved but fragmented).
+Relaunched at 05:22 with `--bs 6` and `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` (jobs 1021717–19; fold 4
+started on nodemm05, folds 0–1 and 2–3 queued) — a recipe difference against E42 (bs 8) to keep in mind.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
