@@ -1127,6 +1127,13 @@ E52 at bs 6 ran out of memory too (05:25, backward pass: 21.2 GB in use, 3.2 GB 
 **bs 4** (05:27, jobs 1021722–24): fold 4 trains on nodemm05 at 20.4 GB / 24.6 GB, GPU at 100 % after 2 min.
 E52 therefore differs from E42 by backbone and batch (4 vs 8, same lr, twice the steps).
 
+**E52 abandoned** (05:57): ConvNeXt V2-tiny at bs 4, fold 4 epoch 1: loss 0.618, **silver 0.484 / gold 0.484** — chance
+level, i.e. collapsed outputs (ConvNeXt V1 runs: loss ~0.58, silver ~0.85 after epoch 1), at 25 min/epoch (2× V1).
+Not debugged (suspects: lr 2e-4 too high for FCMAE weights, GRN in bf16 over 96×96 maps); the 3090 window is worth
+more on a known member. ✗ for now. **E53** (06:00) = E46 recipe with seed 1 (E46 = most useful member of the 16-run
+blend), `slurm/runs/e53_*.txt`: fold 4 on nodemm05 (job 1021738), folds 0–1 / 2–3 (1021736/37) queued.
+E50 at epoch 3 (05:55): folds 0 / 1 / 3 / 4 silver 0.918 / 0.912 / 0.928 / 0.902.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
