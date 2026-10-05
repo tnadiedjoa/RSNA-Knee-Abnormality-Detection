@@ -84,6 +84,8 @@ def predict(model, loader, device):
 
 def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir, device):
     tr, va = np.where(folds != fold)[0], np.where(folds == fold)[0]
+    if args.full_fit:  # every study in training; "fold" only seeds the network and picks the (in-sample) monitor set
+        tr = np.arange(len(folds))
     raw = Path(args.raw_dir) if args.raw_dir else None
     span = tuple(args.span)
     ds_tr = StudyDataset(slots.iloc[tr], y[tr], w[tr], n_windows=args.windows, img_size=args.img_size, train=True,
@@ -147,8 +149,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
         print(f"fold {fold} epoch {epoch + 1}: loss {np.mean(losses):.4f} silver {silver_auc:.4f}{ema_txt} "
               f"gold(fold) {gold_auc:.4f} [{(time.time() - t) / 60:.1f} min]", flush=True)
     (run_dir / "checkpoints").mkdir(exist_ok=True)
-    torch.save(model.state_dict(), run_dir / "checkpoints" / f"fold{fold}.pt")
-    (run_dir / f"fold{fold}_history.json").write_text(json.dumps(history, indent=1))
+    torch.save(model.state_dict(), run_dir / "checkpoints" / f"fold{fold}.pt")  # knee.infer averages every fold*.pt
+    (run_dir / f"{'full' if args.full_fit else 'fold'}{fold}_history.json").write_text(json.dumps(history, indent=1))
     if ema is not None:  # kept apart: package_kaggle and load_oof only pick fold*.pt / oof_fold*.csv
         torch.save(ema.module.state_dict(), run_dir / "checkpoints" / f"ema_fold{fold}.pt")
         oof = pd.DataFrame(pred_ema, columns=LABELS)
@@ -186,6 +188,8 @@ def main():
     p.add_argument("--grad-ckpt", action="store_true")
     p.add_argument("--zoom", type=float, default=1.0, help="field of view = 150 mm / zoom (cache crop is 150 mm)")
     p.add_argument("--exclude-folds", type=int, nargs="*", default=[])
+    p.add_argument("--full-fit", action="store_true",
+                   help="train every network on all studies (one per --folds entry, seeded by it); no OOF is written")
     p.add_argument("--bootstrap-run", default=None, help="run folder whose OOF predictions are mixed into the labels")
     p.add_argument("--bootstrap-alpha", type=float, default=0.5)
     p.add_argument("--mix-public", nargs="*", default=[], help="public label tables averaged with ours (pilkwang_v2 steven_v2 lixin_sol56)")
@@ -220,11 +224,15 @@ def main():
 
     for fold in args.folds:
         va, pred = train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir, device)
+        if args.full_fit:  # in-sample predictions: never written as OOF (eval_oof, teachers and blends read those)
+            continue
         oof = pd.DataFrame(pred, columns=LABELS)
         oof.insert(0, "StudyInstanceUID", studies["StudyInstanceUID"].to_numpy()[va])
         oof.insert(1, "fold", fold)
         oof.to_csv(run_dir / f"oof_fold{fold}.csv", index=False)
 
+    if args.full_fit:
+        return
     # summary over every fold present in the run folder
     oof = pd.concat([pd.read_csv(f) for f in sorted(run_dir.glob("oof_fold*.csv"))])
     idx = studies.reset_index().set_index("StudyInstanceUID").loc[oof["StudyInstanceUID"], "index"].to_numpy()

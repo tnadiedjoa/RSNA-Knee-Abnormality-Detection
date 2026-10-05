@@ -1174,6 +1174,16 @@ over header-only series ≡ the training meta). Checked by running: fold 0 throu
 No precision or code-path loss: the LB gap to the top single models is not an inference bug. (Remaining
 unchecked link: the remote-archive DICOMs vs the files Kaggle mounts — same bytes by construction.)
 
+### E54 — full-data training (2026-10-05 08:30)
+
+Every network so far trained on 4 folds (80 % of the studies) and the submission averages the 5 fold networks.
+`scripts/train.py --full-fit` trains each network on all 4,407 studies instead (one network per `--folds` entry,
+seeded by it; the printed silver/gold are in-sample, so no `oof_fold*.csv` is written and the run cannot feed
+`eval_oof`, teachers or blends; checkpoints keep the `fold<k>.pt` names that `knee.infer` averages). Smoke test on
+the P100 (ResNet-34, 3 steps): checkpoint and `full0_history.json` written, no OOF. **E54** = E41 recipe (224 px,
+LB 0.931 alone) with `--full-fit`, 3 networks, one 3090 in sequence (`slurm/runs/e54.txt`, queued behind the job
+limit, ~3.5 h) → E54 alone against E41 alone: 25 % more data per network vs 5 networks averaged over 3.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

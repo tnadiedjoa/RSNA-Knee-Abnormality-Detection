@@ -1,0 +1,2 @@
+# E54: E41 recipe (224 px, 4-table base, round-4 teacher, LB 0.931 alone) trained on ALL studies (--full-fit), 3 networks (seeds 42/43/44) -> alone against E41 on the LB
+--name e54_full_e41 --run-dir 2026-10-05_0830_e54_convnext_mixpub_r5_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --folds 0 1 2
