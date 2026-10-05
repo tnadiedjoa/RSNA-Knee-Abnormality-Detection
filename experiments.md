@@ -1208,6 +1208,8 @@ from there) waits for the Claude session's knee-submit pushes (marker `logs/day1
 pushes both blends (`logs/push_blends.sh`, which now waits for the new version to start before waiting for its end),
 writes `kaggle/A_SOUMETTRE.md`, then logs Kaggle scores and E55's OOF gain every 10 min (`scripts/auto_followup.py`).
 
+**Versions 26/27 pushed** (01:02): the dataset now holds the 19 runs (models.zip 10 GB, packaged 00:24, pushed after Kaggle processed it). knee-submit **Version 26** (E54 alone) ran its 3 full-data networks on the visible test (1.3 min); **Version 27** (18 runs, MODELS in the order of Version 25 with E53 after E46 and E50 after E42) ran all 18 (5.1 min, no run skipped by the time budget); logs in `logs/push_1006_0024` and `logs/push_1006_0056`. Marker `logs/day10_pushed` written at 01:03; job 1023238 read it at 01:03 and went on to the blends.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
