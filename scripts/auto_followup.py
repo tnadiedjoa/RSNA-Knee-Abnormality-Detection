@@ -1,4 +1,4 @@
-"""Helpers of the unattended follow-up job (slurm/auto_1005.sh): no decision here needs judgement.
+"""Bookkeeping helpers for unattended follow-ups: no decision here needs judgement.
 
     python -m scripts.auto_followup scores          # fill pending rows of kaggle/submissions.csv, add new refs
     python -m scripts.auto_followup gain <run> ...  # OOF blend gain of adding these runs to Version 25's set
@@ -24,7 +24,7 @@ def note(text: str) -> None:
     s = JOURNAL.read_text()
     assert ANCHOR in s, "journal anchor missing"
     stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
-    JOURNAL.write_text(s.replace(ANCHOR, f"Auto ({stamp}, slurm/auto_1005.sh): {text}\n\n{ANCHOR}", 1))
+    JOURNAL.write_text(s.replace(ANCHOR, f"Auto ({stamp}, scripts/auto_followup.py): {text}\n\n{ANCHOR}", 1))
 
 
 def scores() -> bool:

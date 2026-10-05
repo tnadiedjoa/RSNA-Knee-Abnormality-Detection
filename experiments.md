@@ -1184,7 +1184,7 @@ the P100 (ResNet-34, 3 steps): checkpoint and `full0_history.json` written, no O
 LB 0.931 alone) with `--full-fit`, 3 networks, one 3090 in sequence (`slurm/runs/e54.txt`, queued behind the job
 limit, ~3.5 h) → E54 alone against E41 alone: 25 % more data per network vs 5 networks averaged over 3.
 
-Auto (2026-10-06 00:23, slurm/auto_1005.sh): Kaggle: ref 56843645 (knee-blend version 3) scored 0.944; ref 56843667 (knee-blend version 4) scored 0.943; ref 56843671 (knee-submit version 25) scored 0.936.
+Auto (2026-10-06 00:23, scripts/auto_followup.py): Kaggle: ref 56843645 (knee-blend version 3) scored 0.944; ref 56843667 (knee-blend version 4) scored 0.943; ref 56843671 (knee-submit version 25) scored 0.936.
 
 **LB of 2026-10-05** (read 2026-10-06 00:25): knee-blend v3 (public 0.85 + Version 24's 14 runs 0.15) **0.944** — the
 first blend above the public pipeline alone (0.943): our ensemble now adds to it, at a low weight; v4 (weight 0.25)
