@@ -1152,6 +1152,11 @@ Submitted by the user at 07:36–07:37 Paris (2026-10-05): knee-blend versions 3
 knee-submit Version 25 (56843671) — matched through `scriptVersionId` (knee-blend 355281624 < 355283800 = pushed
 00:01 < 00:17; knee-submit 355269060 = Version 25, pushed 22:45). Two submissions left today (E51 abandoned).
 
+**E50 complete** (07:40; E42 recipe, seed 1, 384 px, public-table labels): silver 0.9551, gold 0.911 over 5 folds
+(E42, seed 42: 0.9552 / 0.914) — a seed replicate. Version 25's 16 runs blend to 0.9609 / 0.928; with E50 (17 runs)
+0.9611 / 0.927: +0.0002, below what moved the LB so far (+0.0005 for +0.001) — not worth a submission alone.
+E53 folds 2–3 started (job 1021737, nodemm01) when E50's job ended; E53 folds 0–1 (1021736) and 4 (1021738) running.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
