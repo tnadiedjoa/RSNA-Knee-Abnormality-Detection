@@ -21,3 +21,4 @@ runs/_smoke/
 # kaggle kernels pull yamadan96/rsna-knee-d4-public0946 -p kaggle/blend && mv kaggle/blend/rsna-knee-d4-public0946.ipynb kaggle/blend/public_src.ipynb
 kaggle/blend/*.ipynb
 kaggle/blend_w25/*.ipynb
+kaggle/blend_w10/*.ipynb
