@@ -1148,6 +1148,10 @@ Public write-ups found on GitHub (2026-10-05, web search; context only, nothing 
 Our numbers sit in the same place (0.931 single, 0.935 ensemble, 0.942 blended), and the second write-up warns that
 an extra family may not move the 0.943 public ensemble — the blends submitted today (v3 / v4) test exactly that.
 
+Submitted by the user at 07:36–07:37 Paris (2026-10-05): knee-blend versions 3 (ref 56843645) and 4 (56843667),
+knee-submit Version 25 (56843671) — matched through `scriptVersionId` (knee-blend 355281624 < 355283800 = pushed
+00:01 < 00:17; knee-submit 355269060 = Version 25, pushed 22:45). Two submissions left today (E51 abandoned).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

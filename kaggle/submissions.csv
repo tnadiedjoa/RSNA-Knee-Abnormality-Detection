@@ -22,3 +22,6 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56817560,2026-10-04 07:29,knee-submit,22,E45 (4-table base + next round),0.929,
 56817566,2026-10-04 07:29,knee-submit,23,"E39, E36, E38, E43, E35, E37, E32, E34, E30, E33 (own labels, rounds 3-5)",0.934,
 56817573,2026-10-04 07:30,knee-submit,24,"Version 23 + E41, E42, E44, E45 (14 runs)",0.935,
+56843645,2026-10-05 05:36,knee-blend,3,"public pipeline 0.85 + Version 24's 14 runs 0.15",,pending
+56843667,2026-10-05 05:37,knee-blend,4,"public pipeline 0.75 + Version 24's 14 runs 0.25",,pending
+56843671,2026-10-05 05:37,knee-submit,25,"Version 24 + E46 + E47 (16 runs)",,pending
