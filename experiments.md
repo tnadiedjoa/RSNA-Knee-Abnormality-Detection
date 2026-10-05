@@ -1184,6 +1184,19 @@ the P100 (ResNet-34, 3 steps): checkpoint and `full0_history.json` written, no O
 LB 0.931 alone) with `--full-fit`, 3 networks, one 3090 in sequence (`slurm/runs/e54.txt`, queued behind the job
 limit, ~3.5 h) → E54 alone against E41 alone: 25 % more data per network vs 5 networks averaged over 3.
 
+Auto (2026-10-06 00:23, slurm/auto_1005.sh): Kaggle: ref 56843645 (knee-blend version 3) scored 0.944; ref 56843667 (knee-blend version 4) scored 0.943; ref 56843671 (knee-submit version 25) scored 0.936.
+
+**LB of 2026-10-05** (read 2026-10-06 00:25): knee-blend v3 (public 0.85 + Version 24's 14 runs 0.15) **0.944** — the
+first blend above the public pipeline alone (0.943): our ensemble now adds to it, at a low weight; v4 (weight 0.25)
+0.943; v2 (0.929 set at 0.3) was 0.942 → the optimum weight is ≤ 0.15. knee-submit Version 25 (16 runs) **0.936**
+(+0.001 over Version 24: E46 + E47). Our best with our own labels only stays Version 18/23 (0.934).
+
+**E53 complete** (E46 recipe, seed 1, 384 px): silver 0.9573, gold 0.922 (E46: 0.9578 / 0.920); E46 + E53 0.9618.
+Added to Version 25's 16 runs on OOF: +E53 +0.0004, +E53 +E50 **+0.0006** (0.9609 → 0.9615).
+**E54 complete** (E41 recipe, full data, 3 networks, ~65 min each): in-sample monitor silver 0.978 (not a
+validation); only the LB can judge it. No job ran after E53/E54 ended (~11:00 on 2026-10-05): the unattended
+follow-up job was being written when the user left, and was not submitted.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
