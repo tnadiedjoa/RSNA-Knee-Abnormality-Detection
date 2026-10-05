@@ -1197,6 +1197,17 @@ Added to Version 25's 16 runs on OOF: +E53 +0.0004, +E53 +E50 **+0.0006** (0.960
 validation); only the LB can judge it. No job ran after E53/E54 ended (~11:00 on 2026-10-05): the unattended
 follow-up job was being written when the user left, and was not submitted.
 
+**Plan for 2026-10-06** (00:30): knee-submit **Version 26** = E54 alone (full-data training vs E41 alone, 0.931) and
+**Version 27** = Version 25 + E53 + E50 (18 runs, +0.0006 on OOF) — being packaged (dataset with the 19 runs). knee-blend
+with the same 18 runs at our weight **0.15** (`kaggle/blend/`, vs v3 0.944: a better set at the best weight so far)
+and **0.10** (`kaggle/blend_w10/`, new folder, notebook git-ignored like the other copies of public code): 0.25 < 0.15,
+so the optimum may sit lower. `kaggle/blend/knee-blend-v3.ipynb` keeps the v3 build. **E55** (00:50) = E46 recipe with
+seed 2 (`slurm/runs/e55_*.txt`, jobs 1023235/36/37).
+**Unattended follow-up**: `slurm/auto_1006.sbatch` (job 1023238, CPU partition, nodecpu10; Kaggle API and GitHub reachable
+from there) waits for the Claude session's knee-submit pushes (marker `logs/day10_pushed`, else redoes them at 02:30),
+pushes both blends (`logs/push_blends.sh`, which now waits for the new version to start before waiting for its end),
+writes `kaggle/A_SOUMETTRE.md`, then logs Kaggle scores and E55's OOF gain every 10 min (`scripts/auto_followup.py`).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
