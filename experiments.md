@@ -1134,6 +1134,20 @@ more on a known member. ✗ for now. **E53** (06:00) = E46 recipe with seed 1 (E
 blend), `slurm/runs/e53_*.txt`: fold 4 on nodemm05 (job 1021738), folds 0–1 / 2–3 (1021736/37) queued.
 E50 at epoch 3 (05:55): folds 0 / 1 / 3 / 4 silver 0.918 / 0.912 / 0.928 / 0.902.
 
+**E50 folds 0–1 done** (07:33): silver 0.9540 / 0.9566, gold(fold) 0.929 / 0.932 (E42, seed 42: 0.9577 / 0.9550) —
+seed noise both ways. E53 folds 0–1 took node40 (job 1021736); E53 fold 4 at epoch 1: silver 0.832 (normal).
+
+Public write-ups found on GitHub (2026-10-05, web search; context only, nothing reused):
+- `TranBaDat2607/RSNA-Knee-Abnormality-Detection`: public CoAtNet checkpoints (v5/v10/v8) + residual-gated CoAtNet at
+  0.4 → **0.939 LB**, 0.930 on the 58 gold studies; labels from an OpenAI model (gold agreement 0.869).
+- `raahimnawaz/rsna-knee-abnormality-detection`: ViT-L (DINOv3 continued-pretrained on knees), 7 slots, up to 82
+  three-slice windows per study (96 slices at 384 px, 140 mm FOV) → **0.929 alone**; rank-averaged into the public
+  0.943 ensemble as an extra family → **no change (0.943)**; OOF image teachers mixed into report labels gave at most
+  +0.005 LB; ViT-L and CoAtNet on the same labels within 0.005 of each other ("labels/recipe > architecture");
+  the 58 gold studies overstated LB gains, while a 691-study held-out fold correlated 0.996 with the LB.
+Our numbers sit in the same place (0.931 single, 0.935 ensemble, 0.942 blended), and the second write-up warns that
+an extra family may not move the 0.943 public ensemble — the blends submitted today (v3 / v4) test exactly that.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
