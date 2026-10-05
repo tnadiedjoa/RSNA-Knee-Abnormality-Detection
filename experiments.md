@@ -1157,6 +1157,23 @@ knee-submit Version 25 (56843671) — matched through `scriptVersionId` (knee-bl
 0.9611 / 0.927: +0.0002, below what moved the LB so far (+0.0005 for +0.001) — not worth a submission alone.
 E53 folds 2–3 started (job 1021737, nodemm01) when E50's job ended; E53 folds 0–1 (1021736) and 4 (1021738) running.
 
+**Kaggle inference path replayed on validation folds** (08:00, `scripts/check_infer.py`, P100 = fp16-only like the
+T4s). Motive: on the 58 gold studies our single models sit near Archit Konde's (~0.93 vs his 0.930 OOF), yet he
+scores 0.950 on the LB and we 0.931 — a gap that could hide a train/test mismatch (58 studies: weak evidence).
+Checked by reading: `test_series.csv` has the same columns, dtypes and values as `train_series.csv` (slot choice
+identical); `knee/infer.py` decodes with the training functions and defaults (150 mm, 64 slices, `study_side`
+over header-only series ≡ the training meta). Checked by running: fold 0 through the inference code path in fp16
+(Kaggle) vs the run's own OOF (bf16, `scripts/train.py`), same 12 windows:
+
+| run | studies | OOF silver | fp16 replay silver | mean per-label correlation | max abs diff | non-finite logits |
+|---|---|---|---|---|---|---|
+| E35 (224 px) | 120 | 0.9586 | 0.9587 | 1.0000 | 0.0073 | 0 |
+| E36 (384 px) | 60 | 0.9630 | 0.9629 | 1.0000 | 0.0054 | 0 |
+| E37 (ConvNeXt-small 384) | 60 | 0.9673 | 0.9677 | 1.0000 | 0.0074 | 0 |
+
+No precision or code-path loss: the LB gap to the top single models is not an inference bug. (Remaining
+unchecked link: the remote-archive DICOMs vs the files Kaggle mounts — same bytes by construction.)
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
