@@ -1374,6 +1374,16 @@ Each 224 px question (E58, E61, E62) is one full-data run judged alone against E
 E55, E56, E58) with the grouped `knee/infer.py`, then pushes knee-submit **Version 28 = E56 alone** (full data at
 384 px vs E54 at 224 px) and **Version 29 = E58 alone**.
 
+**E56 and E58 complete** (E56 networks 0–1 at 11:03, network 2 at 12:01; E58 ~11:10; in-sample monitors only).
+`logs/chain_v28.sh` then packaged the 22 runs (12:03) and pushed knee-submit **Version 28 = E56 alone**
+(`logs/push_1006_1202`: 3 networks, one 384 px group, 35 s, 1.3 min on the visible test) and **Version 29 =
+E58 alone** (`logs/push_1006_1230`: 3 networks, 30 s) — the first versions with the grouped two-T4 inference.
+On ~1,250 hidden studies: 3 × 0.60 / 2 ≈ 0.9 s/study → ~20 min of models + ~25 min decoding.
+E61 (gold weight 10) and E62 (sequence embedding) started at 11:03 / 11:13 (2 GPUs each, ~13:20 / 13:30);
+E59 and E60 wait: all ten 3090s busy (six by other users) at 12:35.
+One submission left today: Version 29 first (its answer decides whether E59/E60, not started, switch to
+per-finding α), Version 28 tomorrow.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
