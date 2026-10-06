@@ -1441,6 +1441,15 @@ GPUs 0,1: "BLEND written", 0.11 h; `logs/blend_1006_2130`). Order for the user (
 tonight if a submission is left; tomorrow 34, blend 7, 28, (29), 32; then 33. Running: E64 networks 0–1 (~00:10),
 E65 (node40), E66 network 2 (nodemm01); E66 networks 0–1 waiting.
 
+**Night of 2026-10-06/07** (read 01:16): the Claude session and the interactive job ended during the evening (new
+interactive job 1025494 at ~01:15); the batch jobs were unaffected. **E64** (own-label E39 recipe, 384 px, full
+data) and **E65** (own-label E47 recipe, 224 px, full data) complete, **E66** network 2 complete; E66 networks 0–1
+(job 1024334) wait on Priority: all ten 3090s held by other users, our fair-share priority low after a full day
+(P100s idle, but ConvNeXt is ~8× slower there). Version 29 was not submitted on 10-06 (one submission unused).
+`logs/chain_v35.sh` (01:20) packages 28 runs (adds E64, E65, the last one new so the wait works) and pushes
+knee-submit **Version 35 = own-label full-data ensemble E64 + E60 + E65** — no public table in any lineage, the
+candidate to beat the CV's own-label 0.934.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
