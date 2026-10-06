@@ -27,5 +27,5 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56843671,2026-10-05 05:37,knee-submit,25,"Version 24 + E46 + E47 (16 runs)",0.936,
 56871945,2026-10-06 05:57,knee-submit,26,"E54 alone (E41 recipe, full data, 3 networks)",0.935,
 56871950,2026-10-06 05:57,knee-submit,27,"Version 25 + E53 + E50 (18 runs)",0.936,
-56871958,2026-10-06 05:57,knee-blend,5,"public pipeline 0.85 + Version 27's 18 runs 0.15",,pending
+56871958,2026-10-06 05:57,knee-blend,5,"public pipeline 0.85 + Version 27's 18 runs 0.15",0.944,
 56871962,2026-10-06 05:57,knee-blend,6,"public pipeline 0.90 + Version 27's 18 runs 0.10",0.944,

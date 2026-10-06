@@ -1424,6 +1424,12 @@ rebuild and push **knee-blend version 7** = public pipeline + the same four runs
 `logs/blend7_weight` (0.15 unless version 5's score says otherwise; the version 5 build is kept as
 `kaggle/blend/knee-blend-v5.ipynb`). Expected ~21:30.
 
+Auto (2026-10-06 16:19, scripts/auto_followup.py): Kaggle: ref 56871958 (knee-blend version 5) scored 0.944.
+
+**knee-blend version 5: 0.944** (public 0.85 + Version 27's runs 0.15, scored 16:19): weights 0.10 and 0.15 tie at
+0.944 (0.25: 0.943, 0.30 with a weaker set: 0.942) → version 7 keeps 0.15. **E59 complete** (~16:10, three
+full-data networks, seeds 142–144); E60 started 16:10/16:12 on three 3090s (~4.8 h per network → ~21:00).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
