@@ -1,0 +1,2 @@
+# E64 network 2 (seed 44), see e64_01.txt
+--name e64_full_e39_n2 --run-dir 2026-10-06_1400_e64_convnext_384_labels_r5_full3 --labels qwen36_27b_v1 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.7 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --full-fit --folds 2

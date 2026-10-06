@@ -1400,6 +1400,11 @@ The dataset version of 13:17 was processed at 13:38; knee-submit **Version 32 = 
 Ready to submit, each one change against E54 (0.935): **28** E56 (384 px), **29** E58 (per-finding α), **32** E61
 (gold weight 10), **33** E62 (sequence embedding). E59 (seeds 142–144 of E56) started 13:13 / 13:16.
 
+**E64** queued after E60 (jobs 1024059/60, nice 300) = E39 recipe on all studies: 384 px, **own labels only**
+(Qwen base, round-4 teacher α 0.7; lineage checked: teacher r4 = E35 + E36 ← teacher r3 = E30/E32/E33 ← teacher r2 =
+E23/E24/E25/E27, none with `--mix-public`) — the CV quotes own-label scores (best: Versions 18/23, 0.934) and E54's
+gain suggests a full-data own-label set can beat it. E60 (ConvNeXt-small, round-3 labels) is own-label too.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
