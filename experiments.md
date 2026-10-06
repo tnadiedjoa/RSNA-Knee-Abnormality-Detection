@@ -1430,6 +1430,10 @@ Auto (2026-10-06 16:19, scripts/auto_followup.py): Kaggle: ref 56871958 (knee-bl
 0.944 (0.25: 0.943, 0.30 with a weaker set: 0.942) → version 7 keeps 0.15. **E59 complete** (~16:10, three
 full-data networks, seeds 142–144); E60 started 16:10/16:12 on three 3090s (~4.8 h per network → ~21:00).
 
+**Night queue** (16:30, after E60 and E64): **E65** = E47 recipe on all studies (224 px, own labels: Qwen base +
+round-5 teacher E38/E39/E43, α 0.7; `slurm/runs/e65.txt`, nice 400) — with E60 and E64, an own-label full-data set;
+**E66** = E42 recipe on all studies (384 px, 4-table base, round-4 teacher; `slurm/runs/e66_*.txt`, nice 500).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

@@ -1,0 +1,2 @@
+# E66 network 2 (seed 44), see e66_01.txt
+--name e66_full_e42_n2 --run-dir 2026-10-06_1630_e66_convnext_384_mixpub_r5_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --full-fit --folds 2
