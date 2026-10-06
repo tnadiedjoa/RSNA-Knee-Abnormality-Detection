@@ -1339,6 +1339,15 @@ then ConvNeXt-small 384, then E42.
 dataset's copy; the whole Version 27 list grouped on the same 60 studies, peak GPU memory, per-model predictions
 compared with the old path (E46, E41, E37), and the budget rule with a 300 s budget.
 
+**E57 folds 0–1 done** (09:07; sequence embedding, E41 recipe): silver 0.9538 / 0.9524 (E41 0.9518 / 0.9536), gold(fold)
+0.926 / 0.895 (E41 0.922 / 0.914); pooled over the 1,764 studies 0.9533 vs 0.9524 (**+0.0009**, paired bootstrap 95 %
+CI [−0.0023, +0.0045]), gold 0.901 vs 0.906. Per finding (silver): ACL +0.018, lateral meniscus +0.009, fracture
++0.006 / MCL −0.013, PF OA −0.010, contusion −0.009 — the sagittal gain fits the T1/PD/T2 mix of `sag_t`, the
+rest looks like noise. **Not a clear gain**: folds 2–4 (job 1023567) cancelled at 09:09 for E58's GPUs — fold 2 was
+at epoch 9 of 12 (silver 0.9503), lost (should have waited 12 min). `--seq-emb` stays in the code (default off);
+it could be judged later on the LB as E54 + `--seq-emb` (full data, 3 networks, ~3.3 GPU-hours).
+Queue at 09:10: E56 networks 0–1 (nodemm05) and 2 (node40), **E58** (node40, started 09:09), E59 waiting.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

@@ -1,0 +1,2 @@
+# E59 network 2 (seed 144), see e59_01.txt
+--name e59_full_e46_s142_n2 --run-dir 2026-10-06_0930_e59_convnext_384_mixpub_r6_full3_seed142 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_2210_teacher_mixpub_r5_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --img-size 384 --full-fit --seed 142 --folds 2
