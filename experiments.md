@@ -1296,6 +1296,20 @@ models, ConvNeXt-small among them) — likely past the budget, i.e. the tail of 
   is re-checked before each group. On the P100 (24 training studies, E35 + E41, 12 windows) it gives **exactly**
   the predictions of the per-model path (max |diff| 0.0, one or two device slots) — 58 s vs 70 s on one GPU.
 
+Auto (2026-10-06 08:46, scripts/auto_followup.py): Kaggle: ref 56871945 (knee-submit version 26) scored 0.935.
+
+**Version 26 on the public LB: 0.935** (scored 08:46) — **E54 alone**, i.e. the E41 recipe trained on all 4,407
+studies (3 networks, seeds 42/43/44), against **0.931** for E41 alone (5 fold networks on 80 % each): **+0.004**,
+the largest single-model step since the round-3 labels, and as much as the whole 14-run Version 24 (0.935). More
+data per network beats averaging five 80 % networks here (noisy report labels: data-hungry), and every gold study
+(58, weight 3) is now in training instead of ~46. Full-data training becomes the default for submissions; 5-fold
+runs stay for OOF (teachers, ensemble selection), full-data ones go to Kaggle. Queue changes (08:50):
+- **E58** switched to full data before it started (job 1023584, 2 GPUs: networks 0–1 / 2, seeds as E54), so the
+  per-finding α is compared with E54 (0.935) — same seeds, only the labels differ; the 5-fold version (1023582)
+  was cancelled while pending.
+- **E56 network 2** queued (job 1023585, 1 GPU, `slurm/runs/e56_2.txt`): three full-data E46 networks like E54.
+- E46-recipe network on a full 3090: ~15 min/epoch on all studies (12 on 80 %), ~3 h per network.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
