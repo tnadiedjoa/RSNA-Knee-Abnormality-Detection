@@ -77,7 +77,8 @@ def predict(model, loader, device):
     out = []
     for batch in loader:
         with torch.autocast("cuda", dtype=AMP_DTYPE):
-            logits = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device), batch["mask"].to(device))
+            logits = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device), batch["mask"].to(device),
+                           batch["seq"].to(device))
         out.append(torch.sigmoid(logits.float()).cpu().numpy())
     return np.concatenate(out)
 
@@ -98,7 +99,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
     dl_va = DataLoader(ds_va, bs_va, num_workers=args.workers, pin_memory=True)
 
     torch.manual_seed(args.seed + fold)
-    model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path, pool=args.pool).to(device)
+    model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path, pool=args.pool,
+                    seq_emb=args.seq_emb).to(device)
     model = model.to(memory_format=torch.channels_last)
     if args.grad_ckpt:  # recompute backbone activations in the backward pass: bigger backbones fit a 16 GB P100
         model.backbone.set_grad_checkpointing(True)
@@ -122,7 +124,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
             if args.debug_steps and step >= args.debug_steps:
                 break
             with torch.autocast("cuda", dtype=AMP_DTYPE):
-                logits = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device), batch["mask"].to(device))
+                logits = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device), batch["mask"].to(device),
+                           batch["seq"].to(device))
             loss = F.binary_cross_entropy_with_logits(logits.float(), batch["y"].to(device), reduction="none")
             loss = (loss * batch["w"].to(device)).sum() / batch["w"].sum().to(device)
             opt.zero_grad(set_to_none=True)
@@ -177,6 +180,7 @@ def main():
     p.add_argument("--depth", type=int, default=2)
     p.add_argument("--drop-path", type=float, default=0.1)
     p.add_argument("--pool", default="avg", choices=["avg", "avgmax"], help="pooling inside each window (knee/model.py)")
+    p.add_argument("--seq-emb", action="store_true", help="add a learned T1/PD/T2/... embedding to each slot's tokens (knee/model.py)")
     p.add_argument("--aug", type=float, default=1.0)
     p.add_argument("--silence-weight", type=float, default=0.5)
     p.add_argument("--gold-weight", type=float, default=3.0)

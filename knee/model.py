@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 
 from knee.config import LABELS
-from knee.data import SLOTS
+from knee.data import SEQ_CLASSES, SLOTS
 
 MEAN = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1) * 255
 STD = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1) * 255
@@ -31,7 +31,8 @@ def make_backbone(name: str, pretrained: bool, **kwargs) -> nn.Module:
 
 class KneeNet(nn.Module):
     def __init__(self, backbone: str = "resnet34", pretrained: bool = True, dim: int = 256, depth: int = 2,
-                 heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1, pool: str = "avg"):
+                 heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1, pool: str = "avg",
+                 seq_emb: bool = False):
         super().__init__()
         kwargs = {"drop_path_rate": drop_path} if drop_path else {}
         if backbone.startswith("vit_"):  # ViTs (e.g. DINOv2) were pretrained at another size: resample positions
@@ -43,6 +44,10 @@ class KneeNet(nn.Module):
         n_feats = self.backbone.num_features * (2 if pool == "avgmax" else 1)
         self.proj = nn.Sequential(nn.Linear(n_feats, dim), nn.LayerNorm(dim))
         self.slot_emb = nn.Parameter(torch.zeros(len(SLOTS), dim))
+        # weighting of each slot's series (T1 / PD / T2 / ...), added to its tokens; zero at the start
+        self.seq_emb = nn.Embedding(len(SEQ_CLASSES), dim) if seq_emb else None
+        if self.seq_emb is not None:
+            nn.init.zeros_(self.seq_emb.weight)
         self.pos_emb = nn.Sequential(nn.Linear(1, dim), nn.GELU(), nn.Linear(dim, dim))
         layer = nn.TransformerEncoderLayer(dim, heads, dim * 2, dropout, batch_first=True, norm_first=True)
         self.encoder = nn.TransformerEncoder(layer, depth)
@@ -62,13 +67,15 @@ class KneeNet(nn.Module):
             mx = norm(mx)
         return torch.cat([self.backbone.forward_head(fmap, pre_logits=True), mx.flatten(1)], 1)
 
-    def forward(self, x, pos, mask):
-        # x: (B, S, T, 3, H, W) uint8; pos: (B, S, T); mask: (B, S)
+    def forward(self, x, pos, mask, seq=None):
+        # x: (B, S, T, 3, H, W) uint8; pos: (B, S, T); mask: (B, S); seq: (B, S) SEQ_CLASSES indices
         b, s, t = x.shape[:3]
         imgs = x.flatten(0, 2).float()
         imgs = (imgs - MEAN.to(imgs.device)) / STD.to(imgs.device)
         feats = self.proj(self.embed(imgs.contiguous(memory_format=torch.channels_last))).view(b, s, t, -1)
         tokens = feats + self.slot_emb[None, :, None] + self.pos_emb(pos.unsqueeze(-1))
+        if self.seq_emb is not None:
+            tokens = tokens + self.seq_emb(seq)[:, :, None]
         tokens = tokens.flatten(1, 2)  # (B, S*T, D)
         pad = ~mask.repeat_interleave(t, dim=1)  # True = ignore
         pad[pad.all(1), 0] = False  # a study with no readable series still gets a (blank) token

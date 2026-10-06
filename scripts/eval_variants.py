@@ -38,7 +38,7 @@ def predict(model, ds, device, bs):
     out = []
     for batch in DataLoader(ds, bs, num_workers=ds_workers, pin_memory=True):
         with torch.autocast("cuda", dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16):
-            logits = model(batch["x"].to(device), batch["pos"].to(device), batch["mask"].to(device))
+            logits = model(batch["x"].to(device), batch["pos"].to(device), batch["mask"].to(device), batch["seq"].to(device))
         out.append(torch.sigmoid(logits.float()).cpu().numpy())
     return np.concatenate(out)
 
@@ -70,7 +70,7 @@ def main():
     for fold in range(5):
         va = np.where(studies["fold"].to_numpy() == fold)[0]
         model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
-                         pool=cfg.get("pool", "avg"))
+                         pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False))
         model.load_state_dict(torch.load(run / "checkpoints" / f"fold{fold}.pt", map_location="cpu"))
         model = model.to(device).eval().to(memory_format=torch.channels_last)
         for name, o in variants:

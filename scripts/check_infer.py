@@ -45,7 +45,7 @@ def main():
 
     device = torch.device("cuda")
     model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
-                    pool=cfg.get("pool", "avg"))
+                    pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False))
     model.load_state_dict(torch.load(run / "checkpoints" / f"fold{args.fold}.pt", map_location="cpu"))
     model = model.to(device).eval().to(memory_format=torch.channels_last)
 
@@ -56,9 +56,9 @@ def main():
     out, nonfinite = [], 0
     with torch.no_grad():
         for batch in dl:
-            x, pos, mask = batch["x"].to(device), batch["pos"].to(device), batch["mask"].to(device)
+            x, pos, mask, seq = (batch[k].to(device) for k in ("x", "pos", "mask", "seq"))
             with torch.autocast("cuda", dtype=dtype or torch.float32, enabled=dtype is not None):
-                logits = model(x, pos, mask).float()
+                logits = model(x, pos, mask, seq).float()
             nonfinite += int((~torch.isfinite(logits)).sum())
             out.append(torch.sigmoid(logits).cpu().numpy())
     pred = pd.DataFrame(np.concatenate(out), columns=LABELS, index=oof.index)

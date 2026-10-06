@@ -52,8 +52,9 @@ def _prepare(args):
             x, pos = to_uint8(vol, size=size)
             (size_dir(out_dir, size) / study).mkdir(parents=True, exist_ok=True)
             save_series(size_dir(out_dir, size) / study / f"{series}{SUFFIX}", x, pos)
-        return {"study": study, "series": series, "MRAcquisitionType": vol.meta.get("MRAcquisitionType"),
-                "cached_slices": len(x), "ok": True}
+        return {"study": study, "series": series, "cached_slices": len(x), "ok": True,  # + header fields of series_meta
+                **{t: vol.meta.get(t) for t in ("MRAcquisitionType", "RepetitionTime", "EchoTime", "InversionTime",
+                                                "ScanningSequence")}}
     except Exception as e:  # a broken series must not sink the submission
         return {"study": study, "series": series, "ok": False, "error": repr(e)}
 
@@ -93,15 +94,15 @@ def predict_model(model_dir: Path, slots: pd.DataFrame, cache_dir: Path, device,
     models = []
     for ckpt in sorted(model_dir.glob("fold*.pt")):
         model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
-                         pool=cfg.get("pool", "avg"))
+                         pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False))
         model.load_state_dict(torch.load(ckpt, map_location="cpu"))
         models.append(model.to(device).eval().to(memory_format=torch.channels_last))
     out = [[] for _ in models]
     for batch in dl:  # every batch is read once and goes through all fold networks
-        x, pos, mask = batch["x"].to(device), batch["pos"].to(device), batch["mask"].to(device)
+        x, pos, mask, seq = (batch[k].to(device) for k in ("x", "pos", "mask", "seq"))
         for i, model in enumerate(models):
             with torch.autocast(device.type, dtype=torch.float16, enabled=device.type == "cuda"):
-                logits = model(x, pos, mask)
+                logits = model(x, pos, mask, seq)
             out[i].append(torch.sigmoid(logits.float()).cpu().numpy())
     print(f"{model_dir.name}: {len(models)} fold networks done", flush=True)
     return np.mean([np.concatenate(o) for o in out], axis=0)

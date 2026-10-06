@@ -21,6 +21,9 @@ from knee.config import CACHE_DIR, DATA_DIR
 # (name, plane, fluid-sensitive fat-suppressed?)
 SLOTS = [("sag_fs", "sagittal", 1), ("cor_fs", "coronal", 1), ("ax_fs", "axial", 1),
          ("sag_t", "sagittal", 0), ("cor_t", "coronal", 0)]
+# weighting of the series in a slot, from its header times (KneeNet --seq-emb): the sag_t slot alone
+# holds T1 (39 %), PD (41 %) and T2 (20 %) series of the training set
+SEQ_CLASSES = ["unknown", "T1", "PD", "T2", "STIR", "GRE"]
 
 
 def series_table(split: str = "train") -> pd.DataFrame:
@@ -32,8 +35,20 @@ def series_table(split: str = "train") -> pd.DataFrame:
     return df
 
 
+def sequence_classes(series: pd.DataFrame) -> pd.Series:
+    """Index into SEQ_CLASSES per series: TI 80-300 ms -> STIR, gradient echo -> GRE, TR < 1000 ms -> T1,
+    TE >= 60 ms -> T2, else PD; unknown when TR or TE is missing."""
+    def num(col):
+        return pd.to_numeric(series[col], errors="coerce") if col in series else pd.Series(float("nan"), index=series.index)
+    tr, te, ti = num("RepetitionTime"), num("EchoTime"), num("InversionTime")
+    gre = series["ScanningSequence"].astype(str).eq("GR") if "ScanningSequence" in series else False
+    cls = np.select([tr.isna() | te.isna(), ti.between(80, 300), gre, tr < 1000, te >= 60], [0, 4, 5, 1, 3], 2)
+    return pd.Series(cls, index=series["SeriesInstanceUID"].to_numpy())
+
+
 def assign_slots(series: pd.DataFrame) -> pd.DataFrame:
-    """One series per slot per study (None when the study has no candidate).
+    """One series per slot per study (None when the study has no candidate), and its SEQ_CLASSES
+    index in "<slot>_seq".
 
     Candidates match the CSV plane and fat-suppression flag; ties go to 2D acquisitions,
     then to the series with the most slices. An empty slot borrows another unused series
@@ -55,7 +70,10 @@ def assign_slots(series: pd.DataFrame) -> pd.DataFrame:
                     row[name] = cand["SeriesInstanceUID"].iloc[0]
                     used.add(row[name])
         rows.append(row)
-    return pd.DataFrame(rows)
+    out, seq = pd.DataFrame(rows), sequence_classes(series)
+    for name, _, _ in SLOTS:
+        out[f"{name}_seq"] = out[name].map(seq).fillna(0).astype(int)
+    return out
 
 
 def window_centers(n_slices: int, n_windows: int, lo: float, hi: float, jitter: float, rng) -> np.ndarray:
@@ -109,10 +127,12 @@ class StudyDataset(Dataset):
         x = np.zeros((n_slots, t, 3, s, s), np.uint8)
         pos = np.zeros((n_slots, t), np.float32)
         mask = np.zeros(n_slots, bool)
+        seq = np.zeros(n_slots, np.int64)
         for k, (name, _, _) in enumerate(SLOTS):
             series = row[name]
             if _is_missing(series):
                 continue
+            seq[k] = 0 if pd.isna(row.get(f"{name}_seq")) else int(row[f"{name}_seq"])
             vol = self._load(study, series)
             n = len(vol)
             centers = window_centers(n, t, *self.span, jitter=0.03 if self.train else 0.0, rng=rng)
@@ -133,7 +153,8 @@ class StudyDataset(Dataset):
                 x[k] = (lut * 255).astype(np.uint8)[x[k]]
             pos[k] = centers / max(n - 1, 1)
             mask[k] = True
-        out = {"x": torch.from_numpy(x), "pos": torch.from_numpy(pos), "mask": torch.from_numpy(mask)}
+        out = {"x": torch.from_numpy(x), "pos": torch.from_numpy(pos), "mask": torch.from_numpy(mask),
+               "seq": torch.from_numpy(seq)}
         if self.labels is not None:
             out["y"] = torch.from_numpy(self.labels[i].astype(np.float32))
             out["w"] = torch.from_numpy(self.weights[i].astype(np.float32))
