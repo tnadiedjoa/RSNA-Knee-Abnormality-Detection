@@ -1364,6 +1364,16 @@ the 16-study calibration (41 networks loaded, 0.6 s each) left 2 min, so only E4
 (3 % over: negligible against a budget of hours). On ~1,250 hidden studies the whole 18-model list would need
 ~6.5 h + 0.4 h decoding: it now fits, where one T4 ran only the first ~9.
 
+**Queue for 2026-10-06** (09:40; Slurm runs pending jobs by priority, `--nice` sets the order). Running: E56
+(full-data E46 recipe, 384 px, networks 0–1 nodemm05 ~11:15, network 2 node40 ~12:15), E58 (full-data E54 +
+per-finding α, node40, ~11:20). Pending, in order: **E61** (E54 + gold weight 10), **E62** (E54 + `--seq-emb`,
+`slurm/runs/e62.txt`: the LB test of E57's idea), **E59** (E56 with seeds 142–144), **E60** (E37 recipe —
+ConvNeXt-small 384 px, round-3 labels — on all studies, `slurm/runs/e60_*.txt`, ~4.8 h per network).
+Each 224 px question (E58, E61, E62) is one full-data run judged alone against E54 (0.935), seeds unchanged.
+`logs/chain_v28.sh` (background) waits for E56 and E58's six networks, packages 22 runs (Version 27's 18, E54,
+E55, E56, E58) with the grouped `knee/infer.py`, then pushes knee-submit **Version 28 = E56 alone** (full data at
+384 px vs E54 at 224 px) and **Version 29 = E58 alone**.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
