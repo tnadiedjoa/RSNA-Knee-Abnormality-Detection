@@ -1434,6 +1434,13 @@ full-data networks, seeds 142–144); E60 started 16:10/16:12 on three 3090s (~4
 round-5 teacher E38/E39/E43, α 0.7; `slurm/runs/e65.txt`, nice 400) — with E60 and E64, an own-label full-data set;
 **E66** = E42 recipe on all studies (384 px, 4-table base, round-4 teacher; `slurm/runs/e66_*.txt`, nice 500).
 
+**E60 complete** (21:04; E64 network 2 too, ~19:30). `logs/chain_v34.sh` packaged 26 runs and pushed knee-submit
+**Version 34 = E56 + E59 + E60 + E54** (`logs/push_1006_21*`: one 384 px group of 3 models in 55 s + one 224 px group,
+2.2 min on the visible test) and **knee-blend version 7** (public 0.85 + the same four runs 0.15, 24 windows, ours on
+GPUs 0,1: "BLEND written", 0.11 h; `logs/blend_1006_2130`). Order for the user (`kaggle/A_SOUMETTRE.md`): Version 29
+tonight if a submission is left; tomorrow 34, blend 7, 28, (29), 32; then 33. Running: E64 networks 0–1 (~00:10),
+E65 (node40), E66 network 2 (nodemm01); E66 networks 0–1 waiting.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
