@@ -1356,6 +1356,14 @@ Notebooks switched to the grouped two-T4 inference for the next pushes: knee-sub
 `run(..., grouped=True)`; `scripts/build_blend_nb.py` gives our part every GPU with ≥ 6 GB free (both T4s
 had 14.7 GB free after the public part in blend versions 5/6) and `grouped=True`.
 
+**knee-bench version 2** (COMPLETE 09:40, 33 min, `logs/bench_1006_v2/`) — the grouped two-T4 path on the same 60
+studies, whole Version 27 list at 24 windows: groups 384 px (8 models) 757 s, 224 px (7) 232 s, 256 px (3) 140 s →
+**18.8 s/study vs ~37 s/study** one model after another on one T4 (2.0×); peak memory 8.9 / 8.8 GiB per T4 (16 GB);
+predictions **identical** to the old path (max |diff| 0.0 for E46, E41 and E37). Budget rule with a 300 s budget:
+the 16-study calibration (41 networks loaded, 0.6 s each) left 2 min, so only E46 was kept and the call took 309 s
+(3 % over: negligible against a budget of hours). On ~1,250 hidden studies the whole 18-model list would need
+~6.5 h + 0.4 h decoding: it now fits, where one T4 ran only the first ~9.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
