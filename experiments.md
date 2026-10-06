@@ -1216,6 +1216,32 @@ Auto (2026-10-06 05:38, scripts/auto_followup.py): **E55 complete** (E46 recipe,
 
 Auto (2026-10-06 07:59, scripts/auto_followup.py): Kaggle: new submission ref 56871945 (knee-submit, scriptVersionId 355580807); new submission ref 56871950 (knee-submit, scriptVersionId 355582643); new submission ref 56871958 (knee-blend, scriptVersionId 355583502); new submission ref 56871962 (knee-blend, scriptVersionId 355585333).
 
+Submitted by the user at 07:57 Paris (2026-10-06): refs 56871945 / 56871950 = knee-submit Versions 26 / 27 and
+56871958 / 56871962 = knee-blend versions 5 / 6 (matched through `scriptVersionId`, increasing with push order).
+E55 added alone to Version 25's 16 runs: +0.0003 on OOF (0.9609 → 0.9612): a third seed of E46 adds less than the
+second (E53 +0.0004) — seeds of one recipe are running out.
+
+### E56 / E57 — full-data 384 px, sequence embedding (2026-10-06 08:00)
+
+The 3090s sat idle from 05:38 (E55 done) to 08:04. Two jobs (Slurm here: 2 GPUs per job at most,
+QOSMaxGRESPerJob — a 3-GPU job is refused; 4 CPUs per GPU; 4 running jobs per user, knee_auto and the
+interactive session included):
+- **E56** = E46 recipe (384 px, 4-table base, round-5 mixpub teacher; the most useful member) with `--full-fit`,
+  networks 0–1 in parallel (job 1023550, nodemm05, ~5.5 h; network 2 in `slurm/runs/e56_2.txt` if E54 wins).
+  Launched ahead of the LB verdict on full-data training (Version 26 = E54 alone vs E41 alone 0.931, scored ~11:00):
+  if it wins, E56 joins or replaces E46 in the next Version.
+- **E57** = E41 recipe (224 px) + `--seq-emb`, folds 0–1 (job 1023557, node40, ~1 h per fold), against E41 per
+  fold (0.9518 / 0.9536). Motive (item 2 of the public-vs-ours list of 2026-10-04): a slot can hold several
+  weightings and the model is not told which — `sag_t` holds PD 35 %, T1 32 %, T2 20 %, gradient echo 7 % of the
+  training series, `ax_fs` PD 68 %, T2 12 %, STIR 9 %, GRE 6 %. `knee/data.py` `sequence_classes` maps the header
+  times to unknown / T1 / PD / T2 / STIR / GRE (TI 80–300 ms → STIR, ScanningSequence GR → GRE, TR < 1000 ms → T1,
+  TE ≥ 60 ms → T2, else PD; 5.5 % unknown, no TR/TE); `assign_slots` adds `<slot>_seq`, `KneeNet(seq_emb=True)`
+  adds a zero-initialised embedding of it to the slot's tokens. Test time reads the same header fields from the
+  same `load_volume` meta that built `series_meta.parquet` (`knee/infer.py`), so train and test classes match.
+  Old checkpoints are unchanged: `check_infer` on E35 fold 0 (120 studies, fp16) gives the same numbers as on
+  10-05 (0.9586 / 0.9587, correlation 1.0000, max |diff| 0.0073); a ResNet-34 smoke run (3 steps, P100) writes
+  `"seq_emb": true` and its checkpoint reloads with every key. Commit 9b98f70.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
