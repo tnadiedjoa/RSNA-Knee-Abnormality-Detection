@@ -1395,6 +1395,11 @@ when a MODELS pattern matches no run of the dataset; `knee.infer.run` asserts th
 Versions 28/29 were fine (E55 was new in their package). `logs/chain_v32.sh` waits for the processed version and
 pushes E61 alone and E62 alone again (next version numbers: 32, 33).
 
+The dataset version of 13:17 was processed at 13:38; knee-submit **Version 32 = E61 alone** (`logs/push_1006_1338`,
+3 networks, 31 s) and **Version 33 = E62 alone** (`logs/push_1006_1342`, 28 s) checked on the visible test.
+Ready to submit, each one change against E54 (0.935): **28** E56 (384 px), **29** E58 (per-finding α), **32** E61
+(gold weight 10), **33** E62 (sequence embedding). E59 (seeds 142–144 of E56) started 13:13 / 13:16.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
