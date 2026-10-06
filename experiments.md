@@ -1405,6 +1405,13 @@ Ready to submit, each one change against E54 (0.935): **28** E56 (384 px), **29*
 E23/E24/E25/E27, none with `--mix-public`) — the CV quotes own-label scores (best: Versions 18/23, 0.934) and E54's
 gain suggests a full-data own-label set can beat it. E60 (ConvNeXt-small, round-3 labels) is own-label too.
 
+Auto (2026-10-06 15:59, scripts/auto_followup.py): Kaggle: ref 56871950 (knee-submit version 27) scored 0.936.
+
+**Version 27 on the public LB: 0.936** (scored 15:59, ~8 h after submission: it ran to its budget) — the same as
+Version 25. As the bench predicted, the one-T4 path ran only its first ~9 models (E46, E53, E39, E42, E50, E36,
+E47, E38, E41), and on OOF those score like the full lists; E53 + E50 replaced older tail models that never ran.
+The 5-fold ensemble line is flat at 0.936; full-data single models (E54 0.935) are the way up.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
