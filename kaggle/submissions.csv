@@ -29,3 +29,4 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56871950,2026-10-06 05:57,knee-submit,27,"Version 25 + E53 + E50 (18 runs)",0.936,
 56871958,2026-10-06 05:57,knee-blend,5,"public pipeline 0.85 + Version 27's 18 runs 0.15",0.944,
 56871962,2026-10-06 05:57,knee-blend,6,"public pipeline 0.90 + Version 27's 18 runs 0.10",0.944,
+56892847,2026-10-06 23:17,knee-submit,29,"E58 alone (E54 + per-finding teacher weight)",,pending

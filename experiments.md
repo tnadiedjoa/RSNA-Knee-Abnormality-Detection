@@ -1450,6 +1450,8 @@ data) and **E65** (own-label E47 recipe, 224 px, full data) complete, **E66** ne
 knee-submit **Version 35 = own-label full-data ensemble E64 + E60 + E65** — no public table in any lineage, the
 candidate to beat the CV's own-label 0.934.
 
+Auto (2026-10-07 01:18, scripts/auto_followup.py): Kaggle: new submission ref 56892847 (knee-submit, scriptVersionId 355721387).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
