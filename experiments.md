@@ -1414,6 +1414,16 @@ The 5-fold ensemble line is flat at 0.936; full-data single models (E54 0.935) a
 
 Auto (2026-10-06 16:09, scripts/auto_followup.py): Kaggle: ref 56871962 (knee-blend version 6) scored 0.944.
 
+**knee-blend version 6 on the public LB: 0.944** (public 0.90 + Version 27's 18 runs 0.10, scored 16:09) — same as
+version 3 (0.85 + Version 24's 14 runs 0.15); version 5 (0.15 with Version 27's runs) pending. The blend sits at
+0.944 with 5-fold ensembles as our part; the next step is a stronger part of ours.
+**Evening chain** (`logs/chain_v34.sh`, started 16:10, log `logs/chain_v34.out`): when E59 and E60 have their three
+networks each, package 26 runs (adds E59, E60; E60 last so the wait works) and push knee-submit **Version 34 =
+full-data ensemble E56 + E59 + E60 + E54** (two E46-recipe 384 px trios, ConvNeXt-small 384 px, 224 px), then
+rebuild and push **knee-blend version 7** = public pipeline + the same four runs, both T4s, 24 windows, weight from
+`logs/blend7_weight` (0.15 unless version 5's score says otherwise; the version 5 build is kept as
+`kaggle/blend/knee-blend-v5.ipynb`). Expected ~21:30.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
