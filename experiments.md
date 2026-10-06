@@ -1452,6 +1452,10 @@ candidate to beat the CV's own-label 0.934.
 
 Auto (2026-10-07 01:18, scripts/auto_followup.py): Kaggle: new submission ref 56892847 (knee-submit, scriptVersionId 355721387).
 
+knee-submit **Version 35 = E64 + E60 + E65** pushed and checked (01:44, `logs/push_1006_*`/`push_1007_*`: the three
+own-label full-data runs, one 384 px group of 2 models + one 224 px group, 1.8 min on the visible test). Version 29
+was submitted by the user at 23:17 UTC on 10-06 (ref 56892847). Order for 10-07: 34, blend 7, 35, 28, 32.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
