@@ -176,6 +176,7 @@ def run(data_dir, model_dirs, out_csv="submission.csv", cache_dir="/tmp/knee_cac
     workers = workers or os.cpu_count()
     test = pd.read_csv(data_dir / "test.csv")
     model_dirs = [Path(m) for m in model_dirs]
+    assert model_dirs, "no model to run (MODELS patterns matched nothing in the dataset?)"
     cfgs = {m: json.loads((m / "config.json").read_text()) for m in model_dirs}
     sizes = {m: c.get("cache_size", 256) for m, c in cfgs.items()}
     series = prepare_cache(data_dir, cache_dir, workers, sorted(set(sizes.values())))

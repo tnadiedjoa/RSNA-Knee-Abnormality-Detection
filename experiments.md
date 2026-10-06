@@ -1384,6 +1384,17 @@ E59 and E60 wait: all ten 3090s busy (six by other users) at 12:35.
 One submission left today: Version 29 first (its answer decides whether E59/E60, not started, switch to
 per-finding α), Version 28 tomorrow.
 
+**E61 and E62 complete** (13:17, three full-data networks each). `logs/chain_v30.sh` packaged 24 runs (11 GB upload)
+and pushed knee-submit **Versions 30 (E61) and 31 (E62): both ERROR on the visible test, never to be submitted**.
+Cause: `logs/push_version.sh` waited for "<last run>/fold4" in the dataset listing, and the last run given was
+E55, already in the previous version — the wait passed at once and both notebooks ran against the previous
+dataset version, without E61/E62. MODELS matched nothing (`[]`), `prepare_cache` got no slice size (each series
+failed with UnboundLocalError), `assign_slots` received an empty table → KeyError 'sag_fs'. Fixes: the script now
+waits for the last run's own last checkpoint (`fold2.pt` for a full-data run) for up to 1 h and refuses to push
+when a MODELS pattern matches no run of the dataset; `knee.infer.run` asserts that the model list is not empty.
+Versions 28/29 were fine (E55 was new in their package). `logs/chain_v32.sh` waits for the processed version and
+pushes E61 alone and E62 alone again (next version numbers: 32, 33).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
