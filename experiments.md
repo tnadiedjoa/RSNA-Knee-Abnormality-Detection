@@ -1412,6 +1412,8 @@ Version 25. As the bench predicted, the one-T4 path ran only its first ~9 models
 E47, E38, E41), and on OOF those score like the full lists; E53 + E50 replaced older tail models that never ran.
 The 5-fold ensemble line is flat at 0.936; full-data single models (E54 0.935) are the way up.
 
+Auto (2026-10-06 16:09, scripts/auto_followup.py): Kaggle: ref 56871962 (knee-blend version 6) scored 0.944.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
