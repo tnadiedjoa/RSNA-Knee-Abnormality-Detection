@@ -41,7 +41,8 @@ def build_targets(studies: pd.DataFrame, args):
     if args.bootstrap_run:  # soft bootstrapping: pull report labels towards an earlier run's out-of-fold predictions
         oof = pd.concat([pd.read_csv(f) for f in sorted((RUNS_DIR / args.bootstrap_run).glob("oof_fold*.csv"))])
         oof = oof.set_index("StudyInstanceUID").reindex(studies["StudyInstanceUID"])[LABELS].to_numpy(np.float32)
-        y = np.where(np.isnan(oof), y, (1 - args.bootstrap_alpha) * y + args.bootstrap_alpha * oof).astype(np.float32)
+        alpha = np.array([args.bootstrap_alpha_labels.get(l, args.bootstrap_alpha) for l in LABELS], np.float32)
+        y = np.where(np.isnan(oof), y, (1 - alpha) * y + alpha * oof).astype(np.float32)
     gold = studies[LABELS].to_numpy(np.float32)
     is_gold = ~np.isnan(gold).any(1)
     y[is_gold], w[is_gold] = gold[is_gold], args.gold_weight
@@ -51,6 +52,16 @@ def build_targets(studies: pd.DataFrame, args):
     silver = np.where(g.isin(["moderate", "severe"]), 1.0, np.where(g == "absent", 0.0, np.nan)).astype(np.float32)
     silver[is_gold] = gold[is_gold]
     return y, w, silver, is_gold
+
+
+def _label_values(text: str) -> dict:
+    """"ACL=0.2,Medial_Meniscus=0.5" -> {"ACL": 0.2, "Medial Meniscus": 0.5}: knee.config.LABELS names, "_" for
+    spaces (slurm/multi_gpu.sbatch splits its runs-file lines on spaces)."""
+    out = {k.strip().replace("_", " "): float(v) for k, v in (item.split("=") for item in text.split(",") if item.strip())}
+    unknown = set(out) - set(LABELS)
+    if unknown:
+        raise argparse.ArgumentTypeError(f"unknown findings: {sorted(unknown)}")
+    return out
 
 
 def macro_auc(y_true: np.ndarray, y_pred: np.ndarray) -> tuple[float, list]:
@@ -196,6 +207,8 @@ def main():
                    help="train every network on all studies (one per --folds entry, seeded by it); no OOF is written")
     p.add_argument("--bootstrap-run", default=None, help="run folder whose OOF predictions are mixed into the labels")
     p.add_argument("--bootstrap-alpha", type=float, default=0.5)
+    p.add_argument("--bootstrap-alpha-labels", type=_label_values, default={},
+                   help='per-finding teacher weight overriding --bootstrap-alpha, e.g. "ACL=0.2,MCL=0.2"')
     p.add_argument("--mix-public", nargs="*", default=[], help="public label tables averaged with ours (pilkwang_v2 steven_v2 lixin_sol56)")
     p.add_argument("--raw-dir", default=None, help="unpacked cache on local disk (scripts/unpack_cache.py)")
     p.add_argument("--debug-steps", type=int, default=0, help="cap training steps per epoch (smoke tests)")

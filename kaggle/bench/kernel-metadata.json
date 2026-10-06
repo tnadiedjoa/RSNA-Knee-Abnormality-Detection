@@ -1,0 +1,20 @@
+{
+ "id": "theophilenadiedjoa/knee-bench",
+ "title": "knee bench",
+ "code_file": "knee-bench.ipynb",
+ "language": "python",
+ "kernel_type": "notebook",
+ "is_private": true,
+ "enable_gpu": true,
+ "enable_tpu": false,
+ "enable_internet": false,
+ "competition_sources": [
+  "rsna-knee-abnormality-detection"
+ ],
+ "dataset_sources": [
+  "theophilenadiedjoa/knee-models"
+ ],
+ "kernel_sources": [],
+ "model_sources": [],
+ "machine_shape": "NvidiaTeslaT4"
+}
