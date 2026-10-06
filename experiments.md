@@ -1456,6 +1456,16 @@ knee-submit **Version 35 = E64 + E60 + E65** pushed and checked (01:44, `logs/pu
 own-label full-data runs, one 384 px group of 2 models + one 224 px group, 1.8 min on the visible test). Version 29
 was submitted by the user at 23:17 UTC on 10-06 (ref 56892847). Order for 10-07: 34, blend 7, 35, 28, 32.
 
+Auto (2026-10-07 01:59, scripts/auto_followup.py): Kaggle: ref 56892847 (knee-submit version 29) scored 0.931.
+
+**Version 29 on the public LB: 0.931** (scored 01:59) — **E58 alone** (E54 + per-finding teacher weight) against
+**0.935** for E54: **−0.004**. Per-finding α chosen on the 58 gold studies raised the labels' gold agreement
+(0.934 → 0.944) and lowered the LB: once more the gold set misleads label choices (cf. round 2, where +0.03 gold
+gave +0.003 LB). Leaning the ligaments on the reports (α 0.2) likely teaches report wording rather than what the
+image shows, while the test is read from the images. ✗ — uniform α stays; no queued or packaged run besides E58
+uses `--bootstrap-alpha-labels` (E59, E60, E64, E65, E66 all uniform). E61 (gold weight 10) is the same kind of
+bet on the gold set: Version 32 will tell.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
