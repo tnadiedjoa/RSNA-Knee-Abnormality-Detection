@@ -1214,6 +1214,8 @@ Auto (2026-10-06 01:37, scripts/auto_followup.py): knee-blend versions 5 (public
 
 Auto (2026-10-06 05:38, scripts/auto_followup.py): **E55 complete** (E46 recipe, seed 2, 384 px): silver 0.9558, gold 0.9196. OOF gain on Version 25's 16 runs: +0.0008 V25 0.9609/0.9280 -> +e53,e50,e55 0.9617/0.9273.
 
+Auto (2026-10-06 07:59, scripts/auto_followup.py): Kaggle: new submission ref 56871945 (knee-submit, scriptVersionId 355580807); new submission ref 56871950 (knee-submit, scriptVersionId 355582643); new submission ref 56871958 (knee-blend, scriptVersionId 355583502); new submission ref 56871962 (knee-blend, scriptVersionId 355585333).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

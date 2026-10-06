@@ -25,3 +25,7 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56843645,2026-10-05 05:36,knee-blend,3,"public pipeline 0.85 + Version 24's 14 runs 0.15",0.944,
 56843667,2026-10-05 05:37,knee-blend,4,"public pipeline 0.75 + Version 24's 14 runs 0.25",0.943,
 56843671,2026-10-05 05:37,knee-submit,25,"Version 24 + E46 + E47 (16 runs)",0.936,
+56871945,2026-10-06 05:57,knee-submit,?,scriptVersionId 355580807 (version to match),,pending
+56871950,2026-10-06 05:57,knee-submit,?,scriptVersionId 355582643 (version to match),,pending
+56871958,2026-10-06 05:57,knee-blend,?,scriptVersionId 355583502 (version to match),,pending
+56871962,2026-10-06 05:57,knee-blend,?,scriptVersionId 355585333 (version to match),,pending
