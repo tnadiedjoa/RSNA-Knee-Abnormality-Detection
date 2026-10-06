@@ -1348,6 +1348,14 @@ at epoch 9 of 12 (silver 0.9503), lost (should have waited 12 min). `--seq-emb` 
 it could be judged later on the LB as E54 + `--seq-emb` (full data, 3 networks, ~3.3 GPU-hours).
 Queue at 09:10: E56 networks 0–1 (nodemm05) and 2 (node40), **E58** (node40, started 09:09), E59 waiting.
 
+**E61** queued (job 1023610, 09:13) = E54 with `--gold-weight 10` (3 before): the 58 expert-labelled studies are the
+only labels made like the test's (images, two MSK radiologists + adjudication); at weight 3 they are ~4 % of the
+loss, at 10 ~12 % → alone against E54 (0.935); E54's own gain may partly come from seeing all 58 instead of ~46.
+Put ahead of E59 (`scontrol update … Nice=100` on 1023605/06): a cheap 224 px question before more seeds.
+Notebooks switched to the grouped two-T4 inference for the next pushes: knee-submit's cell calls
+`run(..., grouped=True)`; `scripts/build_blend_nb.py` gives our part every GPU with ≥ 6 GB free (both T4s
+had 14.7 GB free after the public part in blend versions 5/6) and `grouped=True`.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

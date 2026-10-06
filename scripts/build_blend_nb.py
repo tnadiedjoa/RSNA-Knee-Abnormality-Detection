@@ -8,9 +8,10 @@
    ryokucha/rsna-knee-d4-blend-0946-ours10; Apache 2.0), write its submission.csv. They run first
    because their own time budget counts from their own start (version 1 ran ours first: the public
    part then believed it had 8 h left and the run hit Kaggle's 9 h limit);
-3. our models, in a separate process on the GPU with the most free memory, with whatever time is
-   left before END_H: their own budget skips the last models, and a hard timeout kills the process
-   group if the first one alone would overrun. Too little time left: skipped;
+3. our models, in a separate process on every GPU with room left (grouped inference, both T4s since
+   2026-10-06; before, the one with the most free memory), with whatever time is left before END_H:
+   their own budget skips the last models, and a hard timeout kills the process group if the first
+   ones alone would overrun. Too little time left: skipped;
 4. per-label rank average (1 - w) * public + w * ours, or the public submission alone if ours is missing.
 """
 
@@ -52,8 +53,9 @@ if W_OURS > 0 and _left > MIN_LEFT_H * 3600:
         print('empty_cache:', repr(e))
     _free = subprocess.run(['nvidia-smi', '--query-gpu=memory.free', '--format=csv,noheader,nounits'],
                            capture_output=True, text=True).stdout.split()
-    _gpu = str(max(range(len(_free)), key=lambda i: int(_free[i]))) if _free else '0'
-    print('GPU free MiB:', _free, '-> ours on GPU', _gpu)
+    _gpu = ','.join(str(i) for i, f in enumerate(_free) if int(f) >= 6000) or (
+        str(max(range(len(_free)), key=lambda i: int(_free[i]))) if _free else '0')
+    print('GPU free MiB:', _free, '-> ours on GPU(s)', _gpu)
     open('/tmp/knee_ours.py', 'w').write(f"""
 import glob, shutil
 from knee.infer import run
@@ -61,7 +63,7 @@ if __name__ == '__main__':
     models = list(dict.fromkeys(m for pat in {{OUR_MODELS!r}} for m in sorted(glob.glob('{{KNEE}}/models/' + pat))))
     print(models, flush=True)
     run('{{DATA}}', models, out_csv='/kaggle/working/sub_ours.csv', cache_dir='/tmp/knee_cache', workers=4,
-        time_budget_s={{_left - 20 * 60:.0f}}, windows={{OUR_WINDOWS}})
+        time_budget_s={{_left - 20 * 60:.0f}}, windows={{OUR_WINDOWS}}, grouped=True)
     shutil.rmtree('/tmp/knee_cache', ignore_errors=True)
 """)
     _p = subprocess.Popen([sys.executable, '/tmp/knee_ours.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
