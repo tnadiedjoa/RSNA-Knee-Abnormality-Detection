@@ -1310,6 +1310,35 @@ runs stay for OOF (teachers, ensemble selection), full-data ones go to Kaggle. Q
 - **E56 network 2** queued (job 1023585, 1 GPU, `slurm/runs/e56_2.txt`): three full-data E46 networks like E54.
 - E46-recipe network on a full 3090: ~15 min/epoch on all studies (12 on 80 %), ~3 h per network.
 
+**knee-bench version 1** (COMPLETE 09:00, 23 min, `logs/bench_1006_v1/`): Kaggle T4 × 2, 4 CPUs, 31 GB RAM; 60
+training studies (320 series) as a test set.
+
+| step (24 windows unless said) | s / study | per network |
+|---|---|---|
+| decode both cache sizes (4 processes) | 1.11 | — |
+| E46, ConvNeXt-tiny 384 px, 5 networks, 1 T4 | 3.01 (12 windows: 1.47) | 0.60 |
+| E43, 256 px | 1.45 (0.69) | 0.29 |
+| E41, 224 px | 1.01 (0.53) | 0.20 |
+| E37, ConvNeXt-small 384 px | 4.67 (2.35) | 0.93 |
+| E33, RadImageNet ResNet-50 224 px | 0.82 (0.39) | 0.16 |
+| DataLoader alone, 384 px / 224 px | 0.11 / 0.05 | — |
+| two 384 px models at once, one per T4 | 179 s wall vs 361 s in sequence | — |
+
+GPU-bound (the loader needs 4 % of the model time) and the second T4 doubles the throughput. Version 9 (7 models,
+13.5 s/study + decode) took ~5 h on the hidden test → **≈ 1,250 hidden studies**. Version 27's 18 models need
+37 s/study, ~13 h on one T4: its budget rule (skip a model when elapsed + 1.2 × predicted > 8 h) ran only the
+first **~9** (e46, e53, e39, e42, e50, e36, e47, e38, e41), Version 25 the first ~12. It cost little: on OOF the
+cut ensembles score as the full lists (V27: 9 models silver 0.9621 / gold 0.928 vs 18 models 0.9615 / 0.928; the
+tail = older rounds), so Versions 25/27 measured mostly their first models. The second T4 matters for what comes
+next: more strong (full-data) models within 8 h.
+Greedy forward selection on OOF silver over the 32 complete 5-fold runs: E46 0.9578 → +E53 0.9618 → +E55 0.9627
+→ +E37 0.9631 → +E42 0.9632, then flat (gold 0.920 → 0.929): three seeds of the E46 recipe carry most of it,
+ConvNeXt-small (E37) is the useful different member. Full-data priorities follow: E46 recipe (E56, more seeds),
+then ConvNeXt-small 384, then E42.
+**knee-bench version 2** pushed (09:05): the repository's new `knee/infer.py` (grouped, two T4s) replaces the
+dataset's copy; the whole Version 27 list grouped on the same 60 studies, peak GPU memory, per-model predictions
+compared with the old path (E46, E41, E37), and the budget rule with a 300 s budget.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
