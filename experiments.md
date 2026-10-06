@@ -1242,6 +1242,60 @@ interactive session included):
   10-05 (0.9586 / 0.9587, correlation 1.0000, max |diff| 0.0073); a ResNet-34 smoke run (3 steps, P100) writes
   `"seq_emb": true` and its checkpoint reloads with every key. Commit 9b98f70.
 
+The user leaves their PC on from now on (2026-10-06 08:30, "quartier libre"): the Claude session stays up, so
+**knee_auto (job 1023238) was cancelled at 08:26** — it held one of the 4 job slots for a 10-min score poll; the
+poll now runs in the session (`python -m scripts.auto_followup scores`). Its slot took **E57 folds 2–4** (job
+1023567, 1 GPU, folds in sequence, ~3 h; a 2-GPU job pended on Resources: only single 3090s were free), launched
+before the folds 0–1 verdict and to be cancelled if they show no gain. E57 at epoch 3: silver 0.9198 / 0.9184
+(E41: 0.9228 / 0.9222).
+
+### Label sources on the gold studies, per finding (2026-10-06 08:40)
+
+Gold AUC (58 studies) of each training-label source, before any image model (`knee.labels`, public tables,
+teacher OOF; per finding, then macro):
+
+| source | ACL | MCL | MM | LM | MOA | LOA | PFOA | Eff | Syn | Baker | Cont | Frac | macro |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen report | 0.986 | 0.984 | 0.951 | 0.863 | 0.888 | 0.830 | 0.868 | 0.804 | 0.746 | 0.911 | 0.809 | 0.801 | 0.870 |
+| steven v2 | 0.993 | 0.964 | 0.954 | 0.862 | 0.931 | 0.830 | 0.901 | 0.853 | 0.790 | 0.946 | 0.831 | 0.793 | 0.887 |
+| 4-table mean | 0.989 | 0.980 | 0.959 | 0.879 | 0.914 | 0.809 | 0.891 | 0.865 | 0.769 | 0.928 | 0.864 | 0.805 | 0.888 |
+| teacher r4 (OOF) | 0.957 | 0.941 | 0.969 | 0.906 | 0.994 | 0.861 | 0.856 | 0.981 | 0.847 | 0.964 | 0.943 | 0.921 | 0.928 |
+| E41 labels (α 0.5) | 0.978 | 0.975 | 0.980 | 0.925 | 0.981 | 0.843 | 0.902 | 0.993 | 0.843 | 0.971 | 0.914 | 0.903 | 0.934 |
+| V25 ensemble OOF | 0.950 | 0.950 | 0.970 | 0.889 | 0.992 | 0.853 | 0.864 | 0.983 | 0.839 | 0.976 | 0.947 | 0.922 | 0.928 |
+
+Reports are near-perfect for the ligaments (ACL 0.99, MCL 0.98) where the image models are not (0.93–0.95), and
+weak where the image shows more than the text (effusion, synovitis, contusion, fracture, medial OA). A single α
+mixes the teacher's ligament errors into labels that were right. Curves of (1 − α)·4-table + α·teacher r4 per
+finding (α 0 → 1): ACL/MCL best at 0.1–0.3 (0.988/0.984), menisci 0.5–0.7, medial OA → 1, lateral OA 0.8,
+PF OA flat 0.3–0.7, effusion 0.5–0.6, synovitis 0.7, Baker's 0.5–0.6, contusion/fracture 0.8; uniform α 0.5
+0.934, 0.7 0.940, 0.8 0.940. Weak findings for every source and model: lateral OA (≤ 0.86), synovitis (≤ 0.87),
+PF OA (≤ 0.91), lateral meniscus. Patient age (would help OA) is absent from every header (`PatientAge` null);
+sex is present (M/F/O).
+**E58** (queued, job 1023582, starts when E57 folds 0–1 free their GPUs) = E41 with `--bootstrap-alpha-labels`
+(new, `scripts/train.py`; `_` for spaces in finding names): ACL 0.2, MCL 0.2, MM 0.5, LM 0.6, MOA 0.9, LOA 0.8,
+PFOA 0.4, effusion 0.6, synovitis 0.7, Baker's 0.6, contusion 0.8, fracture 0.8 — family-smoothed choices from
+the curves; label gold agreement 0.934 → 0.944 (chosen on the same 58 studies, so optimistic). Only the LB can
+judge a label change: E58 alone against E41 alone (0.931). Label change per cell vs α 0.5 (non-gold studies):
+0.015 (Baker's) to 0.072 (medial OA) on average.
+
+### Inference throughput: is knee-submit cut by its 8 h budget? (2026-10-06 08:35)
+
+`knee.infer.run` predicts one model after another on **one** GPU, re-reading and re-warping every series for
+each model, and skips the last models when the measured pace says they would end past 8 h. knee-submit runs on
+Kaggle's T4 × 2 machine (`machine_shape` NvidiaTeslaT4 in the pulled metadata), so one T4 sits idle; the
+hidden-test log is invisible, so whether Versions 25/27 ran all their models is unknown. Version 9 (35 networks,
+three 384 px models, 24 windows) took ~5 h on the hidden test; Version 27 holds ~2.8× its compute (eight 384 px
+models, ConvNeXt-small among them) — likely past the budget, i.e. the tail of the list may never run.
+- **knee-bench** (`kaggle/bench/`, private notebook, version 1 pushed 08:37): 60 training studies posed as a test
+  set on the same T4 × 2 image; decode time, per-model time at 24 and 12 windows (384 / 256 / 224 px, ConvNeXt-small,
+  RadImageNet), DataLoader alone (CPU bound?), two models at once on the two T4s.
+- **Grouped two-GPU inference** (`knee.infer.run(grouped=True)`, default off): models sharing an input (cache,
+  slice size, windows, span, zoom) run together — each batch read once, every fold network of every model in the
+  group spread round-robin over the GPUs, launches interleaved so both compute at once; a first pass on 16
+  studies measures the pace, the models that fit the budget are kept in the given priority order, and the pace
+  is re-checked before each group. On the P100 (24 training studies, E35 + E41, 12 windows) it gives **exactly**
+  the predictions of the per-model path (max |diff| 0.0, one or two device slots) — 58 s vs 70 s on one GPU.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
