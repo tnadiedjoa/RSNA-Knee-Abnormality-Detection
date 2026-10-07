@@ -1587,6 +1587,15 @@ them. ✗ — gold weight stays 3; the open question is the other direction (wei
 other row), a cheap later test. Same lesson as Versions 29 and the round-2 labels: the 58 gold studies help as
 a check, not as a target to fit harder.
 
+Auto (2026-10-07 11:25, scripts/auto_followup.py): Kaggle: ref 56905340 (knee-submit version 28) scored 0.938.
+
+**Version 28 on the public LB: 0.938 — our best own score** (previous: 0.936, Versions 25/27 with 16–18 five-fold
+runs). **E56 alone** = E46 recipe (384 px, 4-table base, mixpub round-5 teacher) on all studies, 3 networks, against
+**0.935** for E54 (224 px, round-4 teacher): **+0.003**, more than any ensemble of five-fold runs. Two things differ
+(slice size and teacher); E66 (= E54's labels at 384 px, complete, not yet on the LB) separates them. Consequence for
+the GPU plan: new full-data runs go to 384 px even on P100s (~24 h per network instead of ~8 h at 224 px), 224 px
+stays for quick A/B questions.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
