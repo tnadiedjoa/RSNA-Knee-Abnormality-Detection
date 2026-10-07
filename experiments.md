@@ -1497,6 +1497,31 @@ Submitted by the user at 10:20 Paris (2026-10-07): knee-submit Versions **34, 35
 every checkpoint is in `runs/`, the wheels in `kaggle/wheels`, the code in git) was deleted; `scripts/package_kaggle.py`
 now stages in node-local `/tmp/knee_dataset_$USER` (home 82 GB).
 
+### 2026-10-07 morning: where the gap to the top is not
+
+**Leaderboard** (full CSV, 08:32 UTC): 5,373 teams, first **0.964**, 10th 0.960, ≥ 0.955: 56, ≥ 0.950: 116; ours rank
+637 with 0.944 (≥ 0.946: 223 teams). Public notebooks by score (`kaggle kernels list --sort-by scoreDescending`, hotness):
+the newest ones (Tri-Specialist Superstack, Pure CoAtNet 0946, 0944 Fast Stack ConvNeXt Blend, Fast Parent "0.957"
+— a local diagnostic, not the LB) are all the same 0.943 community stack, + an own 2.5D ConvNeXt reader at 30 % for
+0.944 at best — exactly our knee-blend. No better public base. Public GitHub write-ups found today (homeshwarnelakurthi,
+NTejas-1, anhquan1111, Daniel766hi; context only, nothing reused): all at or below 0.941; ideas they list that we
+already have or tested: soft targets, per-finding attention queries, rank blending, weight EMA (E18: no gain).
+Our blend weights bracket flat: 0.10 / 0.15 → 0.944, 0.25 → 0.943, 0.30 (weaker ours) → 0.942: our 0.936 adds
+almost nothing to the stack's 0.943 — an own model near the stack's level is what is missing.
+
+**Scanner / sex prior** (CPU, E41 OOF, `python -m scripts.oof_analysis site-prior`): per finding, a logistic regression on the OOF
+logit + one-hot of 28 scanner groups (maker | model | field) + sex, nested over the 5 folds: silver 0.9510 →
+0.9512, gold 0.906 → 0.896. Silver prevalence varies widely by scanner (ACL 2–53 %), but the image model already
+carries it. PatientAge is blank in every header. ✗
+
+**Subgroups of the OOF** (`python -m scripts.oof_analysis subgroups`, 3-run blend E41 + E46 + E53, silver 0.9615):
+studies with 8 / 9+ series (10 %) score 0.933 / 0.926 against 0.959–0.972 for 4–7 series — two Philips sites (Ingenia Ambition X 0.894, Achieva dStream 0.918; ~9 series:
+T1, T2 and PD FS in each plane, an oblique ACL series), English reports full of "suspicious …". In them the sag_t /
+cor_t slot takes T1 or T2 at random (equal slice counts, ties broken by UID): a natural experiment — the 345
+studies with both a T1 and a PD/T2 sagittal non-FS series score 0.919 with T1 in the slot and 0.908 with PD/T2,
+both far below the other 4,062 studies (0.965). The random pick is not the cause; these sites' reports (or case
+mix) are harder. Also: studies with longer series score lower (longest series ≤ 30 slices 0.971, 30–45 0.960, 45–80 0.954).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
