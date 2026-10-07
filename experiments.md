@@ -1768,6 +1768,22 @@ option stays in the code (one image per series: very cheap inference). Fold 1 st
 P100 for **E79 fold 1** (the 224 → 384 px continuation from E41's fold 1 network, same arguments as E79 fold 0,
 `2026-10-07_1525_e79_convnext_384_from_e41_f1`, against E42 fold 1), started ~15:30 on the interactive P100, ~7 h.
 
+Auto (2026-10-07 18:31, scripts/auto_followup.py): Kaggle: ref 56905335 (knee-blend version 7) scored 0.942.
+
+**knee-blend version 7 on the public LB: 0.942** (public 0.85 + full-data E56 + E59 + E60 + E54 at 0.15, 24 windows,
+both T4s) — below blends 3 / 5 / 6 (0.944; their own part: the 5-fold sets of Versions 24 / 27, mostly 384 px runs
+of both label families, cut by the time budget to the first runs) although our part alone is better (Version 34
+0.938 vs Version 27 0.936). Our part now leans on the mixpub family (E56, E59: 4-table base, mixpub teacher), whose
+labels share the public label tables the stack's members were trained on: the likeliest reason, in line with the
+correlations above. **knee-blend version 8** (built in `kaggle/blend_v8/`, pushed after the evening chain): public
+0.85 + the own-label full-data set of Version 35 (E64 384 px, E60 ConvNeXt-small 384 px, E65 224 px; Qwen labels
+and own teachers only, 0.934 alone) at 0.15, 24 windows: does the label family decide what a member adds to the
+stack?
+
+**E75 started on a 3090** (job 1026904, node40, 18:21): a card freed as E69 / E70 ended, ~3 h per network, the
+three done ~04:30. E77's first job (1026814) now waits for the next slot (01:14, when the interactive job ends):
+E77 and E78 complete ~10:30 as planned (their third networks were already in the later jobs).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

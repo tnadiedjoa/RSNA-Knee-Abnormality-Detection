@@ -31,7 +31,7 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56871962,2026-10-06 05:57,knee-blend,6,"public pipeline 0.90 + Version 27's 18 runs 0.10",0.944,
 56892847,2026-10-06 23:17,knee-submit,29,"E58 alone (E54 + per-finding teacher weight)",0.931,
 56905329,2026-10-07 08:20,knee-submit,34,"full-data ensemble E56 + E59 + E60 + E54",0.938,
-56905335,2026-10-07 08:20,knee-blend,7,"public pipeline 0.85 + full-data E56 + E59 + E60 + E54 0.15 (both T4s, 24 windows)",,pending
+56905335,2026-10-07 08:20,knee-blend,7,"public pipeline 0.85 + full-data E56 + E59 + E60 + E54 0.15 (both T4s, 24 windows)",0.942,
 56905336,2026-10-07 08:21,knee-submit,35,"own-label full-data ensemble E64 + E60 + E65",0.934,
 56905340,2026-10-07 08:21,knee-submit,28,"E56 alone (E46 recipe, 384 px, full data)",0.938,
 56905346,2026-10-07 08:21,knee-submit,32,"E61 alone (E54 + gold weight 10); version from push times, 30/31 had no output",0.928,
