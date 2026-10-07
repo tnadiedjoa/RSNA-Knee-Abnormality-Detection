@@ -1577,7 +1577,9 @@ network** (the 24 h default limit of `slurm/multi_gpu.sbatch` would kill it: 384
 - **Unattended E72 push**: `slurm/auto_1007.sbatch` (E72 only; job 1026435, CPU, `--dependency=afterany` on
   1026319 and 1026432) packages the 13 full-data runs (`logs/day12c_runs.txt`, E72 last), pushes knee-submit
   Version N = E72 alone, notes it here and in `kaggle/A_SOUMETTRE.md`, commits and pushes. The evening pushes run
-  from this session (`logs/chain_v36.sh`): Version 36 = E69 alone, Version 37 = E70 alone (31 runs).
+  from this session (`logs/chain_v36.sh`): Version 36 = E69 alone, Version 37 = E70 alone, Version 38 = **E66 alone**
+  (E54's labels at 384 px, complete since 08:18: against E54 it isolates the slice size, against E56 the teacher)
+  (31 runs); E72 then becomes Version 39.
 Checked while rebuilding: every Slurm job gets a private `/tmp` (`/etc/slurm/plugstack.conf`: `auto_tmpdir.so
 mount=/tmp mount=/var/tmp`), so `/tmp/knee_raw` is per job and a 224 px run can never read a 384 px unpacked
 cache left by another job (`/tmp` usage back to its 99 GB baseline at each job start on node40).
