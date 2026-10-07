@@ -1663,6 +1663,13 @@ run each epoch and measures nothing). Smoke tests on the P100: a full-data run w
 --accum 2` (2 epochs × 6 steps: monitor only at epoch 2, checkpoint reloads, the new head's weights moved off zero)
 and E72's exact path (`--bs 8`, accum 1).
 
+Auto (2026-10-07 13:09, scripts/auto_followup.py): Kaggle: ref 56905329 (knee-submit version 34) scored 0.938.
+
+**Version 34 on the public LB: 0.938** — full-data ensemble **E56 + E59 + E60 + E54** (two E46-recipe 384 px trios,
+ConvNeXt-small 384 px own labels, 224 px) = **E56 alone** (Version 28, 0.938). Six more networks of the same
+families add nothing: our members are too alike (same 2.5D input, close labels), as both outside reviews said.
+The way up is decorrelated members (spatial queries E76, other label bases, other inputs), not more seeds.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
