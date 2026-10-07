@@ -1610,6 +1610,15 @@ runs). **E56 alone** = E46 recipe (384 px, 4-table base, mixpub round-5 teacher)
 the GPU plan: new full-data runs go to 384 px even on P100s (~24 h per network instead of ~8 h at 224 px), 224 px
 stays for quick A/B questions.
 
+Auto (2026-10-07 12:08, scripts/auto_followup.py): Kaggle: ref 56905336 (knee-submit version 35) scored 0.934.
+
+**Version 35 on the public LB: 0.934** — own-label full-data ensemble **E64 + E60 + E65** (Qwen-base labels, no public
+table anywhere: 384 px round 5, ConvNeXt-small 384 px round 3, 224 px round 6). Equal to the best own-label score
+so far (Versions 18/23, 0.934, five-fold ensembles): full data does not lift the own-label line, while E56 alone
+(384 px, 4-table base) reaches 0.938 — at 384 px the public-table base is worth ~+0.004 over our Qwen-only base
+(at 224 px: E41 0.931 vs E38 0.929). More independent readers in the base (E72/E74/E75, 7 tables) is the right
+direction. CV line unchanged (own-label score stays 0.934).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
