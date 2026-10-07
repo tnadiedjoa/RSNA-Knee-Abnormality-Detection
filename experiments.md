@@ -1757,6 +1757,17 @@ to HEAD's `knee/data.py` (6 studies, train and eval); a smoke model predicts ide
 full-data network). Probe: E54's labels (E41 recipe), folds 0–1 on the interactive P100 (started 15:05, ~1 h per
 fold), against E41 (0.9518 / 0.9536) and above all for its correlation with E41.
 
+**E80 fold 0** (882 studies; the run folder says 1505, it started ~14:20): silver **0.9266** vs E41 0.9518 (−0.025),
+gold(fold) 0.865 vs 0.922 (11 studies). Mean rank correlation with E41 **0.822** (E42–E41 0.903, public e9–E41
+0.756, E80–e9 0.718). As good as E41 on the diffuse findings (effusion 0.993 / 0.989, synovitis 0.982 / 0.975,
+Baker's, ACL 0.934 / 0.934), far behind on focal ones (lateral meniscus 0.839 / 0.926, medial meniscus 0.923 /
+0.965, contusion 0.912 / 0.972, fracture 0.893 / 0.936): mixing 16 slices in the first layer dilutes a lesion seen
+on two or three of them. Blend on fold 0: E41 + 20 % E80 0.9542 (+0.0024), but E41 + 20 % E42 (the 384 px 2.5D run)
+0.9561, and E41 + E42 + 15 % E80 0.9602 vs 0.9596 without it (+0.0006). Not worth a full-data trio as it is ✗; the
+option stays in the code (one image per series: very cheap inference). Fold 1 stopped at its start to free the
+P100 for **E79 fold 1** (the 224 → 384 px continuation from E41's fold 1 network, same arguments as E79 fold 0,
+`2026-10-07_1525_e79_convnext_384_from_e41_f1`, against E42 fold 1), started ~15:30 on the interactive P100, ~7 h.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
