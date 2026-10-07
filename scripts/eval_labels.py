@@ -24,6 +24,14 @@ def public_sets() -> dict:
             df = pd.read_csv(root / path)
             if all(label in df.columns for label in LABELS):
                 sets[name] = df[["StudyInstanceUID"] + LABELS]
+    # kiritohayate95/rsna-knee-medgemma-grades (CC0): three local open-weight readers (MedGemma-27B, Mistral-Small-24B
+    # AWQ, Qwen-32B; vLLM) with one prompt, "how likely experts re-reading the images mark the finding", 0-10
+    for name, reader in [("medgemma27_p3", "medgemma27"), ("mistral24_p3", "mistral"), ("qwen32_p3", "qwen32")]:
+        path = root / "kiritohayate95" / f"grades_{reader}_p3.csv"
+        if path.exists():
+            df = pd.read_csv(path)
+            df[LABELS] = df[LABELS] / 10
+            sets[name] = df[["StudyInstanceUID"] + LABELS]
     return sets
 
 
