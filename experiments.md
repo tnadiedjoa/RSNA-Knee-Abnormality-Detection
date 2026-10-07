@@ -1466,6 +1466,28 @@ image shows, while the test is read from the images. ✗ — uniform α stays; n
 uses `--bootstrap-alpha-labels` (E59, E60, E64, E65, E66 all uniform). E61 (gold weight 10) is the same kind of
 bet on the gold set: Version 32 will tell.
 
+### 2026-10-07: new questions while the 3090s are taken
+
+E66 complete at 08:18 (E42 recipe, full data); the queue was then empty until 10:15. All ten 3090s are held by
+other users and a higher-priority backlog (hle-25: 16 pending jobs at priority 3478 vs ~2850 for ours; our
+fair-share factor 0.08 after the last days), while 11 P100s sat idle → today's questions run on P100s (ConvNeXt
+~8× slower: ~40 min per epoch at 224 px on all studies, ~8 h per network), three 2-GPU jobs (4-job limit):
+- **E70** = E54 + bigger window/series aggregator (`--dim 384 --depth 4`, vs 256 × 2), job 1026089 (node17), networks
+  0–1; network 2 shares job 1026124 with E69's.
+- **E69** = E54 + **auxiliary report-grade loss** (`--aux-grades 0.3`, new): the per-finding pooled vectors also
+  predict the 6-way Qwen grade (absent / equivocal / mild / moderate / severe / not mentioned) with a cross-entropy;
+  the head (`aux_grade_head`, knee/model.py) is dropped when the checkpoint is saved, so inference is unchanged.
+  Smoke test (ResNet-34, 3 steps, P100): loss 1.56, checkpoint without aux keys, reloads into a plain KneeNet.
+  Jobs 1026123 (node18) and 1026124 (node19). P100 nodes 18–21 have 64 GB: a 2-GPU job must ask ≤ 56 GB
+  (`scontrol update … MinMemoryNode=57344`), 64G pends on Resources.
+Checked and dropped: **patient overlap** — every study has its own PatientID (4,410 IDs for 4,410 studies), so no
+train/test patient matching is possible; **finer resolution** — native pixel spacing is 0.32–0.33 mm (median, 512
+reconstructed rows over ~160 mm, acquired matrices often lower), our 384 px cache is 0.39 mm/px: a 512 px cache
+would mostly interpolate (and home is at 96/100 GB); **laterality errors** — studies whose report names only one
+meniscus while the 16-run OOF clearly favours the other: 10 of 1,065 (0.9 %), OA 0 of 206 → not a lever.
+Public label tables re-scored on gold: steven `llm_labels_v4_blend.csv` 0.893 (v2, used: 0.887) — not adopted
+(gold gains do not predict the LB, Version 29).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
