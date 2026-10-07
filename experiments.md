@@ -1490,6 +1490,13 @@ Public label tables re-scored on gold: steven `llm_labels_v4_blend.csv` 0.893 (v
 
 Auto (2026-10-07 10:21, scripts/auto_followup.py): Kaggle: new submission ref 56905329 (knee-submit, scriptVersionId 355860913); new submission ref 56905335 (knee-blend, scriptVersionId 355861601); new submission ref 56905336 (knee-submit, scriptVersionId 355900841); new submission ref 56905340 (knee-submit, scriptVersionId 355719628); new submission ref 56905346 (knee-submit, scriptVersionId 355738008).
 
+Submitted by the user at 10:20 Paris (2026-10-07): knee-submit Versions **34, 35, 28, 32** and knee-blend **7**
+(refs 56905329–56905346; Version 32 identified from the push times, scriptVersionId 355738008 ≈ 13:35–13:40 on
+10-06 — Versions 30/31 had no output and cannot be submitted).
+**Disk**: home at 96/100 GB. With the user's OK, `kaggle/_dataset` (14 GB, the staging copy of the 28 packaged runs;
+every checkpoint is in `runs/`, the wheels in `kaggle/wheels`, the code in git) was deleted; `scripts/package_kaggle.py`
+now stages in node-local `/tmp/knee_dataset_$USER` (home 82 GB).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

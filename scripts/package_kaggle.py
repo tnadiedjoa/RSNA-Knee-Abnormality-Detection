@@ -9,6 +9,7 @@ nothing derived from the competition is published during the competition.
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -22,7 +23,8 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("runs", nargs="+")
     p.add_argument("--message", default="update")
-    p.add_argument("--out", default=str(ROOT_DIR / "kaggle" / "_dataset"))
+    # staging copy (~14 GB): node-local disk, not the 100 GB home (kaggle/_dataset until 2026-10-07)
+    p.add_argument("--out", default=f"/tmp/knee_dataset_{os.environ.get('USER', 'user')}")
     args = p.parse_args()
 
     out = Path(args.out)
