@@ -1,0 +1,1 @@
+--name e70_full_agg_n2 --run-dir 2026-10-07_1015_e70_convnext_mixpub_r5_agg384x4_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --dim 384 --depth 4 --folds 2

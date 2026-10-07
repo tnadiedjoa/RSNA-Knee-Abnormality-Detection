@@ -32,7 +32,7 @@ def make_backbone(name: str, pretrained: bool, **kwargs) -> nn.Module:
 class KneeNet(nn.Module):
     def __init__(self, backbone: str = "resnet34", pretrained: bool = True, dim: int = 256, depth: int = 2,
                  heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1, pool: str = "avg",
-                 seq_emb: bool = False):
+                 seq_emb: bool = False, aux_grades: int = 0):
         super().__init__()
         kwargs = {"drop_path_rate": drop_path} if drop_path else {}
         if backbone.startswith("vit_"):  # ViTs (e.g. DINOv2) were pretrained at another size: resample positions
@@ -55,6 +55,9 @@ class KneeNet(nn.Module):
         self.pool = nn.MultiheadAttention(dim, heads, dropout=dropout, batch_first=True)
         self.norm = nn.LayerNorm(dim)
         self.head = nn.Linear(dim, 1)
+        # training-only auxiliary head: report grade class of each finding from its pooled vector; scripts/train.py
+        # drops "aux_" weights when saving, so checkpoints load into a plain KneeNet
+        self.aux_grade_head = nn.Linear(dim, aux_grades) if aux_grades else None
         self.max_head = nn.Linear(dim, len(LABELS))  # max over windows: a focal lesion shows in few windows
 
     def embed(self, imgs):
@@ -67,7 +70,7 @@ class KneeNet(nn.Module):
             mx = norm(mx)
         return torch.cat([self.backbone.forward_head(fmap, pre_logits=True), mx.flatten(1)], 1)
 
-    def forward(self, x, pos, mask, seq=None):
+    def forward(self, x, pos, mask, seq=None, return_pooled=False):
         # x: (B, S, T, 3, H, W) uint8; pos: (B, S, T); mask: (B, S); seq: (B, S) SEQ_CLASSES indices
         b, s, t = x.shape[:3]
         imgs = x.flatten(0, 2).float()
@@ -82,6 +85,7 @@ class KneeNet(nn.Module):
         tokens = self.encoder(tokens, src_key_padding_mask=pad)
         q = self.queries.unsqueeze(0).expand(b, -1, -1)
         pooled, _ = self.pool(q, tokens, tokens, key_padding_mask=pad)
-        logits = self.head(self.norm(pooled)).squeeze(-1)  # (B, 12)
+        pooled = self.norm(pooled)  # (B, 12, D)
+        logits = self.head(pooled).squeeze(-1)  # (B, 12)
         max_logits = self.max_head(tokens).masked_fill(pad.unsqueeze(-1), -1e4).amax(1)
-        return logits + max_logits
+        return (logits + max_logits, pooled) if return_pooled else logits + max_logits

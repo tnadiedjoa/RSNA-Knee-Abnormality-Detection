@@ -51,6 +51,10 @@ def build_targets(studies: pd.DataFrame, args):
     g = grades.reindex(studies["StudyInstanceUID"])[LABELS]
     silver = np.where(g.isin(["moderate", "severe"]), 1.0, np.where(g == "absent", 0.0, np.nan)).astype(np.float32)
     silver[is_gold] = gold[is_gold]
+    if args.aux_grades:  # report grade class per finding (scripts/llm_labels.GRADES order), appended after the 12 labels
+        from scripts.llm_labels import GRADES
+        codes = g.apply(lambda col: col.map({k: i for i, k in enumerate(GRADES)})).fillna(GRADES.index("not_mentioned"))
+        y = np.concatenate([y, codes.to_numpy(np.float32)], 1)
     return y, w, silver, is_gold
 
 
@@ -111,7 +115,7 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
 
     torch.manual_seed(args.seed + fold)
     model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path, pool=args.pool,
-                    seq_emb=args.seq_emb).to(device)
+                    seq_emb=args.seq_emb, aux_grades=6 if args.aux_grades else 0).to(device)
     model = model.to(memory_format=torch.channels_last)
     if args.grad_ckpt:  # recompute backbone activations in the backward pass: bigger backbones fit a 16 GB P100
         model.backbone.set_grad_checkpointing(True)
@@ -135,10 +139,14 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
             if args.debug_steps and step >= args.debug_steps:
                 break
             with torch.autocast("cuda", dtype=AMP_DTYPE):
-                logits = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device), batch["mask"].to(device),
-                           batch["seq"].to(device))
-            loss = F.binary_cross_entropy_with_logits(logits.float(), batch["y"].to(device), reduction="none")
+                logits, pooled = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device),
+                                       batch["mask"].to(device), batch["seq"].to(device), return_pooled=True)
+            yb = batch["y"].to(device)
+            loss = F.binary_cross_entropy_with_logits(logits.float(), yb[:, :len(LABELS)], reduction="none")
             loss = (loss * batch["w"].to(device)).sum() / batch["w"].sum().to(device)
+            if args.aux_grades:  # 6-way report grade of every finding, from the same pooled vectors
+                grade_logits = model.aux_grade_head(pooled.float())
+                loss = loss + args.aux_grades * F.cross_entropy(grade_logits.flatten(0, 1), yb[:, len(LABELS):].long().flatten())
             opt.zero_grad(set_to_none=True)
             scaler.scale(loss).backward()
             scaler.unscale_(opt)
@@ -163,7 +171,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
         print(f"fold {fold} epoch {epoch + 1}: loss {np.mean(losses):.4f} silver {silver_auc:.4f}{ema_txt} "
               f"gold(fold) {gold_auc:.4f} [{(time.time() - t) / 60:.1f} min]", flush=True)
     (run_dir / "checkpoints").mkdir(exist_ok=True)
-    torch.save(model.state_dict(), run_dir / "checkpoints" / f"fold{fold}.pt")  # knee.infer averages every fold*.pt
+    sd = {k: v for k, v in model.state_dict().items() if not k.startswith("aux_")}  # training-only heads
+    torch.save(sd, run_dir / "checkpoints" / f"fold{fold}.pt")  # knee.infer averages every fold*.pt
     (run_dir / f"{'full' if args.full_fit else 'fold'}{fold}_history.json").write_text(json.dumps(history, indent=1))
     if ema is not None:  # kept apart: package_kaggle and load_oof only pick fold*.pt / oof_fold*.csv
         torch.save(ema.module.state_dict(), run_dir / "checkpoints" / f"ema_fold{fold}.pt")
@@ -192,6 +201,8 @@ def main():
     p.add_argument("--drop-path", type=float, default=0.1)
     p.add_argument("--pool", default="avg", choices=["avg", "avgmax"], help="pooling inside each window (knee/model.py)")
     p.add_argument("--seq-emb", action="store_true", help="add a learned T1/PD/T2/... embedding to each slot's tokens (knee/model.py)")
+    p.add_argument("--aux-grades", type=float, default=0.0,
+                   help="weight of an auxiliary 6-way report-grade loss per finding (0 = off; knee/model.py aux head)")
     p.add_argument("--aug", type=float, default=1.0)
     p.add_argument("--silence-weight", type=float, default=0.5)
     p.add_argument("--gold-weight", type=float, default=3.0)
