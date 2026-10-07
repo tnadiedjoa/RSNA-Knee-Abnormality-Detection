@@ -22,3 +22,4 @@ runs/_smoke/
 kaggle/blend/*.ipynb
 kaggle/blend_w25/*.ipynb
 kaggle/blend_w10/*.ipynb
+kaggle/blend_v8/*.ipynb
