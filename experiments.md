@@ -1784,6 +1784,16 @@ stack?
 three done ~04:30. E77's first job (1026814) now waits for the next slot (01:14, when the interactive job ends):
 E77 and E78 complete ~10:30 as planned (their third networks were already in the later jobs).
 
+**Evening chain done (19:07)**: knee-submit **Version 36 = E69 alone** (auxiliary report grades), **37 = E70 alone**
+(aggregator 384 × 4), **38 = E66 alone** (E54's labels at 384 px), each 3 networks on the visible test, dataset of the
+31 runs of `logs/day12_runs.txt`, packaged with the new `knee/infer.py` (E80 option; the 2.5D path unchanged).
+**knee-blend version 8** pushed (19:10, `kaggle/blend_v8/`). `kaggle/A_SOUMETTRE.md` rewritten for 10-08: blend 8,
+E72's version (added by the night job), Version 36 in the morning; E77 and E78 in the afternoon (Versions 38 / 37 if
+they are late); Version 33 later. Night automation: `slurm/auto_1007.sbatch` (job 1026817, after E72: Version N = E72
+alone) and **`slurm/auto_1008.sbatch`** (job 1027476, after E77's jobs and 1026817): packages the 13 full-data runs +
+E75 (when complete) + E77 and pushes E77 alone, then E75 alone; waits for E78 (until 16:00), packages again and
+pushes E78 alone; rows appended to the night table of `kaggle/A_SOUMETTRE.md`.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
