@@ -1578,6 +1578,15 @@ E73 alone, notes them here and in `kaggle/A_SOUMETTRE.md`, commits and pushes. T
 session (`logs/chain_v36.sh`, waits for E69 and E70): Version 36 = E69 alone, Version 37 = E70 alone (dataset of 31
 runs).
 
+Auto (2026-10-07 11:05, scripts/auto_followup.py): Kaggle: ref 56905346 (knee-submit version 32) scored 0.928.
+
+**Version 32 on the public LB: 0.928** — **E61 alone** (E54 with `--gold-weight 10` instead of 3: the 58 expert studies
+~12 % of the loss instead of ~4 %) against **0.935** for E54: **−0.007**, the largest drop of any single change. With
+58 studies seen 12 epochs at weight 10, the network fits them (and their sites) rather than learning more from
+them. ✗ — gold weight stays 3; the open question is the other direction (weight 1, i.e. gold rows like any
+other row), a cheap later test. Same lesson as Versions 29 and the round-2 labels: the 58 gold studies help as
+a check, not as a target to fit harder.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
