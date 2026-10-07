@@ -1711,6 +1711,22 @@ environment parser dry-run gives the expected two commands.
 Jobs: 1026319 (E72 n0–1), 1026813 (E72 n2 + E79), 1026814 (E77 n0–1), 1026815 (E77 n2 + E78 n0), 1026816 (E78 n1–2),
 1026817 (unattended E72 push, after 1026319 + 1026813), 1026676 (E76, after the push).
 
+### 2026-10-07 afternoon: user decisions, rules facts, E75 on a 3090
+
+- User: **no team merge** (merger deadline 2026-10-15, confirmed in the rules timeline: entry and team-merger
+  deadline 10-15, final submission 10-22); MRNet explained and not pursued (2 of our 12 findings, meniscus
+  without side, report-derived labels, 3 pre-cropped series); the two final submissions get chosen in the last week.
+- Rules pages are readable from the cluster (`kaggle competitions pages rsna-knee-abnormality-detection list
+  rsna-knee-abnormality-detection --content`; the forum still is not). Efficiency Prize: the team's selected final
+  submissions are ranked by AUC / (Benchmark - max AUC) + RuntimeSeconds / 32400 (lower is better; 0.01 of AUC is
+  worth ~700 s of runtime); no CPU-only condition (CPU or GPU notebooks, <= 9 h).
+- 3090 partition at 14:15: all 10 cards held (hle-25, revol-24, agranados; nodemm05's fourth card has no free CPU),
+  two jobs pending ahead of ours, our fair-share factor 773 vs 1210-1691. **E75** now queued on one 3090 as a batch
+  job (1026904, `slurm/runs/e75_3090.txt`): E56 recipe (Version 28, best own single) with the 7-table base, three
+  full-data networks one after the other (~3 h each on a 3090, vs ~25 h on a P100), 14 h limit. It is our
+  lowest-priority job (2766), so it takes a job slot only when a card is free once the P100 jobs above have started.
+  The user's interactive 3090 request (1026675) is theirs to keep or cancel.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
