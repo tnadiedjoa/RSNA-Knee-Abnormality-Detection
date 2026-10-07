@@ -1564,19 +1564,23 @@ The fold-0 gain (+0.0017 on 300 studies) shrinks to noise on the full fold, as E
 −0.0006). ✗ — inference keeps the training span. `knee.infer.run(span_pad=…)` (widens every model's range, default 0)
 stays available. Means of two to four span settings (2–4× the inference): at most +0.0008 [+0.0000, +0.0018].
 
-**E73** = E72 + `--seq-emb` (the T1/PD/T2/STIR/GRE embedding per slot of E57/E62; E62 = E54 + seq-emb is Version 33,
-not scored yet), seeds 42/43/44: tonight's third two-GPU slot would otherwise idle. Against E72 it re-tests seq-emb on
-the new labels; if seq-emb is neutral, E72 + E73 still make a six-network model on the 7-table labels. Jobs
-(P100, pending on the job limit): 1026319 = E72 networks 0–1, 1026354 = E72 network 2 + E73 network 0 (replaces the
-one-GPU job 1026320, cancelled before it started: `slurm/runs/e72_2_cancelled.txt`), 1026355 = E73 networks 1–2.
-
-**Unattended push of E72 and E73** (the interactive job, with this Claude session, ends at 01:14 on 10-08; E72/E73
-end ~02:30): `slurm/auto_1007.sbatch` (job 1026359, CPU partition, `--dependency=afterany` on the three jobs) packages
-the 14 full-data runs only (`logs/day12d_runs.txt`: E54 … E70, E72, E73 last; ~5 GB instead of 15 — the 5-fold runs
-stay in the dataset versions that older notebook versions pin), pushes knee-submit Version N = E72 alone and N+1 =
-E73 alone, notes them here and in `kaggle/A_SOUMETTRE.md`, commits and pushes. The evening pushes run from this
-session (`logs/chain_v36.sh`, waits for E69 and E70): Version 36 = E69 alone, Version 37 = E70 alone (dataset of 31
-runs).
+**Queue rebuilt after Version 28 (11:45)**: 384 px beat 224 px on the LB, so tonight's GPUs go to 384 px runs.
+E73 (E72 + seq-emb at 224 px; jobs 1026354/1026355/1026359, cancelled before they started:
+`slurm/runs/*_cancelled.txt`) is dropped — Version 33 answers seq-emb at 224 px. Training time measured: 224 px
+5.0 min/epoch on a 3090, 40.7 on a P100 (8.1×); 384 px 14.5 min/epoch on a 3090 → ~118 min on a P100, **~24 h per
+network** (the 24 h default limit of `slurm/multi_gpu.sbatch` would kill it: 384 px jobs get `--time=36:00:00`).
+- 1026319 = E72 networks 0–1, 1026432 = E72 network 2 (224 px, ~8 h, start ~18:30 when E69/E70 end);
+- **E74** = E72's labels at 384 px (= E66 recipe + 7-table base; E66 = E54's labels at 384 px, not yet on the LB):
+  1026433 networks 0–1 (~18:30 → ~18:30 on 10-08), 1026434 network 2 (starts at the next free slot, 01:14 or 02:30);
+- **E75** = E56 recipe (Version 28: 384 px, mixpub round-5 teacher) with the 7-table base, 2 networks (seeds
+  42/43), ensemble member: 1026436, starts after the unattended E72 push (dependency, so the push gets a slot first).
+- **Unattended E72 push**: `slurm/auto_1007.sbatch` (E72 only; job 1026435, CPU, `--dependency=afterany` on
+  1026319 and 1026432) packages the 13 full-data runs (`logs/day12c_runs.txt`, E72 last), pushes knee-submit
+  Version N = E72 alone, notes it here and in `kaggle/A_SOUMETTRE.md`, commits and pushes. The evening pushes run
+  from this session (`logs/chain_v36.sh`): Version 36 = E69 alone, Version 37 = E70 alone (31 runs).
+Checked while rebuilding: every Slurm job gets a private `/tmp` (`/etc/slurm/plugstack.conf`: `auto_tmpdir.so
+mount=/tmp mount=/var/tmp`), so `/tmp/knee_raw` is per job and a 224 px run can never read a 384 px unpacked
+cache left by another job (`/tmp` usage back to its 99 GB baseline at each job start on node40).
 
 Auto (2026-10-07 11:05, scripts/auto_followup.py): Kaggle: ref 56905346 (knee-submit version 32) scored 0.928.
 
