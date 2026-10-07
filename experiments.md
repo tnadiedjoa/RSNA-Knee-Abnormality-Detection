@@ -1488,6 +1488,8 @@ meniscus while the 16-run OOF clearly favours the other: 10 of 1,065 (0.9 %), OA
 Public label tables re-scored on gold: steven `llm_labels_v4_blend.csv` 0.893 (v2, used: 0.887) — not adopted
 (gold gains do not predict the LB, Version 29).
 
+Auto (2026-10-07 10:21, scripts/auto_followup.py): Kaggle: new submission ref 56905329 (knee-submit, scriptVersionId 355860913); new submission ref 56905335 (knee-blend, scriptVersionId 355861601); new submission ref 56905336 (knee-submit, scriptVersionId 355900841); new submission ref 56905340 (knee-submit, scriptVersionId 355719628); new submission ref 56905346 (knee-submit, scriptVersionId 355738008).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
