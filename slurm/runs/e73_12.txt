@@ -1,0 +1,3 @@
+# E73 networks 1-2 (seeds 43/44): E72 + --seq-emb
+--name e73_full_mix7_seqemb_n1 --run-dir 2026-10-07_1115_e73_convnext_mix7_r5_seqemb_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 medgemma27_p3 mistral24_p3 qwen32_p3 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --seq-emb --folds 1
+--name e73_full_mix7_seqemb_n2 --run-dir 2026-10-07_1115_e73_convnext_mix7_r5_seqemb_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 medgemma27_p3 mistral24_p3 qwen32_p3 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --seq-emb --folds 2

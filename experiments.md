@@ -1558,18 +1558,25 @@ nothing beyond the best single one. Re-checked on all of fold 1 (882 studies, 24
 | 0.08–0.92 (training) | 0.9542 | — | 0.910 |
 | 0.04–0.96 | 0.9545 | +0.0003 [−0.0008, +0.0016] | 0.908 |
 | 0.02–0.98 | 0.9546 | +0.0004 [−0.0005, +0.0015] | 0.902 |
-| 0.00–1.00 | 0.9550 | +0.0008 | 0.904 |
+| 0.00–1.00 | 0.9550 | +0.0008 [−0.0004, +0.0025] | 0.904 |
 
 The fold-0 gain (+0.0017 on 300 studies) shrinks to noise on the full fold, as E17 found at 16 windows (2–98 %:
 −0.0006). ✗ — inference keeps the training span. `knee.infer.run(span_pad=…)` (widens every model's range, default 0)
-stays available.
+stays available. Means of two to four span settings (2–4× the inference): at most +0.0008 [+0.0000, +0.0018].
 
-**Unattended push of E72** (the interactive job, with this Claude session, ends at 01:14 on 10-08; E72 ends ~02:30):
-`slurm/auto_1007.sbatch` (job 1026346, CPU partition, `--dependency=afterany` on both E72 jobs) packages the 13
-full-data runs only (`logs/day12c_runs.txt`: E54 … E70, E72 last; ~5 GB instead of 15 — the 5-fold runs stay in the
-dataset versions that older notebook versions pin), pushes knee-submit Version N = E72 alone, notes it here and in
-`kaggle/A_SOUMETTRE.md`, commits and pushes. The evening pushes run from this session (`logs/chain_v36.sh`, waits for
-E69 and E70): Version 36 = E69 alone, Version 37 = E70 alone (dataset of 31 runs).
+**E73** = E72 + `--seq-emb` (the T1/PD/T2/STIR/GRE embedding per slot of E57/E62; E62 = E54 + seq-emb is Version 33,
+not scored yet), seeds 42/43/44: tonight's third two-GPU slot would otherwise idle. Against E72 it re-tests seq-emb on
+the new labels; if seq-emb is neutral, E72 + E73 still make a six-network model on the 7-table labels. Jobs
+(P100, pending on the job limit): 1026319 = E72 networks 0–1, 1026354 = E72 network 2 + E73 network 0 (replaces the
+one-GPU job 1026320, cancelled before it started: `slurm/runs/e72_2_cancelled.txt`), 1026355 = E73 networks 1–2.
+
+**Unattended push of E72 and E73** (the interactive job, with this Claude session, ends at 01:14 on 10-08; E72/E73
+end ~02:30): `slurm/auto_1007.sbatch` (job 1026359, CPU partition, `--dependency=afterany` on the three jobs) packages
+the 14 full-data runs only (`logs/day12d_runs.txt`: E54 … E70, E72, E73 last; ~5 GB instead of 15 — the 5-fold runs
+stay in the dataset versions that older notebook versions pin), pushes knee-submit Version N = E72 alone and N+1 =
+E73 alone, notes them here and in `kaggle/A_SOUMETTRE.md`, commits and pushes. The evening pushes run from this
+session (`logs/chain_v36.sh`, waits for E69 and E70): Version 36 = E69 alone, Version 37 = E70 alone (dataset of 31
+runs).
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.

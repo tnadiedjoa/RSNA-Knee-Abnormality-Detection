@@ -1,0 +1,4 @@
+# E72 network 2 (seed 44) and E73 network 0 in one two-P100 job (4 running jobs per user, the interactive one included)
+# E73 = E72 (7-table report base) + --seq-emb (T1/PD/T2/STIR/GRE embedding per slot; E62 = E54 + seq-emb is Version 33, not yet scored) -> alone against E72 and E54
+--name e72_full_mix7_n2 --run-dir 2026-10-07_1100_e72_convnext_mix7_r5_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 medgemma27_p3 mistral24_p3 qwen32_p3 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --folds 2
+--name e73_full_mix7_seqemb_n0 --run-dir 2026-10-07_1115_e73_convnext_mix7_r5_seqemb_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 medgemma27_p3 mistral24_p3 qwen32_p3 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --seq-emb --folds 0
