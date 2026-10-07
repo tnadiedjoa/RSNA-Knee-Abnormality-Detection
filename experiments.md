@@ -1522,6 +1522,29 @@ studies with both a T1 and a PD/T2 sagittal non-FS series score 0.919 with T1 in
 both far below the other 4,062 studies (0.965). The random pick is not the cause; these sites' reports (or case
 mix) are harder. Also: studies with longer series score lower (longest series ≤ 30 slices 0.971, 30–45 0.960, 45–80 0.954).
 
+**New public label tables** (Kaggle datasets of 10-06, copied to `data/public_labels/`, licences read from the
+dataset metadata). Gold agreement (macro AUC on the 58) and Spearman with our 4-table mean over all studies:
+
+| table | licence | gold | ρ vs 4-table | verdict |
+|---|---|---|---|---|
+| kiritohayate95 MedGemma-27B (p3 prompt, 0–10) | CC0 | 0.879 | 0.78 | new reader |
+| kiritohayate95 Mistral-Small-24B AWQ | CC0 | 0.879 | 0.76 | new reader |
+| kiritohayate95 Qwen-32B | CC0 | 0.886 | 0.80 | new reader |
+| mean of these three (mutual ρ 0.77) | | **0.898** | | |
+| mandavisingh labels_v1 | CC0 | 0.893 | 0.97 | a mix of the tables we have |
+| tunminhhunh report_labels_v2 | CC0 | 0.866 | — | identical to pilkwang v2 |
+| codeandodev weak_labels | MIT | 1.000 | 0.58 | gold rows overwritten with the truth; lexicon rules |
+
+The three readers are local open-weight models run with vLLM on one prompt ("how likely experts re-reading the
+IMAGES mark the finding", 0 = stated normal, 1 = not mentioned, … 8–10 = definite/significant; scripts in the
+dataset). Base means: 4-table 0.888 → 7-table (equal weights) 0.896, gains on synovitis 0.769 → 0.830 and lateral OA
+0.809 → 0.838, loss on effusion 0.865 → 0.848. Training labels as E54 builds them (base, round-4 teacher at α 0.5,
+gold rows excluded from the check): **0.934 → 0.938** (synovitis 0.843 → 0.873). Not a choice fitted on the gold
+set: just more independent readers averaged, the step that took E38 → E41 from 0.929 to 0.931 on the LB.
+**E72** = E54 with the 7-table base (`--mix-public … medgemma27_p3 mistral24_p3 qwen32_p3`, `scripts/eval_labels.py`
+divides the 0–10 grades by 10), seeds 42/43/44, alone against E54 (0.935). Queued at 11:05 on P100 (jobs 1026319:
+networks 0–1, 1026320: network 2), pending on the 4-job limit until E69/E70 end (~18:30); ~8 h per network.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
