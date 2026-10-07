@@ -89,13 +89,24 @@ def prepare_cache(data_dir: Path, cache_dir: Path, workers: int, sizes=(256,)) -
     return df
 
 
+def model_windows(cfg: dict, windows: int | None = None) -> int:
+    """Windows per series at inference: the test-time setting, except stacked-slice models (one image per series)."""
+    return 1 if cfg.get("stack_slices") else (windows or cfg["windows_eval"])
+
+
+def model_dataset(cfg: dict, slots: pd.DataFrame, cache_dir: Path, windows: int | None = None,
+                  span_pad: float = 0.0) -> StudyDataset:
+    return StudyDataset(slots, n_windows=model_windows(cfg, windows), img_size=cfg["img_size"],
+                        span=model_span(cfg, span_pad), zoom=cfg.get("zoom", 1.0), cache_dir=cache_dir,
+                        stack=cfg.get("stack_slices", 0))
+
+
 @torch.no_grad()
 def predict_model(model_dir: Path, slots: pd.DataFrame, cache_dir: Path, device, workers: int,
                   windows: int | None = None, span_pad: float = 0.0) -> np.ndarray:
     cfg = json.loads((model_dir / "config.json").read_text())
-    windows = windows or cfg["windows_eval"]  # denser than in training helps a little (experiments.md, E17)
-    ds = StudyDataset(slots, n_windows=windows, img_size=cfg["img_size"],
-                      span=model_span(cfg, span_pad), zoom=cfg.get("zoom", 1.0), cache_dir=cache_dir)
+    windows = model_windows(cfg, windows)  # denser than in training helps a little (experiments.md, E17)
+    ds = model_dataset(cfg, slots, cache_dir, windows, span_pad)
     dl = DataLoader(ds, batch_size=max(1, 48 // windows), num_workers=workers)
     models = []
     for ckpt in sorted(model_dir.glob("fold*.pt")):
@@ -120,13 +131,13 @@ BACKBONE_COST = {"convnext_small": 1.95, "radimagenet_resnet50": 0.92, "resnet50
 def model_cost(model_dir: Path, cfg: dict, windows: int | None = None) -> float:
     """Relative inference cost of one model per study: pixels x windows x fold networks x backbone factor."""
     factor = next((v for k, v in BACKBONE_COST.items() if cfg["backbone"].startswith(k)), 1.0)
-    return cfg["img_size"] ** 2 * (windows or cfg["windows_eval"]) * len(list(model_dir.glob("fold*.pt"))) * factor
+    return cfg["img_size"] ** 2 * model_windows(cfg, windows) * len(list(model_dir.glob("fold*.pt"))) * factor
 
 
 def input_key(cfg: dict, windows: int | None = None, span_pad: float = 0.0) -> tuple:
-    """Models with the same key read identical batches: cache, slice size, windows, span, zoom."""
-    return (cfg.get("cache_size", 256), cfg["img_size"], windows or cfg["windows_eval"],
-            model_span(cfg, span_pad), cfg.get("zoom", 1.0))
+    """Models with the same key read identical batches: cache, slice size, windows, span, zoom, stacked slices."""
+    return (cfg.get("cache_size", 256), cfg["img_size"], model_windows(cfg, windows),
+            model_span(cfg, span_pad), cfg.get("zoom", 1.0), cfg.get("stack_slices", 0))
 
 
 @torch.no_grad()
@@ -137,9 +148,8 @@ def predict_group(model_dirs: list, cfgs: dict, slots: pd.DataFrame, cache_dir: 
     consecutive launches alternate between them and both compute at once.
     Returns ({model_dir: mean fold probability}, seconds loading networks, seconds predicting)."""
     cfg = cfgs[model_dirs[0]]
-    windows = windows or cfg["windows_eval"]
-    ds = StudyDataset(slots, n_windows=windows, img_size=cfg["img_size"],
-                      span=model_span(cfg, span_pad), zoom=cfg.get("zoom", 1.0), cache_dir=cache_dir)
+    windows = model_windows(cfg, windows)
+    ds = model_dataset(cfg, slots, cache_dir, windows, span_pad)
     dl = DataLoader(ds, batch_size=max(1, 48 // windows), num_workers=workers, pin_memory=devices[0].type == "cuda")
     t = time.time()
     nets = []  # (model_dir, device, network)
@@ -193,7 +203,7 @@ def run(data_dir, model_dirs, out_csv="submission.csv", cache_dir="/tmp/knee_cac
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     preds, spent, pixels = [], 0.0, 0
     for model_dir in map(Path, model_dirs):
-        cost = cfgs[model_dir]["img_size"] ** 2 * len(list(model_dir.glob("fold*.pt"))) * (windows or cfgs[model_dir]["windows_eval"])
+        cost = cfgs[model_dir]["img_size"] ** 2 * len(list(model_dir.glob("fold*.pt"))) * model_windows(cfgs[model_dir], windows)
         if preds and time_budget_s and time.time() - t0 + spent / pixels * cost * 1.2 > time_budget_s:
             print(f"time budget: skipping {model_dir.name}", flush=True)
             continue

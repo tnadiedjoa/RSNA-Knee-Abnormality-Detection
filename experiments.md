@@ -1727,6 +1727,36 @@ Jobs: 1026319 (E72 n0–1), 1026813 (E72 n2 + E79), 1026814 (E77 n0–1), 102681
   lowest-priority job (2766), so it takes a job slot only when a card is free once the P100 jobs above have started.
   The user's interactive 3090 request (1026675) is theirs to keep or cancel.
 
+### Public members' out-of-fold predictions; E80, a family that reads each series differently (2026-10-07 15:00)
+
+Two families of the 0.943 public stack (antoinegg1 RadImageNet query heads e9 v15 and e11 v20, CC-BY-NC-SA-4.0)
+publish their five-fold OOF tables (`v52_oof.csv`, `v52_e11_oof.csv`; read in the scratchpad, not versioned): the
+per-family public predictions Claude 1 asked about. Against our targets, same 4,407 studies:
+
+| predictions | silver | gold | mean rank correlation with E41 |
+|---|---|---|---|
+| E41 (5-fold, 224 px) | 0.9510 | 0.906 | — |
+| public e9 heads | 0.9197 | 0.854 | 0.75 |
+| public e11 heads | 0.9158 | 0.826 | 0.73 |
+| E41 + 15 % e9 / + 15 % e11 (rank average) | 0.9534 / 0.9539 | 0.909 / 0.907 | |
+| our runs: E46, E42 (384 px), E38 (own labels), E25 / E33 (RadImageNet ResNet-50) | | | 0.895, 0.899, 0.917, 0.869 / 0.868 |
+
+Much weaker members still lift E41 by +0.0025–0.003 silver at 15 % because their errors differ, while our own runs
+stay at 0.87–0.92 of each other whatever the backbone (same 2.5D input, close labels): the reason Version 34 = E56
+alone while the stack gains from its five families. Priority: own families with a different input.
+
+**E80 — stacked slices** (`--stack-slices 16`, new): one image per series, 16 slices spread evenly over the span and
+stacked as channels (depth as channels, the A5 design inside the public stack), instead of 8 (24 at test) windows of
+3 adjacent slices. The ConvNeXt stem takes 16 channels (timm adapts the pretrained weights); the grey slices are
+normalised with the colour-averaged ImageNet statistics; training shifts the covered range by up to ±3 %.
+`--windows` / `--windows-eval` are forced to 1, and `knee/infer.py` gives such models one window whatever the
+test-time setting (`model_windows`, `model_dataset`, the stack in `input_key`). Checks: 2.5D samples byte-identical
+to HEAD's `knee/data.py` (6 studies, train and eval); a smoke model predicts identically through `predict_model` and
+`predict_group` and matches its training OOF (max |diff| 0.0004, CPU fp32 vs GPU fp16). Speed on the P100 at 224 px:
+0.59 s per batch of 8 studies, ~4.3 min per fold epoch, ~8x faster than the 2.5D windows (384 px: ~3 h per
+full-data network). Probe: E54's labels (E41 recipe), folds 0–1 on the interactive P100 (started 15:05, ~1 h per
+fold), against E41 (0.9518 / 0.9536) and above all for its correlation with E41.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

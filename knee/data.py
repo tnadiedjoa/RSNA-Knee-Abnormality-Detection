@@ -103,10 +103,13 @@ class StudyDataset(Dataset):
     def __init__(self, slots: pd.DataFrame, labels: np.ndarray | None = None, weights: np.ndarray | None = None,
                  n_windows: int = 10, img_size: int = 224, train: bool = False, aug_strength: float = 1.0,
                  span: tuple[float, float] = (0.08, 0.92), zoom: float = 1.0, seed: int = 0, cache_dir=CACHE_DIR,
-                 raw_dir=None):
+                 raw_dir=None, stack: int = 0):
+        """stack > 0: one image per series instead of windows of 3 adjacent slices, made of `stack` slices spread
+        evenly over the span and stacked as channels (depth as channels); n_windows must then be 1."""
+        assert not stack or n_windows == 1, "stacked slices give one image per series"
         self.slots = slots.reset_index(drop=True)
         self.labels, self.weights = labels, weights
-        self.n_windows, self.img_size, self.train = n_windows, img_size, train
+        self.n_windows, self.img_size, self.train, self.stack = n_windows, img_size, train, stack
         self.aug_strength, self.span, self.zoom, self.seed = aug_strength, span, zoom, seed
         self.cache_dir, self.raw_dir = cache_dir, raw_dir
         self.epoch = 0
@@ -124,7 +127,7 @@ class StudyDataset(Dataset):
         row = self.slots.iloc[i]
         study = row["StudyInstanceUID"]
         n_slots, t, s = len(SLOTS), self.n_windows, self.img_size
-        x = np.zeros((n_slots, t, 3, s, s), np.uint8)
+        x = np.zeros((n_slots, t, self.stack or 3, s, s), np.uint8)
         pos = np.zeros((n_slots, t), np.float32)
         mask = np.zeros(n_slots, bool)
         seq = np.zeros(n_slots, np.int64)
@@ -135,16 +138,22 @@ class StudyDataset(Dataset):
             seq[k] = 0 if pd.isna(row.get(f"{name}_seq")) else int(row[f"{name}_seq"])
             vol = self._load(study, series)
             n = len(vol)
-            centers = window_centers(n, t, *self.span, jitter=0.03 if self.train else 0.0, rng=rng)
-            needed = np.unique(np.clip(np.concatenate([centers - 1, centers, centers + 1]), 0, n - 1))
+            if self.stack:  # the whole span in one image; training shifts the covered range a little
+                shift = rng.uniform(-0.03, 0.03) if self.train else 0.0
+                zs = window_centers(n, self.stack, self.span[0] + shift, self.span[1] + shift, jitter=0.0, rng=rng)
+                windows, centers = [zs], np.array([zs.mean()])
+            else:
+                centers = window_centers(n, t, *self.span, jitter=0.03 if self.train else 0.0, rng=rng)
+                windows = [np.clip([c - 1, c, c + 1], 0, n - 1) for c in centers]
+            needed = np.unique(np.concatenate(windows))
             frames, m = {}, None
             for z in needed:  # each slice decoded and transformed once, even when windows share it
                 img = vol.slice(z)
                 if m is None:
                     m = _affine(rng, img.shape[-1], s, self.aug_strength if self.train else 0.0, self.zoom)
                 frames[z] = cv2.warpAffine(img, m, (s, s), flags=cv2.INTER_LINEAR, borderValue=0)
-            for j, c in enumerate(centers):
-                for ch, z in enumerate(np.clip([c - 1, c, c + 1], 0, n - 1)):
+            for j, zz in enumerate(windows):
+                for ch, z in enumerate(zz):
                     x[k, j, ch] = frames[z]
             if self.train:  # gamma + contrast through a 256-entry lookup table
                 gamma = math.exp(rng.uniform(-0.25, 0.25) * self.aug_strength)

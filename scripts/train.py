@@ -110,9 +110,10 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
     raw = Path(args.raw_dir) if args.raw_dir else None
     span = tuple(args.span)
     ds_tr = StudyDataset(slots.iloc[tr], y[tr], w[tr], n_windows=args.windows, img_size=args.img_size, train=True,
-                         aug_strength=args.aug, span=span, zoom=args.zoom, seed=args.seed + fold, raw_dir=raw)
+                         aug_strength=args.aug, span=span, zoom=args.zoom, seed=args.seed + fold, raw_dir=raw,
+                         stack=args.stack_slices)
     ds_va = StudyDataset(slots.iloc[va], n_windows=args.windows_eval, img_size=args.img_size, span=span, zoom=args.zoom,
-                         raw_dir=raw)
+                         raw_dir=raw, stack=args.stack_slices)
     dl_tr = DataLoader(ds_tr, args.bs, shuffle=True, num_workers=args.workers, drop_last=True, pin_memory=True,
                        persistent_workers=True)
     bs_va = args.bs if args.windows_eval <= 12 else max(1, args.bs * 12 // args.windows_eval)  # denser eval: smaller batches
@@ -121,7 +122,7 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
     torch.manual_seed(args.seed + fold)
     model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path, pool=args.pool,
                     seq_emb=args.seq_emb, aux_grades=6 if args.aux_grades else 0,
-                    spatial_queries=args.spatial_queries).to(device)
+                    spatial_queries=args.spatial_queries, in_chans=args.stack_slices or 3).to(device)
     model = model.to(memory_format=torch.channels_last)
     if args.init_from:  # e.g. a 224 px network continued at 384 px; tensors of another shape are left as built
         src = Path(args.init_from.format(fold=fold))
@@ -252,6 +253,8 @@ def main():
     p.add_argument("--span", type=float, nargs=2, default=[0.08, 0.92], help="slice range covered by the windows")
     p.add_argument("--grad-ckpt", action="store_true")
     p.add_argument("--zoom", type=float, default=1.0, help="field of view = 150 mm / zoom (cache crop is 150 mm)")
+    p.add_argument("--stack-slices", type=int, default=0,
+                   help="one image per series: this many slices spread over the span, stacked as channels (sets --windows 1)")
     p.add_argument("--exclude-folds", type=int, nargs="*", default=[])
     p.add_argument("--full-fit", action="store_true",
                    help="train every network on all studies (one per --folds entry, seeded by it); no OOF is written")
@@ -268,6 +271,8 @@ def main():
     p.add_argument("--debug-steps", type=int, default=0, help="cap training steps per epoch (smoke tests)")
     p.add_argument("--ema", type=float, default=0.0, help="weight EMA decay (e.g. 0.998), 0 = off")
     args = p.parse_args()
+    if args.stack_slices:
+        args.windows = args.windows_eval = 1
 
     run_dir = RUNS_DIR / (args.run_dir or f"{datetime.now():%Y-%m-%d_%H%M%S}_{args.name}")
     run_dir.mkdir(parents=True, exist_ok=True)

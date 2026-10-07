@@ -32,9 +32,11 @@ def make_backbone(name: str, pretrained: bool, **kwargs) -> nn.Module:
 class KneeNet(nn.Module):
     def __init__(self, backbone: str = "resnet34", pretrained: bool = True, dim: int = 256, depth: int = 2,
                  heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1, pool: str = "avg",
-                 seq_emb: bool = False, aux_grades: int = 0, spatial_queries: bool = False):
+                 seq_emb: bool = False, aux_grades: int = 0, spatial_queries: bool = False, in_chans: int = 3):
         super().__init__()
         kwargs = {"drop_path_rate": drop_path} if drop_path else {}
+        if in_chans != 3:  # stacked slices as channels (knee/data.py, stack): timm adapts the pretrained stem
+            kwargs["in_chans"] = in_chans
         if backbone.startswith("vit_"):  # ViTs (e.g. DINOv2) were pretrained at another size: resample positions
             kwargs["dynamic_img_size"] = True
         self.backbone = make_backbone(backbone, pretrained, **kwargs)
@@ -78,7 +80,7 @@ class KneeNet(nn.Module):
         """Inference network of a run (its config.json / config_folds*.json)."""
         return cls(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
                    pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False),
-                   spatial_queries=cfg.get("spatial_queries", False))
+                   spatial_queries=cfg.get("spatial_queries", False), in_chans=cfg.get("stack_slices", 0) or 3)
 
     def embed(self, imgs, keep_map: bool = False):
         """Pooled window features, and the backbone's feature map (N, C, h, w) when keep_map."""
@@ -111,10 +113,13 @@ class KneeNet(nn.Module):
         return self.sp_head(self.sp_out_norm(out)).squeeze(-1)  # (B, 12)
 
     def forward(self, x, pos, mask, seq=None, return_pooled=False):
-        # x: (B, S, T, 3, H, W) uint8; pos: (B, S, T); mask: (B, S); seq: (B, S) SEQ_CLASSES indices
+        # x: (B, S, T, C, H, W) uint8 (C = 3 adjacent slices, or the stacked slices); pos: (B, S, T); mask: (B, S); seq: (B, S) SEQ_CLASSES indices
         b, s, t = x.shape[:3]
         imgs = x.flatten(0, 2).float()
-        imgs = (imgs - MEAN.to(imgs.device)) / STD.to(imgs.device)
+        if imgs.shape[1] == 3:
+            imgs = (imgs - MEAN.to(imgs.device)) / STD.to(imgs.device)
+        else:  # stacked grey slices: the ImageNet statistics averaged over colours
+            imgs = (imgs - MEAN.mean()) / STD.mean()
         win_feats, fmap = self.embed(imgs.contiguous(memory_format=torch.channels_last), keep_map=self.sp_queries is not None)
         feats = self.proj(win_feats).view(b, s, t, -1)
         tokens = feats + self.slot_emb[None, :, None] + self.pos_emb(pos.unsqueeze(-1))
