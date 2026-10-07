@@ -1794,6 +1794,16 @@ alone) and **`slurm/auto_1008.sbatch`** (job 1027476, after E77's jobs and 10268
 E75 (when complete) + E77 and pushes E77 alone, then E75 alone; waits for E78 (until 16:00), packages again and
 pushes E78 alone; rows appended to the night table of `kaggle/A_SOUMETTRE.md`.
 
+**E79 fold 1 done (22:34; interactive P100, 4 epochs of ~107 min at 384 px from E41's fold-1 network)**: silver
+0.9533 → 0.9537 → 0.9577 → **0.9580**, against **0.9550 for E42** (same labels, 384 px from scratch, 12 epochs) and
+0.9561 for E46; gold(fold) 0.913 (E42 0.923, 12 studies). The continuation is at least as good as training at 384 px
+from scratch for a third of the 384 px epochs, and it combines like a scratch model with other 384 px runs (fold 1:
+E79 + E46 0.9607 vs E42 + E46 0.9589; E79 + E42 0.9604), though not with its own parent (E41 + E79 0.9579, rank
+correlation 0.944): the 384 px version replaces its 224 px parent. Fold 0 (job 1026813) ends ~01:45.
+**E81** queued on one 3090 (job 1027771, lowest priority, `slurm/runs/e81_3090.txt`): E54's three full-data networks
+continued 4 epochs at 384 px (~1 h each on a 3090): the LB test of the continuation against Version 38 (E66, E54's
+recipe at 384 px from scratch). E75 on its 3090: 12.8 min per epoch, network 0 done, all three ~02:20.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
