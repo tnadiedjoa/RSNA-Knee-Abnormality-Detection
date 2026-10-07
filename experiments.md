@@ -1584,6 +1584,14 @@ Checked while rebuilding: every Slurm job gets a private `/tmp` (`/etc/slurm/plu
 mount=/tmp mount=/var/tmp`), so `/tmp/knee_raw` is per job and a 224 px run can never read a 384 px unpacked
 cache left by another job (`/tmp` usage back to its 99 GB baseline at each job start on node40).
 
+**Slice spacing** (OOF of the 3-run blend, by the sag_fs series): studies whose series have more than 30 slices
+score lower than ≤ 30 within 3 of the 4 sites that have both (Philips Achieva 0.934 vs 0.942, Ingenia 0.952 vs
+0.967, Siemens Aera 0.944 vs 0.953; Avanto fit the reverse, 0.959 vs 0.944); by slice gap: ≤ 2.5 mm 0.952 (285
+studies), 2.5–3.5 mm 0.962 (2,212), 3.5–4.5 mm 0.958 (1,325), > 4.5 mm 0.971 (579). A 3-slice window spans 6 mm at
+2 mm spacing but 15 mm at 5 mm, and 8 training windows cover a 45-slice stack only in part. Candidate (not run):
+windows whose neighbours are a fixed ~3 mm apart (stride from the cached slice positions) — needs a training
+run; confounded with sites, so expected gain unclear.
+
 Auto (2026-10-07 11:05, scripts/auto_followup.py): Kaggle: ref 56905346 (knee-submit version 32) scored 0.928.
 
 **Version 32 on the public LB: 0.928** — **E61 alone** (E54 with `--gold-weight 10` instead of 3: the 58 expert studies
