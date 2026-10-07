@@ -1544,6 +1544,32 @@ set: just more independent readers averaged, the step that took E38 → E41 from
 **E72** = E54 with the 7-table base (`--mix-public … medgemma27_p3 mistral24_p3 qwen32_p3`, `scripts/eval_labels.py`
 divides the 0–10 grades by 10), seeds 42/43/44, alone against E54 (0.935). Queued at 11:05 on P100 (jobs 1026319:
 networks 0–1, 1026320: network 2), pending on the 4-job limit until E69/E70 end (~18:30); ~8 h per network.
+Teacher check (gold agreement): the round-4 teacher (E35 + E36 OOF) 0.928 stays the best — the mean OOF of the eight
+mixpub 5-fold runs 0.923, of the five 384 px ones 0.926 (labels 7-table + α 0.5: 0.938 / 0.935 / 0.936): later
+self-distillation rounds drift, E72 keeps the round-4 teacher.
+
+**Test-time slice span** (`scripts/tta_eval.py`, now with `--settings`, `--save` and a paired bootstrap against
+24 windows; E41 fold networks, interactive P100). Fold 0, first 300 studies: base (12 windows) 0.9536, 24 windows
+0.9553, zoom +8 % 0.9525, zoom −7 % 0.9543, span 0.04–0.96 **0.9570**, 0.12–0.88 0.9561; means of two settings add
+nothing beyond the best single one. Re-checked on all of fold 1 (882 studies, 24 windows each):
+
+| span | silver | Δ vs 0.08–0.92 [95 % CI] | gold (~12 studies) |
+|---|---|---|---|
+| 0.08–0.92 (training) | 0.9542 | — | 0.910 |
+| 0.04–0.96 | 0.9545 | +0.0003 [−0.0008, +0.0016] | 0.908 |
+| 0.02–0.98 | 0.9546 | +0.0004 [−0.0005, +0.0015] | 0.902 |
+| 0.00–1.00 | 0.9550 | +0.0008 | 0.904 |
+
+The fold-0 gain (+0.0017 on 300 studies) shrinks to noise on the full fold, as E17 found at 16 windows (2–98 %:
+−0.0006). ✗ — inference keeps the training span. `knee.infer.run(span_pad=…)` (widens every model's range, default 0)
+stays available.
+
+**Unattended push of E72** (the interactive job, with this Claude session, ends at 01:14 on 10-08; E72 ends ~02:30):
+`slurm/auto_1007.sbatch` (job 1026346, CPU partition, `--dependency=afterany` on both E72 jobs) packages the 13
+full-data runs only (`logs/day12c_runs.txt`: E54 … E70, E72 last; ~5 GB instead of 15 — the 5-fold runs stay in the
+dataset versions that older notebook versions pin), pushes knee-submit Version N = E72 alone, notes it here and in
+`kaggle/A_SOUMETTRE.md`, commits and pushes. The evening pushes run from this session (`logs/chain_v36.sh`, waits for
+E69 and E70): Version 36 = E69 alone, Version 37 = E70 alone (dataset of 31 runs).
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.

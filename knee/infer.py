@@ -43,6 +43,12 @@ def size_dir(cache_dir: Path, size: int) -> Path:
     return cache_dir if size == 256 else cache_dir.with_name(f"{cache_dir.name}{size}")
 
 
+def model_span(cfg: dict, span_pad: float = 0.0) -> tuple:
+    """Slice range the windows cover: the training span, widened by span_pad at both ends (clipped to the stack)."""
+    lo, hi = cfg.get("span", (0.08, 0.92))
+    return max(0.0, lo - span_pad), min(1.0, hi + span_pad)
+
+
 def _prepare(args):
     series_dir, out_dir, study, series, side, sizes = args
     try:
@@ -85,11 +91,11 @@ def prepare_cache(data_dir: Path, cache_dir: Path, workers: int, sizes=(256,)) -
 
 @torch.no_grad()
 def predict_model(model_dir: Path, slots: pd.DataFrame, cache_dir: Path, device, workers: int,
-                  windows: int | None = None) -> np.ndarray:
+                  windows: int | None = None, span_pad: float = 0.0) -> np.ndarray:
     cfg = json.loads((model_dir / "config.json").read_text())
     windows = windows or cfg["windows_eval"]  # denser than in training helps a little (experiments.md, E17)
     ds = StudyDataset(slots, n_windows=windows, img_size=cfg["img_size"],
-                      span=tuple(cfg.get("span", (0.08, 0.92))), zoom=cfg.get("zoom", 1.0), cache_dir=cache_dir)
+                      span=model_span(cfg, span_pad), zoom=cfg.get("zoom", 1.0), cache_dir=cache_dir)
     dl = DataLoader(ds, batch_size=max(1, 48 // windows), num_workers=workers)
     models = []
     for ckpt in sorted(model_dir.glob("fold*.pt")):
@@ -118,15 +124,15 @@ def model_cost(model_dir: Path, cfg: dict, windows: int | None = None) -> float:
     return cfg["img_size"] ** 2 * (windows or cfg["windows_eval"]) * len(list(model_dir.glob("fold*.pt"))) * factor
 
 
-def input_key(cfg: dict, windows: int | None = None) -> tuple:
+def input_key(cfg: dict, windows: int | None = None, span_pad: float = 0.0) -> tuple:
     """Models with the same key read identical batches: cache, slice size, windows, span, zoom."""
     return (cfg.get("cache_size", 256), cfg["img_size"], windows or cfg["windows_eval"],
-            tuple(cfg.get("span", (0.08, 0.92))), cfg.get("zoom", 1.0))
+            model_span(cfg, span_pad), cfg.get("zoom", 1.0))
 
 
 @torch.no_grad()
 def predict_group(model_dirs: list, cfgs: dict, slots: pd.DataFrame, cache_dir: Path, devices: list, workers: int,
-                  windows: int | None = None) -> tuple[dict, float, float]:
+                  windows: int | None = None, span_pad: float = 0.0) -> tuple[dict, float, float]:
     """predict_model for several models that read the same input (input_key): each batch is read once and
     goes through every fold network of every model, the networks spread round-robin over the GPUs, so
     consecutive launches alternate between them and both compute at once.
@@ -134,7 +140,7 @@ def predict_group(model_dirs: list, cfgs: dict, slots: pd.DataFrame, cache_dir: 
     cfg = cfgs[model_dirs[0]]
     windows = windows or cfg["windows_eval"]
     ds = StudyDataset(slots, n_windows=windows, img_size=cfg["img_size"],
-                      span=tuple(cfg.get("span", (0.08, 0.92))), zoom=cfg.get("zoom", 1.0), cache_dir=cache_dir)
+                      span=model_span(cfg, span_pad), zoom=cfg.get("zoom", 1.0), cache_dir=cache_dir)
     dl = DataLoader(ds, batch_size=max(1, 48 // windows), num_workers=workers, pin_memory=devices[0].type == "cuda")
     t = time.time()
     nets = []  # (model_dir, device, network)
@@ -165,9 +171,10 @@ def predict_group(model_dirs: list, cfgs: dict, slots: pd.DataFrame, cache_dir: 
 
 
 def run(data_dir, model_dirs, out_csv="submission.csv", cache_dir="/tmp/knee_cache", workers=None,
-        time_budget_s=None, windows=None, grouped=False, calib_studies=16):
+        time_budget_s=None, windows=None, grouped=False, calib_studies=16, span_pad=0.0):
     """time_budget_s: skip the remaining models (in the given order) once the next one would end past
     this many seconds from the call; the blend then uses the models done so far.
+    span_pad: widen every model's slice range by this much at both ends (test-time setting, experiments.md).
     grouped: models sharing an input run together on every GPU (predict_group); a first pass over
     calib_studies studies measures the speed, the models that fit the budget are chosen in the given
     order, and before each group the slowest-priority ones are dropped if the measured pace says so."""
@@ -182,7 +189,8 @@ def run(data_dir, model_dirs, out_csv="submission.csv", cache_dir="/tmp/knee_cac
     series = prepare_cache(data_dir, cache_dir, workers, sorted(set(sizes.values())))
     slots = assign_slots(series).set_index("StudyInstanceUID").reindex(test["StudyInstanceUID"]).reset_index()
     if grouped:
-        preds = _run_grouped(model_dirs, cfgs, slots, cache_dir, workers, windows, time_budget_s, t0, calib_studies)
+        preds = _run_grouped(model_dirs, cfgs, slots, cache_dir, workers, windows, time_budget_s, t0, calib_studies,
+                             span_pad)
         return _write(test, [preds[m] for m in model_dirs if m in preds], len(model_dirs), out_csv)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     preds, spent, pixels = [], 0.0, 0
@@ -192,7 +200,7 @@ def run(data_dir, model_dirs, out_csv="submission.csv", cache_dir="/tmp/knee_cac
             print(f"time budget: skipping {model_dir.name}", flush=True)
             continue
         t = time.time()
-        p = predict_model(model_dir, slots, size_dir(cache_dir, sizes[model_dir]), device, workers, windows)
+        p = predict_model(model_dir, slots, size_dir(cache_dir, sizes[model_dir]), device, workers, windows, span_pad)
         spent, pixels = spent + time.time() - t, pixels + cost
         print(f"{model_dir.name}: {time.time() - t:.0f}s, {(time.time() - t0) / 60:.1f} min elapsed", flush=True)
         preds.append(p)
@@ -210,20 +218,21 @@ def _write(test: pd.DataFrame, preds: list, n_models: int, out_csv) -> pd.DataFr
     return sub
 
 
-def _run_grouped(model_dirs, cfgs, slots, cache_dir, workers, windows, time_budget_s, t0, calib_studies) -> dict:
+def _run_grouped(model_dirs, cfgs, slots, cache_dir, workers, windows, time_budget_s, t0, calib_studies,
+                 span_pad=0.0) -> dict:
     devices = [torch.device(f"cuda:{i}") for i in range(torch.cuda.device_count())] or [torch.device("cpu")]
     print(f"devices: {[str(d) for d in devices]}", flush=True)
     costs = {m: model_cost(m, cfgs[m], windows) for m in model_dirs}
     groups: dict = {}  # input key -> its models, in the given order; groups run in the order of their first model
     for m in model_dirs:
-        groups.setdefault(input_key(cfgs[m], windows), []).append(m)
+        groups.setdefault(input_key(cfgs[m], windows, span_pad), []).append(m)
     n = len(slots)
     keep = list(model_dirs)
     rate, load = None, 0.0  # cost units x studies per second (all GPUs together); seconds to load one network
     if time_budget_s and n > calib_studies:  # speed of the first group on a few studies
         key, ms = next(iter(groups.items()))
         _, load_s, pred_s = predict_group(ms, cfgs, slots.iloc[:calib_studies], size_dir(cache_dir, key[0]), devices,
-                                          workers, windows)
+                                          workers, windows, span_pad)
         rate = sum(costs[m] for m in ms) * calib_studies / pred_s
         load = load_s / sum(len(list(m.glob("fold*.pt"))) for m in ms)
         left = time_budget_s - (time.time() - t0)
@@ -247,7 +256,7 @@ def _run_grouped(model_dirs, cfgs, slots, cache_dir, workers, windows, time_budg
         if not ms:
             continue
         t = time.time()
-        p, _, pred_s = predict_group(ms, cfgs, slots, size_dir(cache_dir, key[0]), devices, workers, windows)
+        p, _, pred_s = predict_group(ms, cfgs, slots, size_dir(cache_dir, key[0]), devices, workers, windows, span_pad)
         preds.update(p)
         done, spent = done + sum(costs[m] for m in ms) * n, spent + pred_s
         rate = done / spent
