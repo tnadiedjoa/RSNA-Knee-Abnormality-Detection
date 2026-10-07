@@ -32,7 +32,7 @@ def make_backbone(name: str, pretrained: bool, **kwargs) -> nn.Module:
 class KneeNet(nn.Module):
     def __init__(self, backbone: str = "resnet34", pretrained: bool = True, dim: int = 256, depth: int = 2,
                  heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1, pool: str = "avg",
-                 seq_emb: bool = False, aux_grades: int = 0):
+                 seq_emb: bool = False, aux_grades: int = 0, spatial_queries: bool = False):
         super().__init__()
         kwargs = {"drop_path_rate": drop_path} if drop_path else {}
         if backbone.startswith("vit_"):  # ViTs (e.g. DINOv2) were pretrained at another size: resample positions
@@ -59,23 +59,64 @@ class KneeNet(nn.Module):
         # drops "aux_" weights when saving, so checkpoints load into a plain KneeNet
         self.aux_grade_head = nn.Linear(dim, aux_grades) if aux_grades else None
         self.max_head = nn.Linear(dim, len(LABELS))  # max over windows: a focal lesion shows in few windows
+        # optional spatial path: one query per finding attends over every feature-map cell of every window (the
+        # window tokens above are average-pooled, which dilutes a small lesion); its logit is added to the others,
+        # and its output layer starts at zero, so training starts from the plain model
+        self.sp_queries = None
+        if spatial_queries:
+            c = self.backbone.num_features
+            self.sp_norm, self.sp_proj = nn.LayerNorm(c), nn.Linear(c, dim)
+            self.sp_pos = nn.Sequential(nn.Linear(2, dim), nn.GELU(), nn.Linear(dim, dim))  # in-plane (row, column)
+            self.sp_queries = nn.Parameter(torch.randn(len(LABELS), dim) * 0.02)
+            self.sp_attn = nn.MultiheadAttention(dim, heads, dropout=dropout, batch_first=True)
+            self.sp_out_norm, self.sp_head = nn.LayerNorm(dim), nn.Linear(dim, 1)
+            nn.init.zeros_(self.sp_head.weight)
+            nn.init.zeros_(self.sp_head.bias)
 
-    def embed(self, imgs):
-        if self.pool_type == "avg":
-            return self.backbone(imgs)
+    @classmethod
+    def from_config(cls, cfg: dict) -> "KneeNet":
+        """Inference network of a run (its config.json / config_folds*.json)."""
+        return cls(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
+                   pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False),
+                   spatial_queries=cfg.get("spatial_queries", False))
+
+    def embed(self, imgs, keep_map: bool = False):
+        """Pooled window features, and the backbone's feature map (N, C, h, w) when keep_map."""
+        if self.pool_type == "avg" and not keep_map:
+            return self.backbone(imgs), None
         fmap = self.backbone.forward_features(imgs)  # (N, C, h, w)
-        mx = fmap.amax((2, 3), keepdim=True)
-        norm = getattr(getattr(self.backbone, "head", None), "norm", None)  # ConvNeXt: LayerNorm2d after pooling
-        if norm is not None:
-            mx = norm(mx)
-        return torch.cat([self.backbone.forward_head(fmap, pre_logits=True), mx.flatten(1)], 1)
+        pooled = self.backbone.forward_head(fmap, pre_logits=True)  # = self.backbone(imgs)
+        if self.pool_type == "avgmax":
+            mx = fmap.amax((2, 3), keepdim=True)
+            norm = getattr(getattr(self.backbone, "head", None), "norm", None)  # ConvNeXt: LayerNorm2d after pooling
+            if norm is not None:
+                mx = norm(mx)
+            pooled = torch.cat([pooled, mx.flatten(1)], 1)
+        return pooled, (fmap if keep_map else None)
+
+    def spatial_logits(self, fmap, pos, seq, pad, b, s, t):
+        """Per-finding attention over all feature-map cells: fmap (B*S*T, C, h, w), pad (B, S*T) True = ignore."""
+        _, _, h, w = fmap.shape
+        z = self.sp_proj(self.sp_norm(fmap.permute(0, 2, 3, 1)))  # (N, h, w, D)
+        rows, cols = torch.meshgrid(torch.linspace(0, 1, h, device=z.device), torch.linspace(0, 1, w, device=z.device),
+                                    indexing="ij")
+        z = z + self.sp_pos(torch.stack([rows, cols], -1).to(z.dtype))
+        window = self.slot_emb[None, :, None] + self.pos_emb(pos.unsqueeze(-1))  # (B, S, T, D): series and depth
+        if self.seq_emb is not None:
+            window = window + self.seq_emb(seq)[:, :, None]
+        z = (z.reshape(b, s, t, h, w, -1) + window[:, :, :, None, None].to(z.dtype)).flatten(1, 4)  # (B, S*T*h*w, D)
+        key_pad = pad[:, :, None].expand(-1, -1, h * w).flatten(1)
+        q = self.sp_queries.unsqueeze(0).expand(b, -1, -1).to(z.dtype)
+        out, _ = self.sp_attn(q, z, z, key_padding_mask=key_pad)
+        return self.sp_head(self.sp_out_norm(out)).squeeze(-1)  # (B, 12)
 
     def forward(self, x, pos, mask, seq=None, return_pooled=False):
         # x: (B, S, T, 3, H, W) uint8; pos: (B, S, T); mask: (B, S); seq: (B, S) SEQ_CLASSES indices
         b, s, t = x.shape[:3]
         imgs = x.flatten(0, 2).float()
         imgs = (imgs - MEAN.to(imgs.device)) / STD.to(imgs.device)
-        feats = self.proj(self.embed(imgs.contiguous(memory_format=torch.channels_last))).view(b, s, t, -1)
+        win_feats, fmap = self.embed(imgs.contiguous(memory_format=torch.channels_last), keep_map=self.sp_queries is not None)
+        feats = self.proj(win_feats).view(b, s, t, -1)
         tokens = feats + self.slot_emb[None, :, None] + self.pos_emb(pos.unsqueeze(-1))
         if self.seq_emb is not None:
             tokens = tokens + self.seq_emb(seq)[:, :, None]
@@ -88,4 +129,7 @@ class KneeNet(nn.Module):
         pooled = self.norm(pooled)  # (B, 12, D)
         logits = self.head(pooled).squeeze(-1)  # (B, 12)
         max_logits = self.max_head(tokens).masked_fill(pad.unsqueeze(-1), -1e4).amax(1)
-        return (logits + max_logits, pooled) if return_pooled else logits + max_logits
+        out = logits + max_logits
+        if self.sp_queries is not None:
+            out = out + self.spatial_logits(fmap, pos, seq, pad, b, s, t)
+        return (out, pooled) if return_pooled else out

@@ -69,8 +69,7 @@ def main():
     preds = {name: [] for name, _ in variants}
     for fold in range(5):
         va = np.where(studies["fold"].to_numpy() == fold)[0]
-        model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
-                         pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False))
+        model = KneeNet.from_config(cfg)
         model.load_state_dict(torch.load(run / "checkpoints" / f"fold{fold}.pt", map_location="cpu"))
         model = model.to(device).eval().to(memory_format=torch.channels_last)
         for name, o in variants:

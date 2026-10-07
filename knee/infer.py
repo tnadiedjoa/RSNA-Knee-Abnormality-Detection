@@ -99,8 +99,7 @@ def predict_model(model_dir: Path, slots: pd.DataFrame, cache_dir: Path, device,
     dl = DataLoader(ds, batch_size=max(1, 48 // windows), num_workers=workers)
     models = []
     for ckpt in sorted(model_dir.glob("fold*.pt")):
-        model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
-                         pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False))
+        model = KneeNet.from_config(cfg)
         model.load_state_dict(torch.load(ckpt, map_location="cpu"))
         models.append(model.to(device).eval().to(memory_format=torch.channels_last))
     out = [[] for _ in models]
@@ -148,8 +147,7 @@ def predict_group(model_dirs: list, cfgs: dict, slots: pd.DataFrame, cache_dir: 
         c = cfgs[m]
         for ckpt in sorted(m.glob("fold*.pt")):
             dev = devices[len(nets) % len(devices)]
-            net = KneeNet(c["backbone"], pretrained=False, dim=c["dim"], depth=c["depth"], drop_path=0,
-                          pool=c.get("pool", "avg"), seq_emb=c.get("seq_emb", False))
+            net = KneeNet.from_config(c)
             net.load_state_dict(torch.load(ckpt, map_location="cpu"))
             nets.append((m, dev, net.to(dev).eval().to(memory_format=torch.channels_last)))
     load_s, t = time.time() - t, time.time()

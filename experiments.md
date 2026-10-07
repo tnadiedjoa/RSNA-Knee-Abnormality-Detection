@@ -1619,6 +1619,50 @@ so far (Versions 18/23, 0.934, five-fold ensembles): full data does not lift the
 (at 224 px: E41 0.931 vs E38 0.929). More independent readers in the base (E72/E74/E75, 7 tables) is the right
 direction. CV line unchanged (own-label score stays 0.934).
 
+### Outside review (Gemini, 2026-10-07 ~12:30) and what came of it
+
+The user gave a full brief of the project to another AI. Its proposals, checked against our own results:
+
+| proposal | verdict |
+|---|---|
+| per-finding spatial attention instead of average-pooled windows | **tested now: E76** — the one model-side idea not tried; the public CoAt readers do it |
+| 6th slot for the oblique ACL / 3D cartilage series | low: oblique ACL series in 275 studies (6 %), 3D cartilage ~450 (10 %); their presence as a feature adds +0.0002 (protocol test below); the ACL is weak everywhere, not only there |
+| per-finding teacher weight (text for ligaments, teacher for synovitis/effusion) | already tested as E58: −0.004 on the LB |
+| per-finding blend weights fitted on the 58 gold studies | no: the public models trained on those 58 (in-sample predictions), 12 weights on 58 studies overfit, and the 58 misled every label choice so far |
+| "extended gold" = gold + studies where the 7 readers agree | no: easy cases, where label recipes do not differ |
+| fixed physical slice spacing | low: only 285 studies (6 %) have ≤ 2.5 mm slices (analysis above) |
+| test-time pseudo-labelling inside the notebook | not now: heavy under the 9 h limit, uncertain gain |
+| MRNet pretraining | possible (allowed, click-through): needs the user's registration; ~1,130 labelled exams (ACL, meniscus without side), +25 % data on two findings |
+
+**Protocol composition** (CPU, E41 OOF, nested logistic regression per finding on the OOF logit + log counts of
+series per plane, fat-suppressed, 3D, T1, STIR, GRE and description keywords — oblique/ACL, contrast, cartilage
+mapping, Dixon, diffusion, anonymised): silver 0.9510 → 0.9512 (the recalibration alone 0.9502), gold 0.906 → 0.904.
+An oblique ACL series goes with ACL tears (silver prevalence 46 % vs 15 %), but the images already carry it. ✗
+
+**E76 — spatial queries** (`--spatial-queries`, `knee/model.py`): one learned query per finding attends over every
+feature-map cell of every window (7 × 7 per window at 224 px, 12 × 12 at 384), each cell tagged with its series,
+depth (the window position MLP) and in-plane position (row/column MLP); the attention output goes through a
+zero-initialised linear layer and is added to the plain model's logits, so training starts from the plain model.
+Checks: with the flag off, old checkpoints predict exactly as before (`scripts/check_infer` on E35 fold 0, 120
+studies: 0.9586 / 0.9587, correlation 1.0000, max |diff| 0.0073, the numbers of 10-05; grouped vs per-model
+`knee/infer.py` on 12 studies for E54 and E66: max |diff| 0.0); with it on, outputs at initialisation equal the
+plain model's, gradients reach the new layers after one step, the checkpoint reloads through the new
+`KneeNet.from_config` (now used by `knee/infer.py`, `check_infer`, `eval_variants`, `tta_eval`). Cost measured on
+the P100 (synthetic batch, 8 studies × 5 series × 8 windows, fp16, gradient checkpointing): 224 px 4.80 vs 4.81
+s/step, 5.8 GiB both. E76 = E41 recipe + `--spatial-queries`, folds 0–1, against E41 (0.9518 / 0.9536): job 1026676
+(2 P100s), after the unattended E72 push (~03:30 → ~10:30 on 10-08). It takes the slot of **E75**, postponed
+(`slurm/runs/e75_01_postponed.txt`): E74 already answers "7 tables at 384 px".
+
+**384 px does not fit a P100 at batch 8** (found by the same benchmark): ConvNeXt-tiny, 8 studies × 40 windows of
+384 px, out of memory at 15.9 GiB even with gradient checkpointing — every 384 px run so far trained on 3090s
+(24 GB), so **E74 would have crashed at its first step tonight**. New `--accum k` in `scripts/train.py` (k batches per
+optimiser step; the schedule counts optimiser steps; an incomplete last group is left out): E74's runs files now
+use `--bs 4 --accum 2` (8 studies per step, as on the 3090s): 6.92 s per 4 studies, 8.3 GiB, i.e. ~2 h per epoch,
+~25 h per network. Full-data runs now compute their in-sample monitor at the last epoch only (it cost ~10 % of the
+run each epoch and measures nothing). Smoke tests on the P100: a full-data run with `--spatial-queries --bs 4
+--accum 2` (2 epochs × 6 steps: monitor only at epoch 2, checkpoint reloads, the new head's weights moved off zero)
+and E72's exact path (`--bs 8`, accum 1).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

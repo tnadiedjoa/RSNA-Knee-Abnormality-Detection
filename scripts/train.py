@@ -115,7 +115,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
 
     torch.manual_seed(args.seed + fold)
     model = KneeNet(args.backbone, dim=args.dim, depth=args.depth, drop_path=args.drop_path, pool=args.pool,
-                    seq_emb=args.seq_emb, aux_grades=6 if args.aux_grades else 0).to(device)
+                    seq_emb=args.seq_emb, aux_grades=6 if args.aux_grades else 0,
+                    spatial_queries=args.spatial_queries).to(device)
     model = model.to(memory_format=torch.channels_last)
     if args.grad_ckpt:  # recompute backbone activations in the backward pass: bigger backbones fit a 16 GB P100
         model.backbone.set_grad_checkpointing(True)
@@ -124,7 +125,10 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
     others = [p for p in model.parameters() if id(p) not in ids]
     opt = torch.optim.AdamW([{"params": backbone, "lr": args.lr}, {"params": others, "lr": args.lr_head}],
                             weight_decay=args.wd)
-    total = args.epochs * len(dl_tr)
+    # --accum k: k batches of --bs studies per optimiser step (a 16 GB P100 holds 4 studies of 384 px, a 3090 8),
+    # so the schedule counts optimiser steps
+    steps_per_epoch = len(dl_tr) // args.accum
+    total = args.epochs * steps_per_epoch
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: lr_lambda(s, total, int(0.05 * total)))
 
     scaler = torch.amp.GradScaler(enabled=AMP_DTYPE == torch.float16)
@@ -136,8 +140,8 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
         ds_tr.epoch = epoch
         t, losses = time.time(), []
         for step, batch in enumerate(dl_tr):
-            if args.debug_steps and step >= args.debug_steps:
-                break
+            if (args.debug_steps and step >= args.debug_steps) or step >= steps_per_epoch * args.accum:
+                break  # with --accum, a last incomplete group of batches is left out (drop_last already does it at 1)
             with torch.autocast("cuda", dtype=AMP_DTYPE):
                 logits, pooled = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device),
                                        batch["mask"].to(device), batch["seq"].to(device), return_pooled=True)
@@ -147,16 +151,22 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
             if args.aux_grades:  # 6-way report grade of every finding, from the same pooled vectors
                 grade_logits = model.aux_grade_head(pooled.float())
                 loss = loss + args.aux_grades * F.cross_entropy(grade_logits.flatten(0, 1), yb[:, len(LABELS):].long().flatten())
-            opt.zero_grad(set_to_none=True)
-            scaler.scale(loss).backward()
+            scaler.scale(loss / args.accum).backward()
+            losses.append(loss.item())
+            if (step + 1) % args.accum:
+                continue
             scaler.unscale_(opt)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 2.0)
             scaler.step(opt)
             scaler.update()
+            opt.zero_grad(set_to_none=True)
             sched.step()
             if ema is not None:
-                ema.update(model, step=epoch * len(dl_tr) + step)
-            losses.append(loss.item())
+                ema.update(model, step=epoch * steps_per_epoch + step // args.accum)
+        if args.full_fit and epoch + 1 < args.epochs:  # the monitor is in-sample on a full fit: last epoch only
+            history.append({"epoch": epoch + 1, "loss": float(np.mean(losses)), "minutes": (time.time() - t) / 60})
+            print(f"fold {fold} epoch {epoch + 1}: loss {np.mean(losses):.4f} [{(time.time() - t) / 60:.1f} min]", flush=True)
+            continue
         pred = predict(model, dl_va, device)
         silver_auc, _ = macro_auc(silver[va], pred)
         gold_va = is_gold[va]
@@ -193,6 +203,7 @@ def main():
     p.add_argument("--windows-eval", type=int, default=12)
     p.add_argument("--epochs", type=int, default=12)
     p.add_argument("--bs", type=int, default=8)
+    p.add_argument("--accum", type=int, default=1, help="batches per optimiser step (effective batch = bs * accum)")
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--lr-head", type=float, default=1e-3)
     p.add_argument("--wd", type=float, default=0.02)
@@ -200,6 +211,8 @@ def main():
     p.add_argument("--depth", type=int, default=2)
     p.add_argument("--drop-path", type=float, default=0.1)
     p.add_argument("--pool", default="avg", choices=["avg", "avgmax"], help="pooling inside each window (knee/model.py)")
+    p.add_argument("--spatial-queries", action="store_true",
+                   help="per-finding attention over every feature-map cell of every window, added to the logits (knee/model.py)")
     p.add_argument("--seq-emb", action="store_true", help="add a learned T1/PD/T2/... embedding to each slot's tokens (knee/model.py)")
     p.add_argument("--aux-grades", type=float, default=0.0,
                    help="weight of an auxiliary 6-way report-grade loss per finding (0 = off; knee/model.py aux head)")

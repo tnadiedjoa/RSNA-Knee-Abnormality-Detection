@@ -58,8 +58,7 @@ def main():
     if args.limit:
         oof = oof.iloc[: args.limit]
     slots = assign_slots(series_table("train")).set_index("StudyInstanceUID").reindex(oof.index).reset_index()
-    model = KneeNet(cfg["backbone"], pretrained=False, dim=cfg["dim"], depth=cfg["depth"], drop_path=0,
-                    pool=cfg.get("pool", "avg"), seq_emb=cfg.get("seq_emb", False))
+    model = KneeNet.from_config(cfg)
     model.load_state_dict(torch.load(run / "checkpoints" / f"fold{args.fold}.pt", map_location="cpu"))
     model = model.cuda().eval().to(memory_format=torch.channels_last)
     dtype = {"fp16": torch.float16, "bf16": torch.bfloat16}[args.dtype]
