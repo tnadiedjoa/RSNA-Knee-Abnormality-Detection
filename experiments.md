@@ -1670,6 +1670,47 @@ ConvNeXt-small 384 px own labels, 224 px) = **E56 alone** (Version 28, 0.938). S
 families add nothing: our members are too alike (same 2.5D input, close labels), as both outside reviews said.
 The way up is decorrelated members (spatial queries E76, other label bases, other inputs), not more seeds.
 
+### Two more outside reviews (two Claude sessions, 2026-10-07 ~13:30) — checks and tonight's tests
+
+Shared diagnosis: our members are too alike (same 2.5D input, close labels), silent cells are under-used, average
+pooling loses where a lesion is (medial vs lateral sit on fixed image sides after mirroring: gold lateral meniscus
+0.889 vs medial 0.970, lateral OA 0.853 vs medial 0.992). Version 34 (0.938 = E56 alone with six more networks of
+the same families) agrees. Checked on CPU:
+- **Mixed contrasts inside a series** (dual-echo / Dixon images at one position, so a 3-slice window would stack two
+  contrasts): none — all 20,792 selected series have one image per position (`n_images == n_slices`; the loader
+  keeps one image per position anyway).
+- **Stacking the 12 OOF predictions** per finding (nested logistic regression): silver −0.0006 to −0.0013, gold
+  −0.01 (E41, E46). ✗ The 12 queries already share the evidence.
+- **Reporting habits by site** (report language × scanner maker, 20 groups; `knee.labels.report_language`, 99.5 %
+  agreement with a public language column): the share of reports that mention a finding varies hugely — synovitis
+  17 % (bg|Philips) to 76 % (es|GE), contusion 21 % (es|Philips) to 91 %, Baker's 22–99 %, effusion 42–99 % — while the
+  image teacher's per-site means vary about as much as the labels (it learned the sites' habits too). Silent cells
+  carry habits, not image content.
+- DDP on two P100s would halve the wall time of one network, not the GPU-hours; our three networks per run already
+  run in parallel. Not pursued.
+
+Tonight's queue rebuilt around these (14:00; 224 px tests, ~8 h each; the 384 px E74 is postponed —
+`slurm/runs/e74_*_postponed.txt` — until E72's LB and E79 say how to make 384 px models):
+- **E77** = E54 + teacher weight by what the report says, fixed a priori: silent cells 0.9 with full loss weight
+  (`--alpha-silent 0.9 --silence-weight 1.0`), cells graded absent/severe 0.25 (`--alpha-clear 0.25`), the rest 0.5.
+  Labels' gold agreement 0.934 → 0.940 (informative only, not used to pick the values). Alone vs E54 (0.935).
+- **E78** = E54 + `--site-bias`: a learned logit offset per (site, finding) on silent cells, training only (saved
+  in `site_bias_fold*.csv`, never used at inference). Alone vs E54.
+- **E79** = E41 fold 0 network (224 px) continued 4 epochs at 384 px (`--init-from`, lr 1e-4 / 5e-4, bs 4 × 2):
+  fold-0 silver against E42 fold 0 (384 px from scratch, same labels, 0.9577). If it matches, a 384 px version
+  costs ~8 h of P100 instead of ~25 h.
+- **E76** (spatial queries, folds 0–1) and **E72** (7-table base) as before.
+New code: `scripts/train.py` `--alpha-silent`, `--alpha-clear`, `--site-bias`, `--init-from`; `StudyDataset` also
+returns its row index (`"i"`); `slurm/multi_gpu.sbatch` takes optional `VAR=value` words before a run's arguments
+(that run gets its own cache, e.g. 384 px next to a 224 px run in one job, and skips the job's unpacked copy).
+Checks: with the new options off, `build_targets` returns exactly the previous labels; with E77's options, silent
+cells move 0.049 on average, mentioned ones 0.018, gold rows not at all; a P100 smoke run with `--site-bias
+--alpha-silent --alpha-clear --init-from` (20 sites, 25.6 % silent cells; 224/224 tensors loaded; in-sample monitor
+0.952 after 8 steps, i.e. the loaded network) writes its checkpoint and `site_bias_fold0.csv`; the per-run
+environment parser dry-run gives the expected two commands.
+Jobs: 1026319 (E72 n0–1), 1026813 (E72 n2 + E79), 1026814 (E77 n0–1), 1026815 (E77 n2 + E78 n0), 1026816 (E78 n1–2),
+1026817 (unattended E72 push, after 1026319 + 1026813), 1026676 (E76, after the push).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

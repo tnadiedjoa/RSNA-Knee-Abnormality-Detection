@@ -27,8 +27,16 @@ if [ "$(df --output=avail -BG /tmp | tail -1 | tr -dc 0-9)" -gt "${RAW_GB:-60}" 
   RAW=(--raw-dir /tmp/knee_raw)
 fi
 for i in "${!RUNS[@]}"; do
-  name=$(echo "${RUNS[$i]}" | grep -oP '(?<=--name )\S+')
-  CUDA_VISIBLE_DEVICES=${GPUS[$i]} $PY -m scripts.train ${RUNS[$i]} "${RAW[@]}" --workers "$WORKERS" \
+  line=${RUNS[$i]}
+  # optional VAR=value words before the arguments (e.g. KNEE_CACHE_DIR=... KNEE_CACHE_SIZE=384): that run gets its own
+  # cache and reads it directly, never the job's unpacked copy, so a 224 px and a 384 px run can share a job
+  envs=()
+  while [[ $line =~ ^([A-Z_][A-Z0-9_]*=[^[:space:]]+)[[:space:]]+(.*)$ ]]; do
+    envs+=("${BASH_REMATCH[1]}"); line=${BASH_REMATCH[2]}
+  done
+  raw=("${RAW[@]}"); [ ${#envs[@]} -gt 0 ] && raw=()
+  name=$(echo "$line" | grep -oP '(?<=--name )\S+')
+  env "${envs[@]}" CUDA_VISIBLE_DEVICES=${GPUS[$i]} $PY -m scripts.train $line "${raw[@]}" --workers "$WORKERS" \
     > "logs/${name}_${SLURM_JOB_ID}.log" 2>&1 &
 done
 wait

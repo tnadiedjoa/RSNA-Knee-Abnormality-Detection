@@ -38,17 +38,22 @@ def build_targets(studies: pd.DataFrame, args):
         tables = [pub[n].set_index("StudyInstanceUID").reindex(studies["StudyInstanceUID"])[LABELS].to_numpy(np.float32)
                   for n in args.mix_public]
         y = ((y + sum(np.where(np.isnan(t), y, t) for t in tables)) / (1 + len(tables))).astype(np.float32)
+    grades = pd.read_parquet(DATA_DIR / "labels" / f"{args.labels}.parquet").set_index("StudyInstanceUID")
+    g = grades.reindex(studies["StudyInstanceUID"])[LABELS]
     if args.bootstrap_run:  # soft bootstrapping: pull report labels towards an earlier run's out-of-fold predictions
         oof = pd.concat([pd.read_csv(f) for f in sorted((RUNS_DIR / args.bootstrap_run).glob("oof_fold*.csv"))])
         oof = oof.set_index("StudyInstanceUID").reindex(studies["StudyInstanceUID"])[LABELS].to_numpy(np.float32)
         alpha = np.array([args.bootstrap_alpha_labels.get(l, args.bootstrap_alpha) for l in LABELS], np.float32)
+        alpha = np.broadcast_to(alpha, y.shape).copy()
+        if args.alpha_clear is not None:  # the report states absent / severe: trust it more
+            alpha[g.isin(["absent", "severe"]).to_numpy()] = args.alpha_clear
+        if args.alpha_silent is not None:  # the report says nothing: trust the image teacher more
+            alpha[~mentioned] = args.alpha_silent
         y = np.where(np.isnan(oof), y, (1 - alpha) * y + alpha * oof).astype(np.float32)
     gold = studies[LABELS].to_numpy(np.float32)
     is_gold = ~np.isnan(gold).any(1)
     y[is_gold], w[is_gold] = gold[is_gold], args.gold_weight
     # confident report labels for evaluation: absent -> 0, moderate/severe -> 1, else excluded
-    grades = pd.read_parquet(DATA_DIR / "labels" / f"{args.labels}.parquet").set_index("StudyInstanceUID")
-    g = grades.reindex(studies["StudyInstanceUID"])[LABELS]
     silver = np.where(g.isin(["moderate", "severe"]), 1.0, np.where(g == "absent", 0.0, np.nan)).astype(np.float32)
     silver[is_gold] = gold[is_gold]
     if args.aux_grades:  # report grade class per finding (scripts/llm_labels.GRADES order), appended after the 12 labels
@@ -98,7 +103,7 @@ def predict(model, loader, device):
     return np.concatenate(out)
 
 
-def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir, device):
+def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir, device, extras=None):
     tr, va = np.where(folds != fold)[0], np.where(folds == fold)[0]
     if args.full_fit:  # every study in training; "fold" only seeds the network and picks the (in-sample) monitor set
         tr = np.arange(len(folds))
@@ -118,13 +123,27 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
                     seq_emb=args.seq_emb, aux_grades=6 if args.aux_grades else 0,
                     spatial_queries=args.spatial_queries).to(device)
     model = model.to(memory_format=torch.channels_last)
+    if args.init_from:  # e.g. a 224 px network continued at 384 px; tensors of another shape are left as built
+        src = Path(args.init_from.format(fold=fold))
+        own, sd = model.state_dict(), torch.load(src, map_location="cpu")
+        sd = {k: v for k, v in sd.items() if k in own and own[k].shape == v.shape}
+        model.load_state_dict(sd, strict=False)
+        print(f"init from {src}: {len(sd)} of {len(own)} tensors", flush=True)
     if args.grad_ckpt:  # recompute backbone activations in the backward pass: bigger backbones fit a 16 GB P100
         model.backbone.set_grad_checkpointing(True)
     backbone = list(model.backbone.parameters())
     ids = {id(p) for p in backbone}
     others = [p for p in model.parameters() if id(p) not in ids]
-    opt = torch.optim.AdamW([{"params": backbone, "lr": args.lr}, {"params": others, "lr": args.lr_head}],
-                            weight_decay=args.wd)
+    groups = [{"params": backbone, "lr": args.lr}, {"params": others, "lr": args.lr_head}]
+    site_bias = None
+    if args.site_bias:  # per (reporting site, finding) logit offset on the cells the report is silent about,
+        # learned with the model and dropped afterwards (test images are scored without it): a site that seldom
+        # writes "synovitis" should not teach the image model that its scanners never show one
+        site_tr = torch.as_tensor(extras["site"][tr], device=device)
+        silent_tr = torch.as_tensor(extras["silent"][tr], device=device, dtype=torch.float32)
+        site_bias = torch.zeros(extras["n_sites"], len(LABELS), device=device, requires_grad=True)
+        groups.append({"params": [site_bias], "lr": args.lr_head, "weight_decay": 0.0})
+    opt = torch.optim.AdamW(groups, weight_decay=args.wd)
     # --accum k: k batches of --bs studies per optimiser step (a 16 GB P100 holds 4 studies of 384 px, a 3090 8),
     # so the schedule counts optimiser steps
     steps_per_epoch = len(dl_tr) // args.accum
@@ -146,7 +165,11 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
                 logits, pooled = model(batch["x"].to(device, non_blocking=True), batch["pos"].to(device),
                                        batch["mask"].to(device), batch["seq"].to(device), return_pooled=True)
             yb = batch["y"].to(device)
-            loss = F.binary_cross_entropy_with_logits(logits.float(), yb[:, :len(LABELS)], reduction="none")
+            logits = logits.float()
+            if site_bias is not None:
+                bi = batch["i"].to(device)
+                logits = logits + site_bias[site_tr[bi]] * silent_tr[bi]
+            loss = F.binary_cross_entropy_with_logits(logits, yb[:, :len(LABELS)], reduction="none")
             loss = (loss * batch["w"].to(device)).sum() / batch["w"].sum().to(device)
             if args.aux_grades:  # 6-way report grade of every finding, from the same pooled vectors
                 grade_logits = model.aux_grade_head(pooled.float())
@@ -181,6 +204,9 @@ def train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir
         print(f"fold {fold} epoch {epoch + 1}: loss {np.mean(losses):.4f} silver {silver_auc:.4f}{ema_txt} "
               f"gold(fold) {gold_auc:.4f} [{(time.time() - t) / 60:.1f} min]", flush=True)
     (run_dir / "checkpoints").mkdir(exist_ok=True)
+    if site_bias is not None:  # kept for the journal, never used at inference
+        b = pd.DataFrame(site_bias.detach().cpu().numpy(), index=extras["site_names"], columns=LABELS)
+        b.round(4).to_csv(run_dir / f"site_bias_fold{fold}.csv")
     sd = {k: v for k, v in model.state_dict().items() if not k.startswith("aux_")}  # training-only heads
     torch.save(sd, run_dir / "checkpoints" / f"fold{fold}.pt")  # knee.infer averages every fold*.pt
     (run_dir / f"{'full' if args.full_fit else 'fold'}{fold}_history.json").write_text(json.dumps(history, indent=1))
@@ -231,6 +257,10 @@ def main():
                    help="train every network on all studies (one per --folds entry, seeded by it); no OOF is written")
     p.add_argument("--bootstrap-run", default=None, help="run folder whose OOF predictions are mixed into the labels")
     p.add_argument("--bootstrap-alpha", type=float, default=0.5)
+    p.add_argument("--alpha-silent", type=float, default=None, help="teacher weight on cells the report does not mention")
+    p.add_argument("--alpha-clear", type=float, default=None, help="teacher weight on cells the report grades absent or severe")
+    p.add_argument("--site-bias", action="store_true", help="per (site, finding) offset on silent cells, training only")
+    p.add_argument("--init-from", default=None, help="checkpoint to start from, '{fold}' replaced (e.g. runs/<run>/checkpoints/fold{fold}.pt)")
     p.add_argument("--bootstrap-alpha-labels", type=_label_values, default={},
                    help='per-finding teacher weight overriding --bootstrap-alpha, e.g. "ACL=0.2,MCL=0.2"')
     p.add_argument("--mix-public", nargs="*", default=[], help="public label tables averaged with ours (pilkwang_v2 steven_v2 lixin_sol56)")
@@ -257,6 +287,16 @@ def main():
     slots = assign_slots(series_table("train")).set_index("StudyInstanceUID").reindex(studies["StudyInstanceUID"])
     slots = slots.reset_index()
     y, w, silver, is_gold = build_targets(studies, args)
+    extras = None
+    if args.site_bias:
+        from knee.labels import site_proxy
+        site = site_proxy(studies)
+        names = sorted(site.unique())
+        soft = load_soft(args.labels).set_index("StudyInstanceUID").reindex(studies["StudyInstanceUID"])
+        mentioned = soft[[f"{l}__mentioned" for l in LABELS]].to_numpy(bool)
+        extras = {"site": site.map({n: i for i, n in enumerate(names)}).to_numpy(np.int64), "site_names": names,
+                  "n_sites": len(names), "silent": ~mentioned & ~is_gold[:, None]}
+        print(f"site bias over {len(names)} sites, {extras['silent'].mean():.1%} silent cells", flush=True)
     folds = studies["fold"].to_numpy()
     device = torch.device("cuda")
     torch.backends.cudnn.benchmark = True
@@ -264,7 +304,7 @@ def main():
     AMP_DTYPE = torch.bfloat16 if torch.cuda.is_bf16_supported(including_emulation=False) else torch.float16
 
     for fold in args.folds:
-        va, pred = train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir, device)
+        va, pred = train_fold(fold, studies, slots, y, w, silver, is_gold, folds, args, run_dir, device, extras)
         if args.full_fit:  # in-sample predictions: never written as OOF (eval_oof, teachers and blends read those)
             continue
         oof = pd.DataFrame(pred, columns=LABELS)

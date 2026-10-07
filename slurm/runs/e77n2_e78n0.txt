@@ -1,0 +1,4 @@
+# E77 network 2 and E78 network 0
+# E78 = E54 + --site-bias: a learned logit offset per (reporting site = report language x scanner maker, 20 groups) and finding on the cells the report is silent about, dropped at inference -> alone against E54
+--name e77_full_silentalpha_n2 --run-dir 2026-10-07_1400_e77_convnext_mixpub_r5_silentalpha_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --alpha-silent 0.9 --alpha-clear 0.25 --silence-weight 1.0 --folds 2
+--name e78_full_sitebias_n0 --run-dir 2026-10-07_1400_e78_convnext_mixpub_r5_sitebias_full3 --labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5 --backbone convnext_tiny.fb_in22k_ft_in1k --grad-ckpt --full-fit --site-bias --folds 0

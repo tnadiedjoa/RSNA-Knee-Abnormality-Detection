@@ -154,7 +154,7 @@ class StudyDataset(Dataset):
             pos[k] = centers / max(n - 1, 1)
             mask[k] = True
         out = {"x": torch.from_numpy(x), "pos": torch.from_numpy(pos), "mask": torch.from_numpy(mask),
-               "seq": torch.from_numpy(seq)}
+               "seq": torch.from_numpy(seq), "i": torch.tensor(i)}
         if self.labels is not None:
             out["y"] = torch.from_numpy(self.labels[i].astype(np.float32))
             out["w"] = torch.from_numpy(self.weights[i].astype(np.float32))

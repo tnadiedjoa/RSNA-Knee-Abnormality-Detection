@@ -7,6 +7,8 @@ half the studies, so an unmentioned synovitis inherits part of the effusion scor
 together; a public label set reported the same trick).
 """
 
+import re
+
 import numpy as np
 import pandas as pd
 
@@ -36,3 +38,35 @@ def load_soft(name: str, **kwargs) -> pd.DataFrame:
 def gold() -> pd.DataFrame:
     train = pd.read_csv(DATA_DIR / "train.csv")
     return train.dropna(subset=LABELS)[["StudyInstanceUID"] + LABELS].reset_index(drop=True)
+
+
+# report language from stopword counts (Cyrillic -> Bulgarian, Greek letters -> Greek); 99.5 % agreement with the
+# 'idioma' column of the public codeandodev weak-label table on the 4,407 training reports
+_STOPWORDS = {
+    "en": r"\b(the|and|of|is|with|no|there|are|without|seen)\b",
+    "es": r"\b(de|la|el|con|sin|los|las|se|del|en|rodilla|menisco)\b",
+    "tr": r"\b(ve|ile|bir|izlendi|mevcut|normal|olarak|menisk[uü]s|diz)\b",
+    "hr": r"\b(je|i|se|u|bez|na|koljena|meniskus|vidi|uredan|uredne)\b",
+    "de": r"\b(der|die|das|und|mit|ohne|des|im|kein|keine|meniskus|kniegelenk)\b",
+    "nl": r"\b(de|het|een|van|en|met|geen|niet|zonder|meniscus|knie)\b",
+    "fr": r"\b(le|la|les|des|du|et|sans|une|un|ménisque|genou|pas)\b",
+}
+
+
+def report_language(text: str) -> str:
+    t = str(text).lower()
+    if len(re.findall(r"[а-яё]{3,}", t)) > 5:
+        return "bg"
+    if len(re.findall(r"[α-ωά-ώ]{3,}", t)) > 5:
+        return "el"
+    return max(_STOPWORDS, key=lambda k: len(re.findall(_STOPWORDS[k], t)))
+
+
+def site_proxy(studies: pd.DataFrame, min_studies: int = 30) -> pd.Series:
+    """Reporting site of each training study: report language x scanner maker (the competition gives no site id);
+    groups under min_studies pooled as "other". Training-only (the test has no report)."""
+    maker = (pd.read_parquet(DATA_DIR / "series_meta.parquet").groupby("study").first().Manufacturer
+             .fillna("?").str.split().str[0].str.upper())
+    site = studies["Report"].map(report_language) + "|" + studies["StudyInstanceUID"].map(maker).fillna("?")
+    counts = site.value_counts()
+    return site.where(site.map(counts) >= min_studies, "other")
