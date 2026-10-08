@@ -4,8 +4,9 @@
 
 1. setup only: our DICOM decoders are installed with --target (the public environment stays untouched)
    and the clock of the whole run starts;
-2. the public notebook's cells, verbatim (yamadan96/rsna-knee-d4-public0946, from
-   ryokucha/rsna-knee-d4-blend-0946-ours10; Apache 2.0), write its submission.csv. They run first
+2. the public notebook's cells, verbatim (credited through --source: yamadan96/rsna-knee-d4-public0946, the 0.943
+   stack, until blend 8; matterhorn3838/rsna-knee-v2-velciraptor-dinosaur-speed, the 0.950 base, from blend 9),
+   write its submission.csv. They run first
    because their own time budget counts from their own start (version 1 ran ours first: the public
    part then believed it had 8 h left and the run hit Kaggle's 9 h limit);
 3. our models, in a separate process on every GPU with room left (grouped inference, both T4s since
@@ -21,8 +22,7 @@ from pathlib import Path
 
 from knee.config import ROOT_DIR
 
-SETUP = '''# Blend of the public 0.943 pipeline with our ensemble (cells below: verbatim copy of
-# yamadan96/rsna-knee-d4-public0946, itself from ryokucha/rsna-knee-d4-blend-0946-ours10; credits there).
+SETUP = '''# Blend of a public pipeline with our ensemble (cells below: verbatim copy of {source}; credits there).
 # Step 1: setup only. The public pipeline runs first, our models after it with the time left.
 import glob, os, subprocess, sys, time
 T0_BLEND = time.time()
@@ -114,13 +114,15 @@ def main():
     p.add_argument("--end-h", type=float, default=8.6)
     p.add_argument("--min-left-h", type=float, default=0.75)
     p.add_argument("--out", default=str(ROOT_DIR / "kaggle" / "blend" / "knee-blend.ipynb"))
+    p.add_argument("--source", default="yamadan96/rsna-knee-d4-public0946, itself from ryokucha/rsna-knee-d4-blend-0946-ours10",
+                   help="public notebook the cells come from, credited in the setup cell")
     args = p.parse_args()
     nb = json.loads(Path(args.public_nb).read_text())
     for c in nb["cells"]:
         c.pop("id", None)
         if c["cell_type"] == "code":
             c["outputs"], c["execution_count"] = [], None
-    fmt = dict(weight=args.weight, models=args.models, windows=args.windows, end_h=args.end_h, min_left_h=args.min_left_h)
+    fmt = dict(source=args.source, weight=args.weight, models=args.models, windows=args.windows, end_h=args.end_h, min_left_h=args.min_left_h)
     nb["cells"] = [code(SETUP.format(**fmt))] + nb["cells"] + [code(OURS.format(**fmt)), code(BLEND)]
     Path(args.out).write_text(json.dumps(nb, indent=1))
     print(args.out, len(nb["cells"]), "cells, weight", args.weight)

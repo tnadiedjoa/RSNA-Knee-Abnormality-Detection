@@ -1821,7 +1821,7 @@ in `kaggle/A_SOUMETTRE.md` is blend 8, Versions 40, 42, 41, 39. GPUs sat idle fr
   folds (+0.002 / +0.003) ✓.
 - **E76 (spatial queries)**: silver 0.9532 / 0.9531 vs E41 0.9518 / 0.9536 (+0.0005 on average), rank correlation with
   E41 0.91; E41 + E76 0.9577 / 0.9569. Neutral alone, no new diversity ✗ (kept as an option).
-- Queued: **E82** (E77's networks continued at 384 px) on the interactive 3090 (`logs/run_e82.sh`, ~3.5 h); **E83**
+- Queued: **E82** (E77's networks continued at 384 px) on the interactive 3090 (`slurm/runs/e82_interactive.sh`, ~3.5 h); **E83**
   (E78 continued) and **E84** (E65, own labels round 6, continued: an own-label 384 px member for blends) on P100s
   (jobs 1029223–1029225, `slurm/runs/e83_01.txt`, `e84_01.txt`, `e83n2_e84n2.txt`; ~8 h per network). E81 alone is
   being pushed (dataset of the 13 full-data runs + E75, E77, E78, E81).
