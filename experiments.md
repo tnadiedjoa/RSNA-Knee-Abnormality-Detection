@@ -1843,6 +1843,8 @@ V5 tunes the 12 weights on the 58 gold studies, not used). Our blends sat on the
 full-data set E64 + E60 + E65 (0.15), 24 windows; ~8 h left for our part after the public one. (The setup cell's
 comment still credits the yamadan96 lineage: `scripts/build_blend_nb.py` to take the source as an argument.)
 
+Auto (2026-10-08 19:39, scripts/auto_followup.py): User (20:10): OK to use the OAI-trained public CoAtNet weights (nartaa) in our blends; leaderboard first.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
