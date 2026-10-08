@@ -1806,6 +1806,10 @@ recipe at 384 px from scratch). E75 on its 3090: 12.8 min per epoch, network 0 d
 
 Auto (2026-10-08 04:43, scripts/auto_followup.py): knee-submit **Version 39 = E72 alone** (7-table report base) pushed by the unattended job (`slurm/auto_1007.sbatch`): dataset of the 13 full-data runs, 1 model(s) predicted on the visible test (`logs/push_1008_0432`).
 
+Auto (2026-10-08 09:52, scripts/auto_followup.py): knee-submit **Version 40 = E77 alone** (teacher weight by what the report says: silent cells 0.9, absent/severe 0.25) pushed by the unattended job (`slurm/auto_1008.sbatch`).
+
+Auto (2026-10-08 09:55, scripts/auto_followup.py): knee-submit **Version 41 = E75 alone** (E56 recipe with the 7-table base, 384 px, trained on a 3090) pushed by the unattended job.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

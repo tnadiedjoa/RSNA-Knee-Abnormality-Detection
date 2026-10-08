@@ -25,3 +25,5 @@ Prête pour plus tard : knee-submit **33** (E62 : type de séquence IRM indiqué
 | Notebook | Version | Contenu | Question |
 |---|---|---|---|
 | knee-submit | **39** | E72 seul : labels moyennés sur 7 lecteurs LLM (3 nouveaux, CC0) | bat-il E54 (0,935) ? |
+| knee-submit | **40** | E77 seul : cases non mentionnées → on suit l'image | bat-il E54 (0,935) ? |
+| knee-submit | **41** | E75 seul : meilleure recette 384 px (E56) + labels à 7 lecteurs | bat-il E56 (0,938) ? |
