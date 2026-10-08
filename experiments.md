@@ -1884,6 +1884,46 @@ both T4s, "our ensemble: ok", BLEND written; logs `logs/blend_1008_22*`):
 The five are the 10-09 list (user rule of 10-08: submissions only for the leaderboard): 9 / 10 / 11 tell which of our
 sets adds most to the new base, 13 / 11 / 12 which weight.
 
+**E82 complete** (22:40, interactive 3090: E77's networks continued 4 epochs at 384 px, ~14.5 min/epoch). The card
+went straight to **E85** and **E86** (`slurm/runs/e85_e86_interactive.sh`, log `logs/e85_e86_interactive.log`, started
+~22:48), two more members of E75's line (E56 recipe + 7-table base + mixpub r5 teacher, 384 px; 0.940 alone):
+E85 = E72's networks (7 tables, teacher r4, 224 px) continued 4 epochs at 384 px on E75's targets (~3 h), E86 = E75
+from scratch with seed 142 (~9 h). E83 / E84 on the P100s: epoch 1 of 4 took 122 min, done ~04:00.
+
+**Public notebooks, evening of 10-08** (`kaggle kernels list --sort-by dateRun`, six pulled): no verified score above
+0.950 ("six notebooks at 0.950, blends" per prvsiyan's table; hitarthjain0 V6 and rabari9999 only state "target
+0.952+" from gold-58 grid searches; romantamrazov "DINOsaur V5" claims nothing yet). One measured fact that bears on our
+blends, from prvsiyan's notebook (official rows 56955785 and 56957785): the 0.949 CoAtNet blended with goodpjw2008's
+2.5D ConvNeXt reader at one weight for all findings (0.30) scored **0.948**, below the CoAtNet alone, whereas the same two
+arms with hand-set per-finding weights (V3: reader 0.35 on Baker's ... 0.03 on Synovitis) make the 0.950 base. Our
+uniform blends on the 0.943 stack did the same: +0.001 with the 5-fold sets (blends 3/5/6), −0.001 with the full-data
+set (blend 7). Our models are 2.5D ConvNeXt readers too, so blends 9–13 (uniform 10–25 % on the 0.950 base) risk the
+same flat or negative result.
+
+**Per-finding blends** (`scripts/build_blend_nb.py --reader-share s [--reader-scale k]`): the 0.950 base leaves its
+two arms in `/kaggle/working` (`_sota_0949.csv` = CoAtNet, `_own.csv` = goodpjw2008's reader) and its weights in
+`TARGET_WEIGHTS`; our last cell redoes that fusion with ours inside the reader's share,
+rank((1 − k v) CoAtNet + k v ((1 − s) reader + s ours)) on per-finding ranks, after checking that s = 0 gives the public
+submission back exactly (else uniform blend at 0.10). Tested on synthetic predictions (s = 0 reproduces the public
+fusion, s = 0.5 matches an independent computation, missing arm → uniform fallback). Same five networks sets as blend
+11 (E75 + E56 + E64 + E60 + E81, 24 windows):
+
+| knee-blend | s (ours' share of the reader slot) | k | ours on Baker's / ACL / Effusion / Synovitis |
+|---|---|---|---|
+| 14 | 0.5 (ours averaged with the reader) | 1.0 | 0.175 / 0.125 / 0.02 / 0.015 |
+| 15 | 1.0 (ours replaces the reader) | 1.0 | 0.35 / 0.25 / 0.04 / 0.03 |
+| 16 | 0.5 | 1.5 (2.5D share × 1.5) | 0.26 / 0.19 / 0.03 / 0.02 |
+
+**JEV table** (riadmohamed42 `jev-knee-labels`, CC0; in `data/public_labels/riadmohamed42/`): on our 58 gold
+studies, HYBRID 0.903 macro and the text-only FINAL2 0.874, vs our 7-table mean 0.896; adding HYBRID as an 8th table:
+0.898 (+0.002, mostly Contusion and Fracture). Both JEV files were tuned on these same gold studies (per-target swaps
+and member weights chosen on 58–67 of them), so the +0.002 is an upper bound: not worth a training run ✗.
+
+**Queued for the P100 slots** (23:00, jobs 1029549–1029551, nice 300, pending until E83 / E84 end ~04:00): **E87** =
+E70 (aggregator dim 384 × depth 4) and **E88** = E62 (sequence embedding) continued 4 epochs at 384 px on E75's targets
+(7 tables + mixpub r5 teacher), each keeping its 224 px architecture: E75-line members with their own aggregator, for
+the per-finding blends (`slurm/runs/e87_01.txt`, `e88_01.txt`, `e87n2_e88n2.txt`; ~8 h per network on a P100).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
