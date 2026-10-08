@@ -35,3 +35,8 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56905336,2026-10-07 08:21,knee-submit,35,"own-label full-data ensemble E64 + E60 + E65",0.934,
 56905340,2026-10-07 08:21,knee-submit,28,"E56 alone (E46 recipe, 384 px, full data)",0.938,
 56905346,2026-10-07 08:21,knee-submit,32,"E61 alone (E54 + gold weight 10); version from push times, 30/31 had no output",0.928,
+56964274,2026-10-08 17:15,knee-blend,?,scriptVersionId 356135474 (version to match),,pending
+56964281,2026-10-08 17:15,knee-submit,?,scriptVersionId 356243472 (version to match),,pending
+56964287,2026-10-08 17:15,knee-submit,?,scriptVersionId 356322295 (version to match),,pending
+56964294,2026-10-08 17:15,knee-submit,?,scriptVersionId 356323202 (version to match),,pending
+56964298,2026-10-08 17:15,knee-submit,?,scriptVersionId 356327365 (version to match),,pending

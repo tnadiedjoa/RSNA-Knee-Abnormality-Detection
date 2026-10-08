@@ -1826,6 +1826,10 @@ in `kaggle/A_SOUMETTRE.md` is blend 8, Versions 40, 42, 41, 39. GPUs sat idle fr
   (jobs 1029223–1029225, `slurm/runs/e83_01.txt`, `e84_01.txt`, `e83n2_e84n2.txt`; ~8 h per network). E81 alone is
   being pushed (dataset of the 13 full-data runs + E75, E77, E78, E81).
 
+Auto (2026-10-08 19:16, scripts/auto_followup.py): Kaggle: new submission ref 56964274 (knee-blend, scriptVersionId 356135474); new submission ref 56964281 (knee-submit, scriptVersionId 356243472); new submission ref 56964287 (knee-submit, scriptVersionId 356322295); new submission ref 56964294 (knee-submit, scriptVersionId 356323202); new submission ref 56964298 (knee-submit, scriptVersionId 356327365).
+
+Auto (2026-10-08 19:32, scripts/auto_followup.py): knee-submit **Version 43 = E81 alone** (E54's networks continued 4 epochs at 384 px), pushed 19:31, 3 networks on the visible test. Efficiency leaderboard (ryanholbrook notebook output, readable through the API): the 13 most efficient teams score 0.952-0.962, first 0.959 (Scott Willis): fast, few-model recipes reach the top, so the gap to them is the recipe (labels, training), not ensembling. We rank 4,703rd (our best, the 9 h blend).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

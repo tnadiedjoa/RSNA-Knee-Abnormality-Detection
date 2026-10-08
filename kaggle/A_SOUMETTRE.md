@@ -19,7 +19,7 @@ Rien n'a encore été soumis le 08/10 : **les 5 soumissions du jour sont encore 
 
 | Notebook | Version | Contenu | Question |
 |---|---|---|---|
-| knee-submit | **43** (en cours de poussée, je confirme) | E81 : E54 repris et fini en 384 px | bat-il la version 38 (E54 en 384 px de zéro) ? |
+| knee-submit | **43** | E81 : E54 repris et fini en 384 px | bat-il la version 38 (E54 en 384 px de zéro) ? |
 | knee-submit | **38** | E66 : la recette E54 en 384 px de zéro | référence pour E81 |
 | knee-submit | **36** | E69 : E54 + tâche annexe (grade du compte rendu) | bat-il E54 (0,935) ? |
 | knee-submit | **37** | E70 : agrégateur plus grand | bat-il E54 (0,935) ? |
