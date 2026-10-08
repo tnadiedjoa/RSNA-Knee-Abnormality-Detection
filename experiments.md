@@ -1804,6 +1804,8 @@ correlation 0.944): the 384 px version replaces its 224 px parent. Fold 0 (job 1
 continued 4 epochs at 384 px (~1 h each on a 3090): the LB test of the continuation against Version 38 (E66, E54's
 recipe at 384 px from scratch). E75 on its 3090: 12.8 min per epoch, network 0 done, all three ~02:20.
 
+Auto (2026-10-08 04:43, scripts/auto_followup.py): knee-submit **Version 39 = E72 alone** (7-table report base) pushed by the unattended job (`slurm/auto_1007.sbatch`): dataset of the 13 full-data runs, 1 model(s) predicted on the visible test (`logs/push_1008_0432`).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

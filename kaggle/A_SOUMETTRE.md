@@ -24,3 +24,4 @@ Prête pour plus tard : knee-submit **33** (E62 : type de séquence IRM indiqué
 
 | Notebook | Version | Contenu | Question |
 |---|---|---|---|
+| knee-submit | **39** | E72 seul : labels moyennés sur 7 lecteurs LLM (3 nouveaux, CC0) | bat-il E54 (0,935) ? |
