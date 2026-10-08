@@ -1810,6 +1810,8 @@ Auto (2026-10-08 09:52, scripts/auto_followup.py): knee-submit **Version 40 = E7
 
 Auto (2026-10-08 09:55, scripts/auto_followup.py): knee-submit **Version 41 = E75 alone** (E56 recipe with the 7-table base, 384 px, trained on a 3090) pushed by the unattended job.
 
+Auto (2026-10-08 10:10, scripts/auto_followup.py): knee-submit **Version 42 = E78 alone** (per-site bias on silent cells, training only) pushed by the unattended job.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
