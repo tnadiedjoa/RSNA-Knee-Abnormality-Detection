@@ -22,21 +22,21 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56817560,2026-10-04 07:29,knee-submit,22,E45 (4-table base + next round),0.929,
 56817566,2026-10-04 07:29,knee-submit,23,"E39, E36, E38, E43, E35, E37, E32, E34, E30, E33 (own labels, rounds 3-5)",0.934,
 56817573,2026-10-04 07:30,knee-submit,24,"Version 23 + E41, E42, E44, E45 (14 runs)",0.935,
-56843645,2026-10-05 05:36,knee-blend,3,"public pipeline 0.85 + Version 24's 14 runs 0.15",0.944,
-56843667,2026-10-05 05:37,knee-blend,4,"public pipeline 0.75 + Version 24's 14 runs 0.25",0.943,
-56843671,2026-10-05 05:37,knee-submit,25,"Version 24 + E46 + E47 (16 runs)",0.936,
+56843645,2026-10-05 05:36,knee-blend,3,public pipeline 0.85 + Version 24's 14 runs 0.15,0.944,
+56843667,2026-10-05 05:37,knee-blend,4,public pipeline 0.75 + Version 24's 14 runs 0.25,0.943,
+56843671,2026-10-05 05:37,knee-submit,25,Version 24 + E46 + E47 (16 runs),0.936,
 56871945,2026-10-06 05:57,knee-submit,26,"E54 alone (E41 recipe, full data, 3 networks)",0.935,
-56871950,2026-10-06 05:57,knee-submit,27,"Version 25 + E53 + E50 (18 runs)",0.936,
-56871958,2026-10-06 05:57,knee-blend,5,"public pipeline 0.85 + Version 27's 18 runs 0.15",0.944,
-56871962,2026-10-06 05:57,knee-blend,6,"public pipeline 0.90 + Version 27's 18 runs 0.10",0.944,
-56892847,2026-10-06 23:17,knee-submit,29,"E58 alone (E54 + per-finding teacher weight)",0.931,
-56905329,2026-10-07 08:20,knee-submit,34,"full-data ensemble E56 + E59 + E60 + E54",0.938,
+56871950,2026-10-06 05:57,knee-submit,27,Version 25 + E53 + E50 (18 runs),0.936,
+56871958,2026-10-06 05:57,knee-blend,5,public pipeline 0.85 + Version 27's 18 runs 0.15,0.944,
+56871962,2026-10-06 05:57,knee-blend,6,public pipeline 0.90 + Version 27's 18 runs 0.10,0.944,
+56892847,2026-10-06 23:17,knee-submit,29,E58 alone (E54 + per-finding teacher weight),0.931,
+56905329,2026-10-07 08:20,knee-submit,34,full-data ensemble E56 + E59 + E60 + E54,0.938,
 56905335,2026-10-07 08:20,knee-blend,7,"public pipeline 0.85 + full-data E56 + E59 + E60 + E54 0.15 (both T4s, 24 windows)",0.942,
-56905336,2026-10-07 08:21,knee-submit,35,"own-label full-data ensemble E64 + E60 + E65",0.934,
+56905336,2026-10-07 08:21,knee-submit,35,own-label full-data ensemble E64 + E60 + E65,0.934,
 56905340,2026-10-07 08:21,knee-submit,28,"E56 alone (E46 recipe, 384 px, full data)",0.938,
 56905346,2026-10-07 08:21,knee-submit,32,"E61 alone (E54 + gold weight 10); version from push times, 30/31 had no output",0.928,
-56964274,2026-10-08 17:15,knee-blend,?,scriptVersionId 356135474 (version to match),,pending
-56964281,2026-10-08 17:15,knee-submit,?,scriptVersionId 356243472 (version to match),,pending
-56964287,2026-10-08 17:15,knee-submit,?,scriptVersionId 356322295 (version to match),,pending
-56964294,2026-10-08 17:15,knee-submit,?,scriptVersionId 356323202 (version to match),,pending
-56964298,2026-10-08 17:15,knee-submit,?,scriptVersionId 356327365 (version to match),,pending
+56964274,2026-10-08 17:15,knee-blend,8,"public 0.943 stack 0.85 + own-label full-data E64 + E60 + E65 0.15 (24 windows, both T4s)",,pending
+56964281,2026-10-08 17:15,knee-submit,39,"E72 alone (E54 recipe, 7-table report base)",0.933,
+56964287,2026-10-08 17:15,knee-submit,40,"E77 alone (E54 + teacher weight by mention: silent 0.9, absent/severe 0.25)",0.934,
+56964294,2026-10-08 17:15,knee-submit,41,"E75 alone (E56 recipe + 7-table base, 384 px, trained on a 3090)",0.940,
+56964298,2026-10-08 17:15,knee-submit,42,"E78 alone (E54 + per-site bias on silent cells, training only)",0.934,

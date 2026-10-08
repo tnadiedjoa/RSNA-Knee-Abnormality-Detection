@@ -1847,6 +1847,28 @@ Auto (2026-10-08 19:39, scripts/auto_followup.py): User (20:10): OK to use the O
 
 Auto (2026-10-08 19:43, scripts/auto_followup.py): knee-blend version 9 checked on the visible test: public 0.950 pipeline then our E64 + E60 + E65 on both T4s, BLEND written (logs/blend_1008_1937). First on the 10-09 list.
 
+Auto (2026-10-08 19:56, scripts/auto_followup.py): Kaggle: ref 56964281 (knee-submit version ?) scored 0.933; ref 56964287 (knee-submit version ?) scored 0.934; ref 56964298 (knee-submit version ?) scored 0.934.
+
+Auto (2026-10-08 20:16, scripts/auto_followup.py): Kaggle: ref 56964294 (knee-submit version ?) scored 0.940.
+
+**LB of 10-08** (submitted 19:15; versions matched to scriptVersionIds by push time, `logs/knee_auto_102*.out`):
+
+| version | model | public LB | against |
+|---|---|---|---|
+| 39 | E72 (E54 recipe + 7-table base, 224 px) | 0.933 | E54 0.935 |
+| 40 | E77 (teacher weight by mention) | 0.934 | E54 0.935 |
+| 42 | E78 (site bias on silent cells) | 0.934 | E54 0.935 |
+| 41 | **E75** (E56 recipe + 7-table base, 384 px, 3090) | **0.940** | E56 0.938 — best own single |
+| blend 8 | 0.943 stack + own-label set | pending | blend 7 0.942 |
+
+The three label tweaks at 224 px are flat or slightly below E54 (−0.001 / −0.002: within the LB's noise, no gain):
+silent-cell handling (E77, E78) does not move the LB ✗; the 7-table base gives −0.002 at 224 px on E54's recipe but
+E75 (+0.002 over E56 at 384 px) is our best own model — the base is at best a small plus, on the stronger recipe.
+Consequences: E82 (E77 at 384 px, interactive 3090) and E83 (E78 at 384 px) continue only as ensemble members; the
+own-model line to push is E75's (E56 recipe, 7 tables, 384 px). Public label table found in passing: riadmohamed42
+`jev-knee-labels` (used by the 0.949 public CoAtNet; 0.921 on its "gold-74" check) — to score on our 58 and try as an
+8th table.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
