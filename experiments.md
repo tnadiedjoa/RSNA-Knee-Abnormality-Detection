@@ -1869,6 +1869,21 @@ own-model line to push is E75's (E56 recipe, 7 tables, 384 px). Public label tab
 `jev-knee-labels` (used by the 0.949 public CoAtNet; 0.921 on its "gold-74" check) — to score on our 58 and try as an
 8th table.
 
+**Blends 10–13 pushed** (2026-10-08 22:21–22:45, `logs/push_blend10_12.out`), all on the 0.950 public base
+(matterhorn3838 notebook verbatim) like blend 9; each ran on the visible test (public pipeline, then our networks on
+both T4s, "our ensemble: ok", BLEND written; logs `logs/blend_1008_22*`):
+
+| knee-blend | ours | weight of ours |
+|---|---|---|
+| 9 | own-label set E64 + E60 + E65 | 0.15 |
+| 10 | best 384 px members E75 + E56 + E59 (labels mixed with public tables) | 0.15 |
+| 11 | mix E75 + E56 + E64 + E60 + E81 | 0.15 |
+| 12 | same as 11 | 0.25 |
+| 13 | same as 11 | 0.10 |
+
+The five are the 10-09 list (user rule of 10-08: submissions only for the leaderboard): 9 / 10 / 11 tell which of our
+sets adds most to the new base, 13 / 11 / 12 which weight.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
