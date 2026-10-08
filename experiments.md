@@ -1845,6 +1845,8 @@ comment still credits the yamadan96 lineage: `scripts/build_blend_nb.py` to take
 
 Auto (2026-10-08 19:39, scripts/auto_followup.py): User (20:10): OK to use the OAI-trained public CoAtNet weights (nartaa) in our blends; leaderboard first.
 
+Auto (2026-10-08 19:43, scripts/auto_followup.py): knee-blend version 9 checked on the visible test: public 0.950 pipeline then our E64 + E60 + E65 on both T4s, BLEND written (logs/blend_1008_1937). First on the 10-09 list.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
