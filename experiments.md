@@ -1924,6 +1924,12 @@ E70 (aggregator dim 384 × depth 4) and **E88** = E62 (sequence embedding) conti
 (7 tables + mixpub r5 teacher), each keeping its 224 px architecture: E75-line members with their own aggregator, for
 the per-finding blends (`slurm/runs/e87_01.txt`, `e88_01.txt`, `e87n2_e88n2.txt`; ~8 h per network on a P100).
 
+**Blends 14–16 pushed and checked** (22:51–23:07, `logs/push_blend14_16.out`, logs `logs/blend_1008_2252`, `_2259`,
+`_2303`): on the visible test each printed "public fusion reproduced (max gap 0.0e+00)" (the 0.950 base redone from its
+two arms gives its submission back exactly), "our ensemble: ok" and the per-finding weights of ours. **10-09 list**
+(`kaggle/A_SOUMETTRE.md`): 14, 16, 15 (per finding), 11 (uniform 15 %, control), 9 (own-label set, uniform 15 %); 10,
+12 and 13 kept in reserve.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
