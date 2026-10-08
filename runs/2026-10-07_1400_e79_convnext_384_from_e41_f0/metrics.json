@@ -1,0 +1,36 @@
+{
+ "folds": [
+  0
+ ],
+ "silver_auc": 0.9596641759959462,
+ "gold_auc": 0.9318181818181818,
+ "n_gold": 11,
+ "silver_per_label": {
+  "ACL": 0.9497887209491305,
+  "MCL": 0.9461798087422653,
+  "Medial Meniscus": 0.9694590858031625,
+  "Lateral Meniscus": 0.942283950617284,
+  "Medial OA": 0.9702594150989324,
+  "Lateral OA": 0.9189479060265577,
+  "PF OA": 0.9283930510314875,
+  "Effusion": 0.9914367013851605,
+  "Synovitis": 0.9843715846994536,
+  "Baker's": 0.9908755627933711,
+  "Contusion": 0.9789583333333333,
+  "Fracture": 0.9450159914712153
+ },
+ "gold_per_label": {
+  "ACL": 1.0,
+  "MCL": NaN,
+  "Medial Meniscus": 1.0,
+  "Lateral Meniscus": 0.7857142857142857,
+  "Medial OA": 1.0,
+  "Lateral OA": 1.0,
+  "PF OA": 1.0,
+  "Effusion": 1.0,
+  "Synovitis": 0.8214285714285714,
+  "Baker's": 1.0,
+  "Contusion": 0.9285714285714286,
+  "Fracture": 0.7142857142857143
+ }
+}

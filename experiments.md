@@ -1812,6 +1812,20 @@ Auto (2026-10-08 09:55, scripts/auto_followup.py): knee-submit **Version 41 = E7
 
 Auto (2026-10-08 10:10, scripts/auto_followup.py): knee-submit **Version 42 = E78 alone** (per-site bias on silent cells, training only) pushed by the unattended job.
 
+### 2026-10-08 evening (new session on an interactive 3090, nodemm01)
+
+Overnight, all as planned: Versions **39** (E72), **40** (E77), **41** (E75), **42** (E78) pushed by the unattended jobs;
+E81 done on a 3090. Nothing was submitted on 10-08 before 19:00 (the five slots stay open until 02:00); the list
+in `kaggle/A_SOUMETTRE.md` is blend 8, Versions 40, 42, 41, 39. GPUs sat idle from ~12:30 (queue empty).
+- **E79 fold 0**: 0.9591 → **0.9597** after 4 epochs at 384 px, vs E42 0.9577 (scratch): the continuation wins on both
+  folds (+0.002 / +0.003) ✓.
+- **E76 (spatial queries)**: silver 0.9532 / 0.9531 vs E41 0.9518 / 0.9536 (+0.0005 on average), rank correlation with
+  E41 0.91; E41 + E76 0.9577 / 0.9569. Neutral alone, no new diversity ✗ (kept as an option).
+- Queued: **E82** (E77's networks continued at 384 px) on the interactive 3090 (`logs/run_e82.sh`, ~3.5 h); **E83**
+  (E78 continued) and **E84** (E65, own labels round 6, continued: an own-label 384 px member for blends) on P100s
+  (jobs 1029223–1029225, `slurm/runs/e83_01.txt`, `e84_01.txt`, `e83n2_e84n2.txt`; ~8 h per network). E81 alone is
+  being pushed (dataset of the 13 full-data runs + E75, E77, E78, E81).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
