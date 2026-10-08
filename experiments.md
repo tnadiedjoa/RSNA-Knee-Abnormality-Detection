@@ -1830,6 +1830,19 @@ Auto (2026-10-08 19:16, scripts/auto_followup.py): Kaggle: new submission ref 56
 
 Auto (2026-10-08 19:32, scripts/auto_followup.py): knee-submit **Version 43 = E81 alone** (E54's networks continued 4 epochs at 384 px), pushed 19:31, 3 networks on the visible test. Efficiency leaderboard (ryanholbrook notebook output, readable through the API): the 13 most efficient teams score 0.952-0.962, first 0.959 (Scott Willis): fast, few-model recipes reach the top, so the gap to them is the recipe (labels, training), not ensembling. We rank 4,703rd (our best, the 9 h blend).
 
+### New public base at 0.950 (found 2026-10-08 ~20:00, from a notebook the user pasted)
+
+Public notebooks of 10-07/08 (`kaggle kernels list --sort-by dateRun`) reach **0.949–0.950**: a single CoAtNet MIL
+reader, nartaa `rsna-knee-publication-swa-weights-20261007` (licence "other": research and educational use
+"including the RSNA Knee competition"; **trained with 2,399 OAI knees as masked external supervision** — OAI is
+controlled-access NDA data: to raise with the user for prize eligibility, not for the leaderboard), scored 0.949
+alone; fused per finding with goodpjw2008's 2.5D ConvNeXt reader (weights 0.03–0.35 on the reader) for **0.950**
+(matterhorn3838 `rsna-knee-v2-velciraptor-dinosaur-speed` = haideptry's "V3" weights, ~26 min on 2×T4; haideptry's
+V5 tunes the 12 weights on the 58 gold studies, not used). Our blends sat on the 0.943 stack: the base moved.
+**knee-blend version 9** (`kaggle/blend_v9/`): the matterhorn notebook verbatim (public 0.85) + our own-label
+full-data set E64 + E60 + E65 (0.15), 24 windows; ~8 h left for our part after the public one. (The setup cell's
+comment still credits the yamadan96 lineage: `scripts/build_blend_nb.py` to take the source as an argument.)
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
