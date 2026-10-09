@@ -1978,7 +1978,7 @@ in the reader's slot our five-set ensemble is not better than that 3-fold reader
 change measured so far (`slurm/runs/e91_01.txt`, `e92_01.txt`, `e91n2_e92n2.txt`; done ~22:00). knee-models packaging
 of 24 runs (+ E86, E87, E88; `logs/day13c_runs.txt`) started ~13:05.
 
-**A second public CoAtNet for the base** (13:10–13:30). nartaa's weights dataset holds two checkpoints: the 384 px
+**A second public CoAtNet for the base** (~13:10). nartaa's weights dataset holds two checkpoints: the 384 px
 SWA (0.949 alone with native-320 crop, K94, mirror TTA: the base's CoAtNet arm) and a 224 px SWA (`c08_r224`, 140 mm
 crop, 0.945 alone with K94 and one view; notebook `nartaa/rsna-knee-0945-efficient-224crop`), same OAI + JEV-blend
 labels and seed, other resolution and crop: unused by the 0.950 base. `scripts/build_blend_nb.py --extra-arm-nb
@@ -1988,6 +1988,8 @@ change), runs it in its own process after the public cells, and averages its ran
 drops out, nothing usable → the public submission). Synthetic tests: uniform and per-finding modes unchanged, extra
 arm exact, weight 0 or missing file → the public submission. **knee-blend 17** = the 0.950 base with the 224 px
 CoAtNet at 0.33 of the CoAtNet arm, without our models (a clean test of the extra arm).
+Checked on the visible test (pushed 13:09, `logs/blend_1009_1309`): the 224 px script ran in its own process (0.5 min
+for the 3 studies, `_r224.csv` written), public fusion reproduced (gap 0), "BLEND written: per finding, extra arm 0.33".
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
