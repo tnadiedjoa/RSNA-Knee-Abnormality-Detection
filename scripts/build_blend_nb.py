@@ -22,6 +22,9 @@
    With --extra-arm-nb (0.950 base, from blend 17): a second public CoAtNet script (nartaa's 0.945 224 px model) runs
    in its own process after the public cells, its output path redirected to /kaggle/working/_r224.csv, and joins the
    base's CoAtNet arm at --extra-w inside the same per-finding fusion (with or without ours).
+   With --reader-nb (from blend 19): the 0.950 base's reader cells (own_src files + its fusion cell, verbatim) run after
+   another public notebook (heliosli's 0.951 blend), whose submission thus takes the CoAtNet's place in the V3 fusion;
+   --reader-share 0 --reader-scale k then redoes that fusion with the reader weights times k.
 """
 
 import argparse
@@ -142,10 +145,10 @@ if _arms is not None and EXTRA_ARM:
     except Exception as e:
         print('extra arm missing:', repr(e))
 _s = READER_SHARE if (_arms is not None and _ours is not None and READER_SHARE) else 0.0
-_k = READER_SCALE if _s else 1.0
+_k = READER_SCALE if (_s or READER_SHARE == 0) else 1.0  # READER_SHARE 0: the readers rescaled without ours
 try:
     _out = _pub.copy()
-    if _arms is not None and (_s or _extra is not None):
+    if _arms is not None and (_s or _extra is not None or _k != 1.0):
         for c in _labels:
             v = min(_k * _v[c], 0.9)
             co = _rk(_arms[0][c]) if _extra is None else (1 - EXTRA_W) * _rk(_arms[0][c]) + EXTRA_W * _rk(_extra[c])
@@ -182,6 +185,9 @@ def main():
     p.add_argument("--reader-share", type=float, default=None,
                    help="0.950 base: ours' share of its reader's per-finding weight (default: uniform blend at --weight)")
     p.add_argument("--reader-scale", type=float, default=1.0)
+    p.add_argument("--reader-nb", default=None, help="append the 2.5D reader cells (own_src files + fusion cell, verbatim) "
+                   "of this notebook (the 0.950 base) after the public cells: the reader is fused per finding into "
+                   "whatever submission they wrote")
     p.add_argument("--extra-arm-nb", default=None, help="public notebook whose last code cell is the extra CoAtNet script")
     p.add_argument("--extra-w", type=float, default=0.33)
     p.add_argument("--extra-source", default="nartaa/rsna-knee-0945-efficient-224crop")
@@ -205,7 +211,13 @@ def main():
         src = src.replace('"/kaggle/working/submission.csv"', '"/kaggle/working/_r224.csv"')
         extra = [code(f"%%writefile /kaggle/working/extra_arm.py\n# Verbatim copy of {args.extra_source} (credits there); "
                       f"only its output path is changed.\n" + src), code(EXTRA_RUN)]
-    nb["cells"] = [code(SETUP.format(**fmt))] + nb["cells"] + extra + [code(OURS.format(**fmt)), code(BLEND)]
+    reader = []
+    if args.reader_nb:  # the cells from the one writing own_src/ to the fusion cell, verbatim (matterhorn3838 notebook)
+        cells = [c for c in json.loads(Path(args.reader_nb).read_text())["cells"] if c["cell_type"] == "code"]
+        first = next(i for i, c in enumerate(cells) if "own_src" in "".join(c["source"]))
+        last = next(i for i, c in enumerate(cells) if "TARGET_WEIGHTS" in "".join(c["source"]))
+        reader = [code("".join(c["source"])) for c in cells[first:last + 1]]
+    nb["cells"] = [code(SETUP.format(**fmt))] + nb["cells"] + reader + extra + [code(OURS.format(**fmt)), code(BLEND)]
     Path(args.out).write_text(json.dumps(nb, indent=1))
     print(args.out, len(nb["cells"]), "cells, weight", args.weight, "reader share", args.reader_share, "scale", args.reader_scale,
           "extra arm", bool(args.extra_arm_nb), args.extra_w)

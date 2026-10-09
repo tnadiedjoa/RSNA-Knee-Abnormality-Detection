@@ -1996,6 +1996,37 @@ for the 3 studies, `_r224.csv` written), public fusion reproduced (gap 0), "BLEN
 (blend 9; was 0.944) = listed 328th: 237 teams above 0.950, 451 tied at 0.950 (ties ordered by submission time);
 ≥ 0.951: 237 teams, ≥ 0.952: 163, ≥ 0.955: 82, ≥ 0.960: 25. Blends 14, 16, 11 still pending 3 h 40 after submission.
 
+Auto (2026-10-09 13:46, scripts/auto_followup.py): Kaggle: ref 56999915 (knee-blend version 14) scored 0.950.
+
+Auto (2026-10-09 13:56, scripts/auto_followup.py): Kaggle: ref 56999920 (knee-blend version 16) scored 0.950.
+
+Auto (2026-10-09 14:06, scripts/auto_followup.py): Kaggle: ref 56999933 (knee-blend version 11) scored 0.950.
+
+**LB of 10-09, complete** (14:06): knee-blend **14 = 0.950**, **16 = 0.950**, **11 = 0.950** (with 9 = 0.950 and 15 =
+0.949). Whatever the set (own-label or mix), the weight (uniform 15 %) or the per-finding form (half the reader share,
+×1.5), our models leave the 0.950 base where it is; replacing the reader costs a tick. At the LB's 0.001 resolution our
+2.5D ConvNeXt members add nothing to a CoAtNet-OAI + 2.5D-reader base: they play the reader's role and the reader
+already fills it.
+
+**Public notebooks, 10-09 afternoon** (`kaggle kernels list --sort-by scoreDescending`, four pulled): the top one is
+**heliosli `rsna-knee-blend-gold`**: nartaa's 0.949 CoAtNet (its notebook run as a subprocess) 0.7 + heliosli's own
+"compact" ConvNeXt-small (4 folds, `heliosli/rsna-knee-compact-v1` + `rsna-orthofoundation-fold0-epoch7-20261004`,
+own pipeline with pinned pydicom 3.0.1 / timm 1.0.25) 0.3, per-finding rank average, nothing fitted; rabari9999
+republished the same pipeline as "LB 0.951". So a uniform 0.3 of a different ConvNeXt-small model lifts the CoAtNet by
++0.002, where goodpjw2008's reader at uniform 0.3 cost −0.001 and needed hand-set per-finding weights for +0.001.
+Measured by others: Apex (0.950 base) 0.7 + nartaa's 224 px CoAtNet 0.3 = 0.950 (karttikjangid05, no gain: blend 17
+probably flat too); Apex 0.6 + a DINO/RadImageNet model 0.4 = 0.948.
+**Blends 18–20** (`--reader-nb`, new: the 0.950 base's reader cells — own_src files and its fusion cell — appended
+verbatim after another public notebook, whose submission then takes the CoAtNet's place in the V3 fusion; heliosli's
+docker image, our part off):
+| knee-blend | content |
+|---|---|
+| 18 | heliosli's notebook alone (a new base for us if 0.951 holds) |
+| 19 | 18, then the reader fused per finding at the V3 weights (0.35 Baker's ... 0.03 Synovitis) |
+| 20 | 18 + the reader at half the V3 weights (`--reader-share 0 --reader-scale 0.5`: the final cell redoes the fusion) |
+Synthetic tests of the final cell: 11 cases (uniform, per-finding with ours, extra arm, readers rescaled without ours,
+missing files) exact.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
