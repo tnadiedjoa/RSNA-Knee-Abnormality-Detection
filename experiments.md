@@ -2064,7 +2064,7 @@ the loop's PID did not stop it: check the log, not `ps`):
 | **22** | heliosli alone, pinned copy (`knee-compact-pinned`) | OK: stages PASS, 3/3 scored, public kept |
 | **23** | 22 + reader at the V3 weights (matterhorn's fusion cell verbatim) | OK: reader 28.7 s, "Apex Fusion SUCCESS" |
 | **24** | 22 + reader at half the V3 weights | OK: fusion reproduced (gap 0), ×0.5 applied |
-| **25** | 22 + reader at 1.5 × the V3 weights | pushed 14:43 |
+| **25** | 22 + reader at 1.5 × the V3 weights | OK: fusion reproduced, ×1.5 applied (built with the `KB_` fix) |
 
 **10-10 list** (`kaggle/A_SOUMETTRE.md`): 23, 24, 22, 25, 17. Python 3.13 decoder wheels (pylibjpeg-libjpeg 2.4.0,
 pylibjpeg-openjpeg 2.6.0, python-gdcm 3.2.6, from PyPI) added to `kaggle/wheels/` so that our models can run on
