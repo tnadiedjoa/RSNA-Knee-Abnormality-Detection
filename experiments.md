@@ -2019,13 +2019,30 @@ probably flat too); Apex 0.6 + a DINO/RadImageNet model 0.4 = 0.948.
 **Blends 18–20** (`--reader-nb`, new: the 0.950 base's reader cells — own_src files and its fusion cell — appended
 verbatim after another public notebook, whose submission then takes the CoAtNet's place in the V3 fusion; heliosli's
 docker image, our part off):
+
 | knee-blend | content |
 |---|---|
 | 18 | heliosli's notebook alone (a new base for us if 0.951 holds) |
 | 19 | 18, then the reader fused per finding at the V3 weights (0.35 Baker's ... 0.03 Synovitis) |
 | 20 | 18 + the reader at half the V3 weights (`--reader-share 0 --reader-scale 0.5`: the final cell redoes the fusion) |
+
 Synthetic tests of the final cell: 11 cases (uniform, per-finding with ours, extra arm, readers rescaled without ours,
 missing files) exact.
+
+**knee-blend 18, 19, 20 are broken — never submit them.** Version 18 (heliosli alone) stopped at heliosli's bundle check:
+`AssertionError: ('209a32c8b50a6b1c', '209a32c8b50a6b1c', 'c7ebab1eb953f1a6')`. heliosli updated
+`rsna-knee-compact-v1` after scoring the notebook (versions: 7 = cnx_s5, **9 = the "dual" bundle a5e76db599f5bb66 whose
+S5 files have id c7ebab1eb953f1a6, the one blend-gold checks**, 10 = cnx_s6, built 10-09 02:35, unscored), and the
+Kaggle API attaches only a dataset's latest version: `dataset_sources` is `{owner}/{slug}` only (kagglesdk
+`ApiSaveKernelRequest`); `heliosli/rsna-knee-compact-v1/9` passes the client check but the server still mounted version
+10 (version 20, same error). Version 19 (with the reader) was pushed before the stop and has the same flaw.
+Fix: **private dataset `theophilenadiedjoa/knee-compact-pinned`** = the S5 files of version 9 (4 folds, state spec,
+side classifier, manifest), unchanged, SHA-256 checked against the manifest (the dataset's licence is "Other", with no
+text: a private copy, used only to pin the version our submissions read); heliosli's cell reads it through one changed
+line (`C_SLUG`, marked `[ours]`). Blends rebuilt as **knee-blend 21** (heliosli alone), **22** (+ reader at the V3
+weights), **23** (+ reader at half of them); folders `kaggle/blend_v21..v23` = Kaggle versions (folder `blend_v20` was
+built but never pushed). Python on heliosli's docker image is 3.13: our decoder wheels do not install there, so our
+models cannot run on these blends as they are (our part is off).
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
