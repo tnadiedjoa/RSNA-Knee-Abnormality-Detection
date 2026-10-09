@@ -2199,6 +2199,13 @@ pushed in the other order and then swapped so that `kaggle/blend_vN` = Kaggle ve
 the intended 2.5D shares (Lateral OA 0.5; 30: ACL 0.4, Contusion 0.5; 31: extra arm written in 0.4 min, 0.33 of the
 CoAtNet arm; 32: our five runs done, ours = half of each share). **10-10 list** (`kaggle/A_SOUMETTRE.md`): 29, 30, 31, 32, 17.
 
+**E91, E92 (P100s) and E93 (3090) complete** (~21:30–21:50); **knee-models packaged** with 29 runs (`logs/package_1009e.out`,
+21:51–22:09, `logs/push_1009_2151`, models.zip 9 GB; 29 run folders listed): `logs/day13d_runs.txt` + E90, E91, E92, E93.
+E94 (E60's ConvNeXt-small on the round-6 own targets) running on the 3090, 23 min per epoch (done ~02:30), then E95
+(~11:00). The P100 slots are left free tonight: our members have added nothing to the 0.950 base on the LB (blends 9–16),
+and blend 32 (ours inside the 2.5D shares, with the Lateral OA change) is the 10-10 test of whether more of them is worth
+GPU time.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
