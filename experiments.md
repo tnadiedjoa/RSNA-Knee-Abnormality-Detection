@@ -1930,6 +1930,19 @@ two arms gives its submission back exactly), "our ensemble: ok" and the per-find
 (`kaggle/A_SOUMETTRE.md`): 14, 16, 15 (per finding), 11 (uniform 15 %, control), 9 (own-label set, uniform 15 %); 10,
 12 and 13 kept in reserve.
 
+Auto (2026-10-09 03:17, scripts/auto_followup.py): Kaggle: ref 56964274 (knee-blend version 8) scored 0.943.
+
+**knee-blend version 8 on the public LB: 0.943** (scored ~03:00 on 10-09): the 0.943 stack + the own-label full-data set
+E64 + E60 + E65 at 0.15, vs **0.942** for blend 7 (same base and weight, mixpub-heavy set E56 + E59 + E60 + E54). The
+own-label family blends one tick better (in line with its lower correlation with the public members), but neither
+beats the base alone: one weight for all findings adds nothing on that base. Same message as prvsiyan's measurement;
+the per-finding blends 14–16 are the test on the 0.950 base. Of the two uniform controls of 10-09, blend 9 carries the
+own-label set.
+
+**E85 complete** (~01:30, interactive 3090, 14.5 min/epoch); **E86** (E75 from scratch, seed 142) started right after,
+fold 0 at epoch 7 of 12 at 03:15 (13.2 min/epoch, ~2.9 h per network → done ~10:15). E83 / E84 at epoch 3 of 4 on the
+P100s (done ~03:45–04:05); E87 / E88 wait for their slots.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

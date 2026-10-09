@@ -1,9 +1,9 @@
-# À soumettre (mis à jour le 08/10 à 23 h 10)
+# À soumettre (mis à jour le 09/10 à 3 h 20)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31** (cassées).
 
-Scores du 08/10 : version 41 (E75) **0,940** = notre meilleur modèle · 40 et 42 → 0,934 · 39 → 0,933 · blend 8 en attente.
+Scores du 08/10 : version 41 (E75) **0,940** = notre meilleur modèle · 40 et 42 → 0,934 · 39 → 0,933 · blend 8 → 0,943 (= la base publique 0,943 seule : un poids unique n'apporte rien).
 
 ## Le 09/10 (5 soumissions, à partir de 2 h du matin) : blends sur la nouvelle base publique à 0,950
 
