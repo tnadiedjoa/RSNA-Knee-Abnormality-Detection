@@ -36,35 +36,35 @@ from knee.config import ROOT_DIR
 SETUP = '''# Blend of a public pipeline with our ensemble (cells below: verbatim copy of {source}; credits there).
 # Step 1: setup only. The public pipeline runs first, our models after it with the time left.
 import glob, os, subprocess, sys, time
-T0_BLEND = time.time()
-W_OURS = {weight}  # rank weight of our ensemble in the final blend (0 = public pipeline alone)
-READER_SHARE = {reader_share}  # None: uniform blend at W_OURS; else ours' share of the public 2.5D reader's per-finding weight
-READER_SCALE = {reader_scale}  # the readers' per-finding weights times this (with READER_SHARE)
-EXTRA_ARM = {extra_arm!r}  # extra CoAtNet predictions averaged into the base's CoAtNet arm (None: no extra arm)
-EXTRA_W = {extra_w}  # weight of EXTRA_ARM inside the CoAtNet arm
-OUR_MODELS = {models}
-OUR_WINDOWS = {windows}
-END_H = {end_h}  # our process must be done by then (Kaggle stops the notebook at 9 h)
-MIN_LEFT_H = {min_left_h}  # below this, our models are skipped and the public submission goes alone
+KB_T0_BLEND = time.time()
+KB_W_OURS = {weight}  # rank weight of our ensemble in the final blend (0 = public pipeline alone)
+KB_READER_SHARE = {reader_share}  # None: uniform blend at KB_W_OURS; else ours' share of the public 2.5D reader's per-finding weight
+KB_READER_SCALE = {reader_scale}  # the readers' per-finding weights times this (with KB_READER_SHARE)
+KB_EXTRA_ARM = {extra_arm!r}  # extra CoAtNet predictions averaged into the base's CoAtNet arm (None: no extra arm)
+KB_EXTRA_W = {extra_w}  # weight of KB_EXTRA_ARM inside the CoAtNet arm
+KB_OUR_MODELS = {models}
+KB_OUR_WINDOWS = {windows}
+KB_END_H = {end_h}  # our process must be done by then (Kaggle stops the notebook at 9 h)
+KB_MIN_LEFT_H = {min_left_h}  # below this, our models are skipped and the public submission goes alone
 def _find(pattern):
     return next(p for depth in range(4) for p in glob.glob('/kaggle/input/' + '*/' * depth + pattern))
-KNEE = os.path.dirname(os.path.dirname(_find('knee/infer.py')))
-DATA = os.path.dirname(_find('test_series.csv'))
+KB_KNEE = os.path.dirname(os.path.dirname(_find('knee/infer.py')))
+KB_DATA = os.path.dirname(_find('test_series.csv'))
 pip = subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', '--no-index', '--no-deps', '--target', '/tmp/knee_libs',
-                      '--find-links', f'{{KNEE}}/wheels', 'pylibjpeg', 'pylibjpeg-libjpeg', 'pylibjpeg-openjpeg', 'python-gdcm'],
+                      '--find-links', f'{{KB_KNEE}}/wheels', 'pylibjpeg', 'pylibjpeg-libjpeg', 'pylibjpeg-openjpeg', 'python-gdcm'],
                      capture_output=True, text=True)
-print(KNEE, DATA, sys.version, 'decoders:', 'ok' if pip.returncode == 0 else pip.stderr[-1000:])
+print(KB_KNEE, KB_DATA, sys.version, 'decoders:', 'ok' if pip.returncode == 0 else pip.stderr[-1000:])
 '''
 
 EXTRA_RUN = '''# Step 2b: the extra public arm (script written by the cell above), in its own process after the public pipeline.
-if EXTRA_ARM:
+if KB_EXTRA_ARM:
     _t = time.time()
     try:
         _p = subprocess.run([sys.executable, '/kaggle/working/extra_arm.py'], capture_output=True, text=True,
-                            timeout=max(600, END_H * 3600 - (time.time() - T0_BLEND) - 3 * 3600))
+                            timeout=max(600, KB_END_H * 3600 - (time.time() - KB_T0_BLEND) - 3 * 3600))
         print(_p.stdout[-2500:], _p.stderr[-1500:])
         print(f'extra arm: return code {_p.returncode}, {(time.time() - _t) / 60:.1f} min,',
-              'written' if os.path.exists(EXTRA_ARM) else 'MISSING')
+              'written' if os.path.exists(KB_EXTRA_ARM) else 'MISSING')
     except Exception as e:
         print('extra arm failed:', repr(e))
 '''
@@ -72,9 +72,9 @@ if EXTRA_ARM:
 
 OURS = '''# Step 3: our models, after the public pipeline, in a separate process with the time left.
 import gc, signal
-_left = END_H * 3600 - (time.time() - T0_BLEND)
-print(f'public pipeline done at {{(time.time() - T0_BLEND) / 3600:.2f}} h, {{_left / 3600:.2f}} h left for ours')
-if W_OURS > 0 and _left > MIN_LEFT_H * 3600:
+_left = KB_END_H * 3600 - (time.time() - KB_T0_BLEND)
+print(f'public pipeline done at {{(time.time() - KB_T0_BLEND) / 3600:.2f}} h, {{_left / 3600:.2f}} h left for ours')
+if KB_W_OURS > 0 and _left > KB_MIN_LEFT_H * 3600:
     gc.collect()
     try:
         import torch; torch.cuda.empty_cache()
@@ -89,14 +89,14 @@ if W_OURS > 0 and _left > MIN_LEFT_H * 3600:
 import glob, shutil
 from knee.infer import run
 if __name__ == '__main__':
-    models = list(dict.fromkeys(m for pat in {{OUR_MODELS!r}} for m in sorted(glob.glob('{{KNEE}}/models/' + pat))))
+    models = list(dict.fromkeys(m for pat in {{KB_OUR_MODELS!r}} for m in sorted(glob.glob('{{KB_KNEE}}/models/' + pat))))
     print(models, flush=True)
-    run('{{DATA}}', models, out_csv='/kaggle/working/sub_ours.csv', cache_dir='/tmp/knee_cache', workers=4,
-        time_budget_s={{_left - 20 * 60:.0f}}, windows={{OUR_WINDOWS}}, grouped=True)
+    run('{{KB_DATA}}', models, out_csv='/kaggle/working/sub_ours.csv', cache_dir='/tmp/knee_cache', workers=4,
+        time_budget_s={{_left - 20 * 60:.0f}}, windows={{KB_OUR_WINDOWS}}, grouped=True)
     shutil.rmtree('/tmp/knee_cache', ignore_errors=True)
 """)
     _p = subprocess.Popen([sys.executable, '/tmp/knee_ours.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-                          start_new_session=True, env=dict(os.environ, PYTHONPATH=f'/tmp/knee_libs:{{KNEE}}', CUDA_VISIBLE_DEVICES=_gpu))
+                          start_new_session=True, env=dict(os.environ, PYTHONPATH=f'/tmp/knee_libs:{{KB_KNEE}}', CUDA_VISIBLE_DEVICES=_gpu))
     try:
         _out, _ = _p.communicate(timeout=_left - 10 * 60)
         print(_out[-6000:]); print('our ensemble:', 'ok' if _p.returncode == 0 else f'FAILED ({{_p.returncode}})')
@@ -106,12 +106,12 @@ if __name__ == '__main__':
         print('our ensemble: TIMEOUT, killed')
 else:
     print('our ensemble skipped')
-print(f'{{(time.time() - T0_BLEND) / 3600:.2f}} h')
+print(f'{{(time.time() - KB_T0_BLEND) / 3600:.2f}} h')
 '''
 
-BLEND = '''# Step 4: the final submission. 0.950 base (READER_SHARE or EXTRA_ARM set): its per-finding fusion redone from its two
-# arms (checked to give the public submission back), the CoAtNet arm averaged with EXTRA_ARM at EXTRA_W and the reader's
-# share shared with ours at READER_SHARE (readers x READER_SCALE); otherwise per-label rank average with ours at W_OURS.
+BLEND = '''# Step 4: the final submission. 0.950 base (KB_READER_SHARE or KB_EXTRA_ARM set): its per-finding fusion redone from its two
+# arms (checked to give the public submission back), the CoAtNet arm averaged with KB_EXTRA_ARM at KB_EXTRA_W and the reader's
+# share shared with ours at KB_READER_SHARE (readers x KB_READER_SCALE); otherwise per-label rank average with ours at KB_W_OURS.
 # Whatever is missing drops out; nothing usable left: the public submission alone.
 import pandas as pd
 _pub = pd.read_csv('/kaggle/working/submission.csv', dtype={'StudyInstanceUID': str})
@@ -123,12 +123,12 @@ def _read(f):
     assert df.notna().all().all(), f'{f} misses studies'
     return df
 _ours = _arms = _extra = None
-if W_OURS > 0:
+if KB_W_OURS > 0:
     try:
         _ours = _read('/kaggle/working/sub_ours.csv')
     except Exception as e:
         print('ours missing:', repr(e))
-if READER_SHARE is not None or EXTRA_ARM:
+if KB_READER_SHARE is not None or KB_EXTRA_ARM:
     try:  # CoAtNet and reader arms of the 0.950 base, and its per-finding reader weights
         _arms = [_read('/kaggle/working/_sota_0949.csv'), _read('/kaggle/working/_own.csv')]
         _v = {c: TARGET_WEIGHTS.get(c, 0.15) for c in _labels}
@@ -139,34 +139,34 @@ if READER_SHARE is not None or EXTRA_ARM:
     except Exception as e:
         print('per-finding fusion impossible:', repr(e))
         _arms = None
-if _arms is not None and EXTRA_ARM:
+if _arms is not None and KB_EXTRA_ARM:
     try:
-        _extra = _read(EXTRA_ARM)
+        _extra = _read(KB_EXTRA_ARM)
     except Exception as e:
         print('extra arm missing:', repr(e))
-_s = READER_SHARE if (_arms is not None and _ours is not None and READER_SHARE) else 0.0
-_k = READER_SCALE if (_s or READER_SHARE == 0) else 1.0  # READER_SHARE 0: the readers rescaled without ours
+_s = KB_READER_SHARE if (_arms is not None and _ours is not None and KB_READER_SHARE) else 0.0
+_k = KB_READER_SCALE if (_s or KB_READER_SHARE == 0) else 1.0  # KB_READER_SHARE 0: the readers rescaled without ours
 try:
     _out = _pub.copy()
     if _arms is not None and (_s or _extra is not None or _k != 1.0):
         for c in _labels:
             v = min(_k * _v[c], 0.9)
-            co = _rk(_arms[0][c]) if _extra is None else (1 - EXTRA_W) * _rk(_arms[0][c]) + EXTRA_W * _rk(_extra[c])
+            co = _rk(_arms[0][c]) if _extra is None else (1 - KB_EXTRA_W) * _rk(_arms[0][c]) + KB_EXTRA_W * _rk(_extra[c])
             rd = (1 - _s) * _rk(_arms[1][c]) + (_s * _rk(_ours[c]) if _s else 0)
             _out[c] = pd.Series((1 - v) * co + v * rd).rank(pct=True).to_numpy()
-        print(f'BLEND written: per finding, extra arm {EXTRA_W if _extra is not None else 0} of the CoAtNet arm,',
+        print(f'BLEND written: per finding, extra arm {KB_EXTRA_W if _extra is not None else 0} of the CoAtNet arm,',
               f'ours {_s} of the reader share, readers x{_k};', {c: round(min(_k * _v[c], 0.9) * _s, 3) for c in _labels}, _out.shape)
     elif _ours is not None:
         for c in _labels:
-            _out[c] = (1 - W_OURS) * _rk(_pub[c]) + W_OURS * _rk(_ours[c])
-        print(f'BLEND written: public {1 - W_OURS:.2f} + ours {W_OURS:.2f}', _out.shape)
+            _out[c] = (1 - KB_W_OURS) * _rk(_pub[c]) + KB_W_OURS * _rk(_ours[c])
+        print(f'BLEND written: public {1 - KB_W_OURS:.2f} + ours {KB_W_OURS:.2f}', _out.shape)
     else:
         print('public submission kept alone')
     _out.to_csv('/kaggle/working/submission.csv', index=False)
 except Exception as e:
     _pub.to_csv('/kaggle/working/submission.csv', index=False)
     print('public submission kept alone:', repr(e))
-print(f'total {(time.time() - T0_BLEND) / 3600:.2f} h')
+print(f'total {(time.time() - KB_T0_BLEND) / 3600:.2f} h')
 '''
 
 

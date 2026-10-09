@@ -2044,6 +2044,13 @@ weights), **23** (+ reader at half of them); folders `kaggle/blend_v21..v23` = K
 built but never pushed). Python on heliosli's docker image is 3.13: our decoder wheels do not install there, so our
 models cannot run on these blends as they are (our part is off).
 
+**Name clash found on version 22's visible-test run**: heliosli's stage-3 cell sets `W_RAPTOR, W_OURS = 0.7, 0.3`, which
+overwrote our setup's `W_OURS = 0`: our models' cell then ran with the builder's default patterns, matched nothing and
+failed in seconds, and the final cell kept the public submission — the right output, by its fallback. Fixed in
+`scripts/build_blend_nb.py`: every global of our cells now carries a `KB_` prefix (`KB_W_OURS`, `KB_DATA`, ...);
+synthetic tests rerun with a foreign `W_OURS` in the namespace. Versions 22–24 were built before the fix: same
+harmless detour.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
