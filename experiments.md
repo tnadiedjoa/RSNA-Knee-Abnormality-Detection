@@ -2120,6 +2120,13 @@ Python 3.13 image ("decoders: ok"). Our set: E75, E86, E85, E56, E64 (15 network
 **10-10 list rewritten** (`kaggle/A_SOUMETTRE.md`, the user had not submitted yet): 26, 28, 23, 27, 22 (24, 25, 17 in
 reserve) — the gold-58 result (S5 + ours > S5 + reader > S5) put our models back in the blend.
 
+**Which of our runs to put next to heliosli's compact model** (10-09 ~17:00, gold-58, each 5-fold CV run's OOF alone
+and 50/50 with heliosli S5): own-label runs score highest on gold (e47 0.930, 0.936 with S5; e29 0.929; e36 0.929,
+0.934 with S5; e32 0.927; e37 0.925), mixpub runs lower (e46 / e55 0.920, e42 0.914), the reverse of the LB, where the
+mixpub-line E75 is our best single (0.940). 58 studies, and our teachers were partly chosen on them: blends 26–28 keep
+their mixed set (E75, E86, E85, E56, E64); an own-label-heavy set is a candidate for 10-11, after the 10-10 scores.
+E90 at fold 1 epoch 2 (17:08), the 0.949 CoAtNet on gold-58 runs after it; E91 / E92 on the P100s, done ~22:00.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
