@@ -1,4 +1,4 @@
-# À soumettre (mis à jour le 09/10 à 18 h 40)
+# À soumettre (mis à jour le 09/10 à 19 h)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18, 19, 20 ni 21** (cassées).
@@ -24,8 +24,8 @@ idée sans score publié pour l'instant.
 |---|---|---|---|
 | knee-blend | **29** | base 0,950, lecteur à 50 % sur l'arthrose latérale (au lieu de 8 %) | le lecteur aide-t-il là ? |
 | knee-blend | **30** | comme 29, plus lecteur à 50 % sur la contusion et 40 % sur le LCA | et sur ces deux-là ? |
-| knee-blend | **32** | comme 29, plus le 2e modèle public de nartaa (224 px) | ce 2e modèle apporte-t-il ? |
-| knee-blend | **31** | comme 29, plus nos modèles | nos modèles aident-ils ici ? |
+| knee-blend | **31** | comme 29, plus le 2e modèle public de nartaa (224 px) | ce 2e modèle apporte-t-il ? |
+| knee-blend | **32** | comme 29, plus nos modèles | nos modèles aident-ils ici ? |
 | knee-blend | **17** | base 0,950 + le 2e modèle de nartaa, sans autre changement | idem, sur la base seule |
 
-Versions 29 à 32 en cours d'envoi et de vérification : je confirme ici quand c'est fait.
+Les 5 sont vérifiées sur les 3 examens de test visibles (19 h) : chacune applique bien ses poids.

@@ -2190,11 +2190,14 @@ these weights, only the LB can. romantamrazov's DINOsaur V16 tests the Lateral O
 |---|---|
 | 29 | Lateral OA 2.5D share 0.5 (V3: 0.08), reader only |
 | 30 | 29 + Contusion 0.5 (0.30) + ACL 0.4 (0.25) |
-| 31 | 29 + ours at half of every 2.5D share (E75, E86, E85, E56, E64; 24 windows) |
-| 32 | 29 + nartaa's 224 px CoAtNet at 0.33 of the CoAtNet arm (blend 17's extra arm) |
+| 31 | 29 + nartaa's 224 px CoAtNet at 0.33 of the CoAtNet arm (blend 17's extra arm) |
+| 32 | 29 + ours at half of every 2.5D share (E75, E86, E85, E56, E64; 24 windows) |
 
-**10-10 list rewritten** (`kaggle/A_SOUMETTRE.md`): 29, 30, 32, 31, 17 (pushed and checked in that order by
-`logs/push_blend29_32.out`).
+Pushed 18:37–18:55 (`logs/push_blend29_32.out`; Kaggle numbers versions by push order, the folders built as v31 / v32 were
+pushed in the other order and then swapped so that `kaggle/blend_vN` = Kaggle version N). Each checked on the visible test
+(logs `logs/blend_1009_1837`, `_1842`, `_1846`, `_1850`): "public fusion reproduced (max gap 0.0e+00)", BLEND written with
+the intended 2.5D shares (Lateral OA 0.5; 30: ACL 0.4, Contusion 0.5; 31: extra arm written in 0.4 min, 0.33 of the
+CoAtNet arm; 32: our five runs done, ours = half of each share). **10-10 list** (`kaggle/A_SOUMETTRE.md`): 29, 30, 31, 32, 17.
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
