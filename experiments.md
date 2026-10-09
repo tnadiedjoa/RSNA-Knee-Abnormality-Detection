@@ -1976,7 +1976,8 @@ in the reader's slot our five-set ensemble is not better than that 3-fold reader
 **E91** = E69 and **E92** = E72 continued 4 epochs at 384 px on E75's targets with a **130 mm field of view**
 (`--zoom 1.154`): on 2026-09-30, plain (E07) + zoomed (E09) models blended +0.0045 silver, the most complementary input
 change measured so far (`slurm/runs/e91_01.txt`, `e92_01.txt`, `e91n2_e92n2.txt`; done ~22:00). knee-models packaging
-of 24 runs (+ E86, E87, E88; `logs/day13c_runs.txt`) started ~13:05.
+of 24 runs (+ E86, E87, E88; `logs/day13c_runs.txt`) started ~13:05, done 13:18 (`logs/push_1009_1304`, models.zip
+8 GB, the 24 runs listed).
 
 **A second public CoAtNet for the base** (~13:10). nartaa's weights dataset holds two checkpoints: the 384 px
 SWA (0.949 alone with native-320 crop, K94, mirror TTA: the base's CoAtNet arm) and a 224 px SWA (`c08_r224`, 140 mm
