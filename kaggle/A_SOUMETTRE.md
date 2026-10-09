@@ -1,4 +1,4 @@
-# À soumettre (mis à jour le 09/10 à 19 h 15)
+# À soumettre (mis à jour le 09/10 à 18 h 40)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18, 19, 20 ni 21** (cassées).

@@ -2167,7 +2167,7 @@ teacher and α were chosen on them, and our CV folds trained on the other gold s
 most from that (gold 0.934, LB 0.934 for Version 35). So the gold-58 case for blends 26–28 is weaker than it looked;
 their gold scores (0.930–0.933) are level with heliosli's blend (0.931). The 10-10 LB decides.
 
-**heliosli retired his compact model** (found 10-09 ~18:50, evening check of public notebooks). `heliosli/rsna-knee-compact-v1`
+**heliosli retired his compact model** (found 10-09 ~18:30, evening check of public notebooks). `heliosli/rsna-knee-compact-v1`
 was emptied at 13:50: its latest version holds only a README, "This dataset no longer ships model files. The earlier
 versions have been retired and are not accessible. Notebooks that relied on them will not run." His new notebook
 `heliosli/rsna-knee-abnormality-detection` (Raptor 0.7 + "S6" 0.3, bundle 209a32c8b50a6b1c; first of the score-sorted
