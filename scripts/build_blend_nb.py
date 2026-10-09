@@ -25,6 +25,8 @@
    With --reader-nb (from blend 19): the 0.950 base's reader cells (own_src files + its fusion cell, verbatim) run after
    another public notebook (heliosli's 0.951 blend), whose submission thus takes the CoAtNet's place in the V3 fusion;
    --reader-share 0 --reader-scale k then redoes that fusion with the reader weights times k.
+   With --finding-v (0.950 base, from blend 29): JSON {finding: v} replacing the base's 2.5D share v of those findings
+   in the redone fusion (e.g. {"Lateral OA": 0.5}); with --reader-share > 0 it applies only when ours are present.
 """
 
 import argparse
@@ -40,6 +42,7 @@ KB_T0_BLEND = time.time()
 KB_W_OURS = {weight}  # rank weight of our ensemble in the final blend (0 = public pipeline alone)
 KB_READER_SHARE = {reader_share}  # None: uniform blend at KB_W_OURS; else ours' share of the public 2.5D reader's per-finding weight
 KB_READER_SCALE = {reader_scale}  # the readers' per-finding weights times this (with KB_READER_SHARE)
+KB_FINDING_V = {finding_v!r}  # per-finding 2.5D share replacing the base's (with KB_READER_SHARE > 0: only if ours are present)
 KB_EXTRA_ARM = {extra_arm!r}  # extra CoAtNet predictions averaged into the base's CoAtNet arm (None: no extra arm)
 KB_EXTRA_W = {extra_w}  # weight of KB_EXTRA_ARM inside the CoAtNet arm
 KB_HELIOS_MIX = {helios_mix!r}  # heliosli base: rank weights of raptor / compact / ours / reader (None: off)
@@ -129,7 +132,7 @@ if KB_W_OURS > 0:
         _ours = _read('/kaggle/working/sub_ours.csv')
     except Exception as e:
         print('ours missing:', repr(e))
-if KB_READER_SHARE is not None or KB_EXTRA_ARM:
+if KB_READER_SHARE is not None or KB_EXTRA_ARM or KB_FINDING_V:
     try:  # CoAtNet and reader arms of the 0.950 base, and its per-finding reader weights
         _arms = [_read('/kaggle/working/_sota_0949.csv'), _read('/kaggle/working/_own.csv')]
         _v = {c: TARGET_WEIGHTS.get(c, 0.15) for c in _labels}
@@ -147,16 +150,19 @@ if _arms is not None and KB_EXTRA_ARM:
         print('extra arm missing:', repr(e))
 _s = KB_READER_SHARE if (_arms is not None and _ours is not None and KB_READER_SHARE) else 0.0
 _k = KB_READER_SCALE if (_s or KB_READER_SHARE == 0) else 1.0  # KB_READER_SHARE 0: the readers rescaled without ours
+_fv = KB_FINDING_V if (KB_FINDING_V and _arms is not None and (_s or not KB_READER_SHARE)) else {}
 try:
     _out = _pub.copy()
-    if _arms is not None and (_s or _extra is not None or _k != 1.0):
+    if _arms is not None and (_s or _extra is not None or _k != 1.0 or _fv):
+        _vv = {c: _fv.get(c, min(_k * _v[c], 0.9)) for c in _labels}
         for c in _labels:
-            v = min(_k * _v[c], 0.9)
+            v = _vv[c]
             co = _rk(_arms[0][c]) if _extra is None else (1 - KB_EXTRA_W) * _rk(_arms[0][c]) + KB_EXTRA_W * _rk(_extra[c])
             rd = (1 - _s) * _rk(_arms[1][c]) + (_s * _rk(_ours[c]) if _s else 0)
             _out[c] = pd.Series((1 - v) * co + v * rd).rank(pct=True).to_numpy()
         print(f'BLEND written: per finding, extra arm {KB_EXTRA_W if _extra is not None else 0} of the CoAtNet arm,',
-              f'ours {_s} of the reader share, readers x{_k};', {c: round(min(_k * _v[c], 0.9) * _s, 3) for c in _labels}, _out.shape)
+              f'ours {_s} of the reader share, readers x{_k}; 2.5D share', {c: round(_vv[c], 3) for c in _labels},
+              'of which ours', {c: round(_vv[c] * _s, 3) for c in _labels}, _out.shape)
     elif _ours is not None:
         for c in _labels:
             _out[c] = (1 - KB_W_OURS) * _rk(_pub[c]) + KB_W_OURS * _rk(_ours[c])
@@ -233,6 +239,7 @@ def main():
     p.add_argument("--reader-share", type=float, default=None,
                    help="0.950 base: ours' share of its reader's per-finding weight (default: uniform blend at --weight)")
     p.add_argument("--reader-scale", type=float, default=1.0)
+    p.add_argument("--finding-v", default=None, help='0.950 base: JSON per-finding 2.5D share, e.g. {"Lateral OA": 0.5}')
     p.add_argument("--reader-nb", default=None, help="append the 2.5D reader cells (own_src files + fusion cell, verbatim) "
                    "of this notebook (the 0.950 base) after the public cells: the reader is fused per finding into "
                    "whatever submission they wrote")
@@ -244,6 +251,9 @@ def main():
     p.add_argument("--source", default="yamadan96/rsna-knee-d4-public0946, itself from ryokucha/rsna-knee-d4-blend-0946-ours10",
                    help="public notebook the cells come from, credited in the setup cell")
     args = p.parse_args()
+    if args.finding_v:
+        from knee.config import LABELS
+        assert set(json.loads(args.finding_v)) <= set(LABELS), f'--finding-v: unknown finding in {args.finding_v}'
     nb = json.loads(Path(args.public_nb).read_text())
     for c in nb["cells"]:
         c.pop("id", None)
@@ -251,6 +261,7 @@ def main():
             c["outputs"], c["execution_count"] = [], None
     fmt = dict(source=args.source, weight=args.weight, models=args.models, windows=args.windows, end_h=args.end_h, min_left_h=args.min_left_h,
                reader_share=args.reader_share, reader_scale=args.reader_scale,
+               finding_v=json.loads(args.finding_v) if args.finding_v else None,
                extra_arm='/kaggle/working/_r224.csv' if args.extra_arm_nb else None, extra_w=args.extra_w,
                helios_mix=json.loads(args.helios_mix) if args.helios_mix else None)
     extra = []

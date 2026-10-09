@@ -2167,6 +2167,35 @@ teacher and α were chosen on them, and our CV folds trained on the other gold s
 most from that (gold 0.934, LB 0.934 for Version 35). So the gold-58 case for blends 26–28 is weaker than it looked;
 their gold scores (0.930–0.933) are level with heliosli's blend (0.931). The 10-10 LB decides.
 
+**heliosli retired his compact model** (found 10-09 ~18:50, evening check of public notebooks). `heliosli/rsna-knee-compact-v1`
+was emptied at 13:50: its latest version holds only a README, "This dataset no longer ships model files. The earlier
+versions have been retired and are not accessible. Notebooks that relied on them will not run." His new notebook
+`heliosli/rsna-knee-abnormality-detection` (Raptor 0.7 + "S6" 0.3, bundle 209a32c8b50a6b1c; first of the score-sorted
+list; romantamrazov credits "heliosli — 0.954") reads S6 from that retired dataset and from a private one
+(`rsna-knee-ofl-ssl-weights`, 403 for us). So knee-blend 22–28 (10-10 list) run on our private copy of a model its author
+withdrew. The rules ask external models to be publicly available and equally accessible to all participants (Section 6),
+and we could not keep it for the final selection anyway: **22–28 taken off the 10-10 list** (the user decides; nothing
+deleted, `theophilenadiedjoa/knee-compact-pinned` stays private and unused).
+
+**Back to the 0.950 base (CoAtNet + reader, both public), per-finding shares** (`scripts/build_blend_nb.py --finding-v`,
+new: JSON {finding: v} replacing the base's 2.5D share v of those findings in the redone fusion; with `--reader-share` > 0
+only when ours are present). 8 synthetic cases exact (one or three findings, share None or 0, with ours, ours missing →
+public, with the extra arm, blend 17's logic unchanged). Gold-58 per finding (reader never trained on gold, CoAtNet only
+selected on it): Lateral OA CoAtNet 0.776 vs reader 0.855 (11 positives), the V3 share 0.08 leaves the fusion at 0.779,
+0.5 gives 0.818; Contusion 0.937 vs 0.957 (V3 0.30 → 0.947, 0.5 → 0.957); ACL 0.964 vs 0.977. Caution: on gold a uniform
+reader share 0.3 beats V3 (0.928 vs 0.925) while the LB says the opposite (0.948 vs 0.950, prvsiyan): gold-58 cannot set
+these weights, only the LB can. romantamrazov's DINOsaur V16 tests the Lateral OA idea (reader 0.52), unscored yet.
+
+| knee-blend | content (0.950 base: matterhorn3838 cells verbatim, rebuilt from blend 14's copy) |
+|---|---|
+| 29 | Lateral OA 2.5D share 0.5 (V3: 0.08), reader only |
+| 30 | 29 + Contusion 0.5 (0.30) + ACL 0.4 (0.25) |
+| 31 | 29 + ours at half of every 2.5D share (E75, E86, E85, E56, E64; 24 windows) |
+| 32 | 29 + nartaa's 224 px CoAtNet at 0.33 of the CoAtNet arm (blend 17's extra arm) |
+
+**10-10 list rewritten** (`kaggle/A_SOUMETTRE.md`): 29, 30, 32, 31, 17 (pushed and checked in that order by
+`logs/push_blend29_32.out`).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
