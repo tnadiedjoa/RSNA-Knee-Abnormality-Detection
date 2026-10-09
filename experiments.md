@@ -2141,6 +2141,31 @@ common near the top, but it does not explain 0.964 alone (the OAI model is 0.949
 0.952–0.962 on the efficiency board). For us: we already use OAI through nartaa's weights; own training on OAI needs an
 NDA data access request in the user's name and hundreds of GB of images, too slow for 10-22 unless access is quick.
 
+**E90 complete** (18:24, interactive 3090). The 3090 went at once (18:37) to **E93–E95**, own-label members at 384 px on
+the round-6 targets (Qwen labels + own round-5 teacher at α 0.7, no public table; `slurm/runs/e93_e95_interactive.sh`,
+log `logs/e93_e95_interactive.log`): E93 = E65 continued 4 epochs with a 130 mm field of view (E84 + zoom, ~3 h), E94 =
+E60's ConvNeXt-small continued on these targets (~5 h), E95 = E64's recipe from scratch on them, seed 142 (~9 h, done
+~11:30 on 10-10, before the job ends at 15:16).
+
+**nartaa's 0.949 CoAtNet on the 58 gold studies** (`/tmp/nartaa_run`, its notebook with local paths, 56 s on the 3090):
+**0.923** macro — not inflated (nartaa only picked checkpoints on them). Same studies, rank averages:
+
+| predictions (gold-58) | macro | L.OA | PF OA | Fracture |
+|---|---|---|---|---|
+| CoAtNet 0.949 (LB 0.949) | 0.923 | 0.776 | 0.860 | 0.958 |
+| heliosli S5 | 0.917 | 0.845 | 0.880 | 0.808 |
+| goodpjw2008 reader | 0.915 | 0.855 | 0.834 | 0.932 |
+| ours, 7 CV runs (E75 line alone: LB 0.940) | 0.929 | 0.844 | 0.873 | 0.918 |
+| ours, 5 own-label CV runs (e47, e29, e36, e32, e37) | 0.934 | 0.856 | 0.871 | 0.936 |
+| heliosli's blend 0.7 CoAtNet + 0.3 S5 (LB 0.951 claimed) | 0.931 | | | |
+| knee-blend 26 / 27 / 28 | 0.931 / 0.933 / 0.930 | | | |
+
+Rank correlations with the CoAtNet: S5 0.84, reader 0.89, ours 0.90. Reading: gold-58 ranks ours **above** the CoAtNet
+(0.929 vs 0.923) where the LB puts it 0.009 below (0.940 vs 0.949): these 58 studies overrate our models (our labels'
+teacher and α were chosen on them, and our CV folds trained on the other gold studies), and the own-label set gains
+most from that (gold 0.934, LB 0.934 for Version 35). So the gold-58 case for blends 26–28 is weaker than it looked;
+their gold scores (0.930–0.933) are level with heliosli's blend (0.931). The 10-10 LB decides.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
