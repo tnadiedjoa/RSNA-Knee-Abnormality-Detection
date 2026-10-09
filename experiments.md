@@ -1992,6 +1992,10 @@ CoAtNet at 0.33 of the CoAtNet arm, without our models (a clean test of the extr
 Checked on the visible test (pushed 13:09, `logs/blend_1009_1309`): the 224 px script ran in its own process (0.5 min
 for the 3 studies, `_r224.csv` written), public fusion reproduced (gap 0), "BLEND written: per finding, extra arm 0.33".
 
+**Leaderboard snapshot 10-09 13:35** (`kaggle competitions leaderboard -d`): 5,576 teams, top 0.964. Ours **0.950**
+(blend 9; was 0.944) = listed 328th: 237 teams above 0.950, 451 tied at 0.950 (ties ordered by submission time);
+≥ 0.951: 237 teams, ≥ 0.952: 163, ≥ 0.955: 82, ≥ 0.960: 25. Blends 14, 16, 11 still pending 3 h 40 after submission.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
