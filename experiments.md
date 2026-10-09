@@ -1962,6 +1962,22 @@ idled until ~10:05 (seen late), then **E89** and **E90** (`slurm/runs/e89_e90_in
 E89 = E60's ConvNeXt-small networks (384 px, own labels round 3; checkpoint loaded whole, 386 tensors) for backbone
 diversity, ~1.6 h per network; E90 = E58's 224 px networks at 384 px, ~1 h per network. Expected end ~17:45.
 
+Auto (2026-10-09 12:25, scripts/auto_followup.py): Kaggle: ref 56999941 (knee-blend version 9) scored 0.950.
+
+Auto (2026-10-09 12:55, scripts/auto_followup.py): Kaggle: ref 56999925 (knee-blend version 15) scored 0.949.
+
+**First LB results of 10-09** (~12:30): knee-blend **9 = 0.950** (0.950 base 0.85 + own-label set E64 + E60 + E65
+0.15, uniform) — the base's own score, so a uniform 15 % of the own-label set neither helps nor hurts; knee-blend
+**15 = 0.949** (per finding, ours replace goodpjw2008's reader inside the base's per-finding weights) — one tick below:
+in the reader's slot our five-set ensemble is not better than that 3-fold reader. 14 (ours averaged with the reader),
+16 (same, readers ×1.5) and 11 (uniform mix) pending.
+
+**E87 / E88 complete** (~12:45, P100s, 131 min per epoch). The freed P100s went at once (13:15, jobs 1030580–1030582) to
+**E91** = E69 and **E92** = E72 continued 4 epochs at 384 px on E75's targets with a **130 mm field of view**
+(`--zoom 1.154`): on 2026-09-30, plain (E07) + zoomed (E09) models blended +0.0045 silver, the most complementary input
+change measured so far (`slurm/runs/e91_01.txt`, `e92_01.txt`, `e91n2_e92n2.txt`; done ~22:00). knee-models packaging
+of 24 runs (+ E86, E87, E88; `logs/day13c_runs.txt`) started 13:20.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
