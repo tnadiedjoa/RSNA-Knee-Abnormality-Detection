@@ -2103,6 +2103,23 @@ which is what the LB said on 10-09 — but next to heliosli's compact model it a
 base with our models sharing the compact slot (needs our models on his Python 3.13 image: decoder wheels for 3.13
 added, knee-models to repackage). The ViT is weak alone and its dual adds little: not worth its 3.5 h on Kaggle.
 
+**Heliosli base + our models** (`scripts/build_blend_nb.py --helios-mix '{"raptor": ..., "compact": ..., "ours": ...,
+"reader": ...}'`, new final cell `HELIOS_BLEND`): heliosli's notebook leaves its parts in `/kaggle/working`
+(`raptor_raw.csv`, `ours_sub.csv` = his compact model); our cell recomputes his 0.7 / 0.3 blend from them (must match
+his submission, rank correlation ≥ 0.99 per finding, else his submission is kept), then writes the rank average of the
+parts at the given weights (a missing part of ours or the reader leaves its share to his compact model). Synthetic tests
+exact. knee-models repackaged (16:00, 25 runs + E89 + the Python 3.13 decoder wheels): our models now run on his
+Python 3.13 image ("decoders: ok"). Our set: E75, E86, E85, E56, E64 (15 networks, 24 windows).
+
+| knee-blend | raptor / compact / ours / reader | visible test |
+|---|---|---|
+| 26 | 0.70 / 0.15 / 0.15 / — | ours ok, his blend recomputed (ρ 1.0000), BLEND written, 0.07 h |
+| 27 | 0.60 / 0.20 / 0.20 / — | same, 0.06 h |
+| 28 | 0.70 / 0.10 / 0.10 / 0.10 (+ reader cells) | reader fused, ours ok, recomputed, BLEND written |
+
+**10-10 list rewritten** (`kaggle/A_SOUMETTRE.md`, the user had not submitted yet): 26, 28, 23, 27, 22 (24, 25, 17 in
+reserve) — the gold-58 result (S5 + ours > S5 + reader > S5) put our models back in the blend.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

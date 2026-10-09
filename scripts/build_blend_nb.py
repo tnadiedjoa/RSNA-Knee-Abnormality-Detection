@@ -42,6 +42,7 @@ KB_READER_SHARE = {reader_share}  # None: uniform blend at KB_W_OURS; else ours'
 KB_READER_SCALE = {reader_scale}  # the readers' per-finding weights times this (with KB_READER_SHARE)
 KB_EXTRA_ARM = {extra_arm!r}  # extra CoAtNet predictions averaged into the base's CoAtNet arm (None: no extra arm)
 KB_EXTRA_W = {extra_w}  # weight of KB_EXTRA_ARM inside the CoAtNet arm
+KB_HELIOS_MIX = {helios_mix!r}  # heliosli base: rank weights of raptor / compact / ours / reader (None: off)
 KB_OUR_MODELS = {models}
 KB_OUR_WINDOWS = {windows}
 KB_END_H = {end_h}  # our process must be done by then (Kaggle stops the notebook at 9 h)
@@ -170,6 +171,53 @@ print(f'total {(time.time() - KB_T0_BLEND) / 3600:.2f} h')
 '''
 
 
+HELIOS_BLEND = '''# Step 4 (heliosli base): his final blend redone from its parts with ours (and the 2.5D reader) beside his compact
+# model: per finding, rank of the weighted mean of the parts' ranks, weights KB_HELIOS_MIX (renormalised over the
+# parts present). His own 0.7 / 0.3 blend recomputed from the same files must match his submission (rank correlation
+# >= 0.99 on every finding, his failed-study rules aside), else his submission is kept.
+import numpy as np
+import pandas as pd
+_pub = pd.read_csv('/kaggle/working/submission.csv', dtype={'StudyInstanceUID': str})
+_pub.to_csv('/kaggle/working/sub_public.csv', index=False)
+_labels = [c for c in _pub.columns if c != 'StudyInstanceUID']
+_rk = lambda x: x.rank(pct=True).to_numpy()
+def _read(f):
+    df = pd.read_csv(f, dtype={'StudyInstanceUID': str}).set_index('StudyInstanceUID').reindex(_pub['StudyInstanceUID'])[_labels]
+    assert df.notna().all().all(), f'{f} misses studies'
+    return df
+_files = {'raptor': '/kaggle/working/raptor_raw.csv', 'compact': '/kaggle/working/ours_sub.csv',
+          'ours': '/kaggle/working/sub_ours.csv', 'reader': '/kaggle/working/_own.csv'}
+_parts = {}
+for _k, _w in KB_HELIOS_MIX.items():
+    if _w > 0:
+        try:
+            _parts[_k] = _read(_files[_k])
+        except Exception as e:
+            print(_k, 'missing:', repr(e))
+try:
+    assert 'raptor' in _parts and 'compact' in _parts, 'heliosli parts missing'
+    # his own 0.7 / 0.3 blend: submission.csv, or _sota_0949.csv when the reader cells fused the reader into it
+    _base = _read('/kaggle/working/_sota_0949.csv') if os.path.exists('/kaggle/working/_sota_0949.csv') else _pub.set_index('StudyInstanceUID')
+    _rho = min(pd.Series(0.7 * _rk(_parts['raptor'][c]) + 0.3 * _rk(_parts['compact'][c])).corr(pd.Series(_rk(_base[c])), method='spearman')
+               for c in _labels)
+    print(f'heliosli blend recomputed: min rank correlation {_rho:.4f}')
+    assert _rho >= 0.99, 'heliosli blend not reproduced'
+    _w = {k: KB_HELIOS_MIX[k] for k in _parts}
+    for _k in ('ours', 'reader'):  # a missing part leaves its share to his compact model
+        if KB_HELIOS_MIX.get(_k, 0) > 0 and _k not in _parts:
+            _w['compact'] += KB_HELIOS_MIX[_k]
+    _tot = sum(_w.values())
+    _out = _pub.copy()
+    for c in _labels:
+        _out[c] = pd.Series(sum(_w[k] / _tot * _rk(_parts[k][c]) for k in _parts)).rank(pct=True).to_numpy()
+    _out.to_csv('/kaggle/working/submission.csv', index=False)
+    print('BLEND written: heliosli parts', {k: round(v / _tot, 3) for k, v in _w.items()}, _out.shape)
+except Exception as e:
+    _pub.to_csv('/kaggle/working/submission.csv', index=False)
+    print('public submission kept alone:', repr(e))
+print(f'total {(time.time() - KB_T0_BLEND) / 3600:.2f} h')
+'''
+
 def code(src):
     return {"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": src}
 
@@ -190,6 +238,7 @@ def main():
                    "whatever submission they wrote")
     p.add_argument("--extra-arm-nb", default=None, help="public notebook whose last code cell is the extra CoAtNet script")
     p.add_argument("--extra-w", type=float, default=0.33)
+    p.add_argument("--helios-mix", default=None, help='heliosli base: JSON rank weights, e.g. {"raptor": 0.7, "compact": 0.15, "ours": 0.15}')
     p.add_argument("--extra-source", default="nartaa/rsna-knee-0945-efficient-224crop")
     p.add_argument("--out", default=str(ROOT_DIR / "kaggle" / "blend" / "knee-blend.ipynb"))
     p.add_argument("--source", default="yamadan96/rsna-knee-d4-public0946, itself from ryokucha/rsna-knee-d4-blend-0946-ours10",
@@ -202,7 +251,8 @@ def main():
             c["outputs"], c["execution_count"] = [], None
     fmt = dict(source=args.source, weight=args.weight, models=args.models, windows=args.windows, end_h=args.end_h, min_left_h=args.min_left_h,
                reader_share=args.reader_share, reader_scale=args.reader_scale,
-               extra_arm='/kaggle/working/_r224.csv' if args.extra_arm_nb else None, extra_w=args.extra_w)
+               extra_arm='/kaggle/working/_r224.csv' if args.extra_arm_nb else None, extra_w=args.extra_w,
+               helios_mix=json.loads(args.helios_mix) if args.helios_mix else None)
     extra = []
     if args.extra_arm_nb:  # its script verbatim, written to a file; only the output path changes
         src = [c for c in json.loads(Path(args.extra_arm_nb).read_text())["cells"] if c["cell_type"] == "code"][-1]
@@ -217,7 +267,8 @@ def main():
         first = next(i for i, c in enumerate(cells) if "own_src" in "".join(c["source"]))
         last = next(i for i, c in enumerate(cells) if "TARGET_WEIGHTS" in "".join(c["source"]))
         reader = [code("".join(c["source"])) for c in cells[first:last + 1]]
-    nb["cells"] = [code(SETUP.format(**fmt))] + nb["cells"] + reader + extra + [code(OURS.format(**fmt)), code(BLEND)]
+    final = HELIOS_BLEND if args.helios_mix else BLEND
+    nb["cells"] = [code(SETUP.format(**fmt))] + nb["cells"] + reader + extra + [code(OURS.format(**fmt)), code(final)]
     Path(args.out).write_text(json.dumps(nb, indent=1))
     print(args.out, len(nb["cells"]), "cells, weight", args.weight, "reader share", args.reader_share, "scale", args.reader_scale,
           "extra arm", bool(args.extra_arm_nb), args.extra_w)
