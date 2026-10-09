@@ -1947,7 +1947,8 @@ P100s (done ~03:45–04:05); E87 / E88 wait for their slots.
 teacher) continued at 384 px. **E87 / E88 started** (jobs 1029549 / 1029550 at ~03:45, 1029551 at ~04:17; checkpoints
 loaded whole: 248 / 225 tensors), done ~12:30–13:15. **knee-models packaging** (04:20, `PACKAGE_ONLY=1 bash
 logs/push_version.sh` — new option: dataset version only, no notebook push): the 17 runs of Version 43's package +
-E82, E83, E84, E85 (`logs/day13b_runs.txt`), for the next blends.
+E82, E83, E84, E85 (`logs/day13b_runs.txt`), for the next blends. Done 04:32 (`logs/push_1009_0419`, models.zip 7 GB):
+the dataset lists the 21 runs, E82–E85 included. The pushed blends 9–16 only use runs present in both versions.
 
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
