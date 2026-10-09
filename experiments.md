@@ -2141,11 +2141,12 @@ common near the top, but it does not explain 0.964 alone (the OAI model is 0.949
 0.952–0.962 on the efficiency board). For us: we already use OAI through nartaa's weights; own training on OAI needs an
 NDA data access request in the user's name and hundreds of GB of images, too slow for 10-22 unless access is quick.
 
-**E90 complete** (18:24, interactive 3090). The 3090 went at once (18:37) to **E93–E95**, own-label members at 384 px on
+**E90 complete** (18:24, interactive 3090). The 3090 went at once (18:28) to **E93–E95**, own-label members at 384 px on
 the round-6 targets (Qwen labels + own round-5 teacher at α 0.7, no public table; `slurm/runs/e93_e95_interactive.sh`,
 log `logs/e93_e95_interactive.log`): E93 = E65 continued 4 epochs with a 130 mm field of view (E84 + zoom, ~3 h), E94 =
 E60's ConvNeXt-small continued on these targets (~5 h), E95 = E64's recipe from scratch on them, seed 142 (~9 h, done
-~11:30 on 10-10, before the job ends at 15:16).
+~11:30 on 10-10, before the job ends at 15:16). `logs/package_1009e.sh` (background) packages knee-models with E90–E93 once
+E91 / E92 (P100s, epoch 2 of 4 at 17:30, ~121 min per epoch) and E93 are complete (~22:00; run list `logs/day13e_runs.txt`, 29 runs).
 
 **nartaa's 0.949 CoAtNet on the 58 gold studies** (`/tmp/nartaa_run`, its notebook with local paths, 56 s on the 3090):
 **0.923** macro — not inflated (nartaa only picked checkpoints on them). Same studies, rank averages:
