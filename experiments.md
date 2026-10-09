@@ -2074,6 +2074,35 @@ heliosli's docker image once the next knee-models package ships them.
 targets); **E90** (E58 continued at 384 px on E75's targets) started right after, ~1 h per network, done ~17:30, then
 packaged with E89 (and the Python 3.13 decoder wheels) before the interactive job ends at 19:07.
 
+**New session 10-09 15:16** (interactive job 1030891, nodemm01, until 10-10 15:16): the previous job ended early (~15:00),
+killing E90 at fold 0 epoch 3; E90 restarted (stopped again 15:25–15:40 to free the card for the runs below, restarted
+15:41, `logs/e90_restart.log`).
+
+**Public models scored on the 58 gold studies** (new `scripts/make_kaggle_sim.py`: the gold studies laid out like
+Kaggle's test folder, 336 series / 10,528 DICOMs fetched from the archive into `/tmp/kaggle_sim`, never versioned;
+`scripts/run_heliosli_local.py`: heliosli's stage 2 run as in his notebook, embedded sources SHA-checked, his pinned
+pydicom 3.0.1 / timm 1.0.25 in a separate target dir). Out of sample for all of them: heliosli's compact models never
+trained on gold (`gold_in_training 0`), goodpjw2008's reader neither (fold −1); ours = mean rank of the OOF of 7 CV
+runs (e46, e53, e55, e42, e50, e39, e36; their training folds did see the other gold studies at weight 3). nartaa's
+CoAtNet trained on all studies: not scored. Bootstrap over studies, 2,000 draws.
+
+| model (gold-58) | macro | note |
+|---|---|---|
+| heliosli S5 ConvNeXt-small (the 0.951 notebook's 0.3 arm) | 0.917 | 5.1 s/study on the 3090 (606 windows/study) |
+| heliosli ViT-B DINOv3 (second model of compact v9, unused by his notebook) | 0.897 | 7.5 s/study |
+| dual S5 + ViT with the bundle's per-finding weights `w2` | 0.921 | +0.003 vs S5 [−0.006, +0.012] |
+| goodpjw2008 reader | 0.915 | |
+| **ours, 7 CV runs** | **0.929** | e46 alone 0.920 |
+| S5 + reader | 0.926 | +0.009 vs S5 [−0.004, +0.021], P 0.92 |
+| **S5 + ours** | **0.931** | **+0.0135 vs S5 [+0.004, +0.024], P 1.00** |
+| dual + reader + ours | 0.931 | |
+
+Rank correlations: reader–ours 0.90, S5–ours 0.86, S5–reader 0.83, S5–ViT 0.87. Reading: our ensemble is a 2.5D
+ConvNeXt reader like goodpjw2008's — so close to it that on the 0.950 base (CoAtNet + reader) it had nothing to add,
+which is what the LB said on 10-09 — but next to heliosli's compact model it adds clearly on gold. Next: heliosli's
+base with our models sharing the compact slot (needs our models on his Python 3.13 image: decoder wheels for 3.13
+added, knee-models to repackage). The ViT is weak alone and its dual adds little: not worth its 3.5 h on Kaggle.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
