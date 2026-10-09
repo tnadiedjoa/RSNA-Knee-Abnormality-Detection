@@ -28,3 +28,5 @@ kaggle/blend_v10/*.ipynb
 kaggle/blend_v11/*.ipynb
 kaggle/blend_v12/*.ipynb
 kaggle/blend_v13/*.ipynb
+kaggle/blend_v1[4-9]/*.ipynb
+kaggle/blend_v[2-9][0-9]/*.ipynb

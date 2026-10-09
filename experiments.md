@@ -1943,6 +1943,12 @@ own-label set.
 fold 0 at epoch 7 of 12 at 03:15 (13.2 min/epoch, ~2.9 h per network → done ~10:15). E83 / E84 at epoch 3 of 4 on the
 P100s (done ~03:45–04:05); E87 / E88 wait for their slots.
 
+**E83 / E84 complete** (~04:00, P100s, 131 min for the last epoch): E78 (site bias) and E65 (own labels, round-6
+teacher) continued at 384 px. **E87 / E88 started** (jobs 1029549 / 1029550 at ~03:45, 1029551 at ~04:17; checkpoints
+loaded whole: 248 / 225 tensors), done ~12:30–13:15. **knee-models packaging** (04:20, `PACKAGE_ONLY=1 bash
+logs/push_version.sh` — new option: dataset version only, no notebook push): the 17 runs of Version 43's package +
+E82, E83, E84, E85 (`logs/day13b_runs.txt`), for the next blends.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
