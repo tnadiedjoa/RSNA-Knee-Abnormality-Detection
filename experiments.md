@@ -2127,6 +2127,20 @@ mixpub-line E75 is our best single (0.940). 58 studies, and our teachers were pa
 their mixed set (E75, E86, E85, E56, E64); an own-label-heavy set is a candidate for 10-11, after the 10-10 scores.
 E90 at fold 1 epoch 2 (17:08), the 0.949 CoAtNet on gold-58 runs after it; E91 / E92 on the P100s, done ~22:00.
 
+**Does the top use external data?** (user's question, 10-09 18:20). Leaderboard 16:16: three teams at **0.964**
+(CentralyDS 172 submissions, Sergey Bryansky 35, Ilya Kolb 107), 24 teams ≥ 0.960; none of the top 12 has a public
+notebook or dataset for this competition, and the forum is not readable from here, so their inputs are unknown. Facts:
+the rules allow it (overview: "Freely & publicly available external data is allowed, including pre-trained models";
+Section 6: reasonably accessible to all, minimal cost). Both best public pipelines use it: nartaa's 0.949 CoAtNet
+(2,399 OAI knees, masked supervision; its lineage's Raptor model without OAI and with older labels scored 0.924) and
+heliosli's 0.951 notebook, whose compact model (views v4) reads its series through `anatomy.pt`, "offline SKM-TEA tissue
+proposals" (plus KneeXNet weights) from `rsna-orthofoundation-fold0-epoch7-20261004`. A copy of MRNet on Kaggle
+(`techtech69/mrnet-knee-mri-stanford-aimi`, updated 08-27) has 2,337 downloads; fastMRI+ annotations (08-24) and a
+"harmonized RSNA + MRNet + OAI + fastMRI" label table (tsuyu122, 261 downloads) are there too. So external data is
+common near the top, but it does not explain 0.964 alone (the OAI model is 0.949; fast few-model notebooks reach
+0.952–0.962 on the efficiency board). For us: we already use OAI through nartaa's weights; own training on OAI needs an
+NDA data access request in the user's name and hundreds of GB of images, too slow for 10-22 unless access is quick.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
