@@ -2051,6 +2051,25 @@ failed in seconds, and the final cell kept the public submission — the right o
 synthetic tests rerun with a foreign `W_OURS` in the namespace. Versions 22–24 were built before the fix: same
 harmless detour.
 
+**Kaggle knee-blend versions of 10-09 afternoon** (folders renamed so that `kaggle/blend_vN` = Kaggle version N; the
+push loop I stopped at 14:15 had in fact gone on and pushed the folder then called `blend_v20` as version 21 — `kill` on
+the loop's PID did not stop it: check the log, not `ps`):
+
+| version | content | visible test |
+|---|---|---|
+| 18 | heliosli alone, latest compact bundle | ERROR (bundle check) |
+| 19 | + reader, latest compact bundle | ERROR |
+| 20 | 18 with `heliosli/rsna-knee-compact-v1/9` (pin ignored by the server) | ERROR |
+| 21 | + reader ×0.5, latest compact bundle | ERROR |
+| **22** | heliosli alone, pinned copy (`knee-compact-pinned`) | OK: stages PASS, 3/3 scored, public kept |
+| **23** | 22 + reader at the V3 weights (matterhorn's fusion cell verbatim) | OK: reader 28.7 s, "Apex Fusion SUCCESS" |
+| **24** | 22 + reader at half the V3 weights | OK: fusion reproduced (gap 0), ×0.5 applied |
+| **25** | 22 + reader at 1.5 × the V3 weights | pushed 14:43 |
+
+**10-10 list** (`kaggle/A_SOUMETTRE.md`): 23, 24, 22, 25, 17. Python 3.13 decoder wheels (pylibjpeg-libjpeg 2.4.0,
+pylibjpeg-openjpeg 2.6.0, python-gdcm 3.2.6, from PyPI) added to `kaggle/wheels/` so that our models can run on
+heliosli's docker image once the next knee-models package ships them.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

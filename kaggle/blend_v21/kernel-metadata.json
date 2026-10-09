@@ -9,9 +9,10 @@
  "enable_tpu": false,
  "enable_internet": false,
  "dataset_sources": [
-  "theophilenadiedjoa/knee-compact-pinned",
+  "heliosli/rsna-knee-compact-v1/9",
   "nartaa/rsna-knee-publication-swa-weights-20261007",
   "heliosli/rsna-orthofoundation-fold0-epoch7-20261004",
+  "goodpjw2008/rsna-knee-2-5d-convnext-reader",
   "theophilenadiedjoa/knee-models"
  ],
  "kernel_sources": [],
