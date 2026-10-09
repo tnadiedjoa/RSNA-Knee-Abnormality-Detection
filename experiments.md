@@ -1950,6 +1950,12 @@ logs/push_version.sh` — new option: dataset version only, no notebook push): t
 E82, E83, E84, E85 (`logs/day13b_runs.txt`), for the next blends. Done 04:32 (`logs/push_1009_0419`, models.zip 7 GB):
 the dataset lists the 21 runs, E82–E85 included. The pushed blends 9–16 only use runs present in both versions.
 
+Auto (2026-10-09 09:54, scripts/auto_followup.py): Kaggle: new submission ref 56999915 (knee-blend, scriptVersionId 356534807); new submission ref 56999920 (knee-blend, scriptVersionId 356536865); new submission ref 56999925 (knee-blend, scriptVersionId 356535978); new submission ref 56999933 (knee-blend, scriptVersionId 356530290); new submission ref 56999941 (knee-blend, scriptVersionId 356490093).
+
+**Submitted 10-09 ~09:53** (user, in the list's order): knee-blend 14, 16, 15, 11, 9 (refs 56999915, 56999920,
+56999925, 56999933, 56999941). Versions matched through `scriptVersionId`, which grows with push time (9 < 11 < 14 < 15
+< 16), and the submission order agrees; ledger rows filled.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

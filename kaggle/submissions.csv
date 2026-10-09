@@ -40,3 +40,8 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 56964287,2026-10-08 17:15,knee-submit,40,"E77 alone (E54 + teacher weight by mention: silent 0.9, absent/severe 0.25)",0.934,
 56964294,2026-10-08 17:15,knee-submit,41,"E75 alone (E56 recipe + 7-table base, 384 px, trained on a 3090)",0.940,
 56964298,2026-10-08 17:15,knee-submit,42,"E78 alone (E54 + per-site bias on silent cells, training only)",0.934,
+56999915,2026-10-09 07:53,knee-blend,14,"0.950 base (matterhorn3838: nartaa CoAtNet + goodpjw2008 reader, V3 weights) + E75 + E56 + E64 + E60 + E81, per finding: ours = 0.5 of the reader share (24 windows); scriptVersionId 356534807",,pending
+56999920,2026-10-09 07:53,knee-blend,16,"0.950 base (matterhorn3838: nartaa CoAtNet + goodpjw2008 reader, V3 weights) + E75 + E56 + E64 + E60 + E81, per finding: ours = 0.5 of the reader share, readers x1.5 (24 windows); scriptVersionId 356536865",,pending
+56999925,2026-10-09 07:53,knee-blend,15,"0.950 base (matterhorn3838: nartaa CoAtNet + goodpjw2008 reader, V3 weights) + E75 + E56 + E64 + E60 + E81, per finding: ours replace the reader (24 windows); scriptVersionId 356535978",,pending
+56999933,2026-10-09 07:53,knee-blend,11,"0.950 base (matterhorn3838: nartaa CoAtNet + goodpjw2008 reader, V3 weights) 0.85 + E75 + E56 + E64 + E60 + E81 0.15, uniform (24 windows); scriptVersionId 356530290",,pending
+56999941,2026-10-09 07:53,knee-blend,9,"0.950 base (matterhorn3838: nartaa CoAtNet + goodpjw2008 reader, V3 weights) 0.85 + own-label E64 + E60 + E65 0.15, uniform (24 windows); scriptVersionId 356490093",,pending
