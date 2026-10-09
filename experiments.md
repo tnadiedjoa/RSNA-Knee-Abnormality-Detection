@@ -2070,6 +2070,10 @@ the loop's PID did not stop it: check the log, not `ps`):
 pylibjpeg-openjpeg 2.6.0, python-gdcm 3.2.6, from PyPI) added to `kaggle/wheels/` so that our models can run on
 heliosli's docker image once the next knee-models package ships them.
 
+**E89 complete** (14:32, interactive 3090, 22–24 min per epoch: E60's ConvNeXt-small networks continued on E75's
+targets); **E90** (E58 continued at 384 px on E75's targets) started right after, ~1 h per network, done ~17:30, then
+packaged with E89 (and the Python 3.13 decoder wheels) before the interactive job ends at 19:07.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
