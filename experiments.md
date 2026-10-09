@@ -1956,6 +1956,12 @@ Auto (2026-10-09 09:54, scripts/auto_followup.py): Kaggle: new submission ref 56
 56999925, 56999933, 56999941). Versions matched through `scriptVersionId`, which grows with push time (9 < 11 < 14 < 15
 < 16), and the submission order agrees; ledger rows filled.
 
+**E86 complete** (09:36, interactive 3090: E75 from scratch, seed 142, 12 epochs × 13–14.5 min per network). The card
+idled until ~10:05 (seen late), then **E89** and **E90** (`slurm/runs/e89_e90_interactive.sh`, log
+`logs/e89_e90_interactive.log`), both continued 4 epochs on E75's targets before the interactive job ends at 19:07:
+E89 = E60's ConvNeXt-small networks (384 px, own labels round 3; checkpoint loaded whole, 386 tensors) for backbone
+diversity, ~1.6 h per network; E90 = E58's 224 px networks at 384 px, ~1 h per network. Expected end ~17:45.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
