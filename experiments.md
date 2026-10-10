@@ -2279,6 +2279,12 @@ with the same five models and the same two input groups (zoom 1.154 and 1.5), ra
 `pkill -f "<pattern>"` from the Bash tool kills the tool's own shell when its command line contains the pattern — kill by
 PID.) **10-11 list**: 35, 37, 40, 36, 39.
 
+**E98 / E99 complete** (P100s, ~01:20). **Night chain restarted** (01:30): the background loop of `logs/night_1011.sh` was
+killed at 01:26 (its waiting `pgrep` loop ended, so it launched E102 on the 3090 while E101 was still training — stopped
+after ~1 min, before its first epoch, and its empty run folder removed). `logs/night_1011b.sh` (detached with setsid) waits
+for E101's three checkpoints and the end of its process, starts E102 (`slurm/runs/e102_interactive.sh`), then packages
+knee-models with `logs/day15_runs.txt` (37 runs: + E98, E99, E100, E101).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
