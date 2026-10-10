@@ -2255,6 +2255,14 @@ them, while heliosli's compact model, the one model that added to the CoAtNet (+
 whose input differed (anatomy-anchored 352 px crops). Tomorrow's slots go to members with a different view: zoom 130 mm
 (E91–E93, packaged) and zoom 100 mm (E96–E97, packaged tonight with E94 and E95).
 
+User (10-10 ~15:10): no OAI data for our own training ("continue sans"); we go on without external data of our own.
+
+**Blends for 10-11, first two** (pushed from 15:20, `logs/push_blend35_36.out`): **35** = 0.950 base + the 130 mm members
+E91, E92, E93 at half of every reader share (V3 weights); **36** = 0.950 base 0.8 + the same three at 0.2, uniform. The
+100 mm members (E96, E97) follow tonight after packaging (`logs/package_1010.sh`, background). **E98 / E99** queued on idle
+P100s (jobs 1033529–1033531, running 15:31, `slurm/runs/e98_01.txt`, `e99_01.txt`, `e98n2_e99n2.txt`, ~9 h): E86 and E84
+continued 4 epochs on the central 100 mm, more members of that view in case it adds.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
