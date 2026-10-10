@@ -2285,6 +2285,20 @@ after ~1 min, before its first epoch, and its empty run folder removed). `logs/n
 for E101's three checkpoints and the end of its process, starts E102 (`slurm/runs/e102_interactive.sh`), then packages
 knee-models with `logs/day15_runs.txt` (37 runs: + E98, E99, E100, E101).
 
+**Session cut and overlap (10-11 01:24–01:35).** The user reconnected (new interactive job **1033826**, a second 3090 on
+nodemm01, until 10-12 01:23); the old job 1033306 runs on until ~11:40 with E101. The interrupted Claude session kept
+running for a few minutes beside the new one: the new session killed `logs/night_1011.sh` (by PID) to move E102 to the
+second 3090, the old one then wrote and started its own `logs/night_1011b.sh` (commit d3f1fca, E102 on the first 3090 after
+E101), and the new one overwrote that file with its chain a few minutes later. The old session's process (reading a
+rewritten script) was killed at 01:33; one chain is left. Current plan:
+- second 3090 (job 1033826): **E102** (E89's ConvNeXt-small, 100 mm) via `logs/run_in_job.sh` (an `srun --overlap` step of
+  that job, detached). Each job has its own /tmp and /var/tmp (Slurm job container), so the 384 px cache is unpacked again
+  in that job (`slurm/runs/e102_interactive.sh` now does it; ~10 min);
+- first 3090 (job 1033306): E101 (done ~02:45), then **E103** (E56 → 100 mm, E75's targets) and **E104** (E93 → 100 mm,
+  own round-6 targets), `slurm/runs/e103_e104_interactive.sh`, ~6.6 h;
+- `logs/night_1011b.sh` (this session's version): after E101, starts E103/E104 and packages knee-models with
+  `logs/day15_runs.txt` (37 runs: + E98, E99, E100, E101).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
