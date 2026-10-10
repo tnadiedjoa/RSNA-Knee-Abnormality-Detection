@@ -2226,6 +2226,24 @@ Auto (2026-10-10 11:53, scripts/auto_followup.py): Kaggle: new submission ref 57
 **Submitted 10-10 ~11:50** (user, list order): knee-blend 31, 29, 32, 30, 33 (refs 57038715, 57038722, 57038729, 57038732,
 57038739); versions matched through `scriptVersionId` (push order 29 < 30 < 31 < 32 < 33), consistent with the submission order.
 
+Auto (2026-10-10 12:43, scripts/auto_followup.py): Kaggle: ref 57038732 (knee-blend version 30) scored 0.950.
+
+Auto (2026-10-10 12:53, scripts/auto_followup.py): Kaggle: ref 57038715 (knee-blend version 31) scored 0.950.
+
+Auto (2026-10-10 13:24, scripts/auto_followup.py): Kaggle: ref 57038739 (knee-blend version 33) scored 0.950.
+
+Auto (2026-10-10 13:34, scripts/auto_followup.py): Kaggle: ref 57038722 (knee-blend version 29) scored 0.950.
+
+**LB of 10-10** (scored 12:43–13:34): knee-blend **29, 30, 31 and 33 = 0.950**, the base's own score; 32 (with ours) pending.
+Raising the reader's share on Lateral OA (0.08 → 0.5), on Contusion and ACL, adding nartaa's 224 px CoAtNet, or taking
+rabari9999's seven weights exactly (33) moves nothing at the LB's 0.001 resolution. Reading rabari9999's notebook again: its
+own note says the 0.954 ("Rank 127, Official LB 0.954") comes from "private proprietary foundation report priors and
+fine-tuned private" models kept out of the public version; its public fusion is the one 33 reproduces (one difference: it
+re-ranks the mixed CoAtNet arm before the per-finding fusion, a negligible change). So the "0.954" title is not the public
+pipeline's score, and the gold-58 per-finding gaps (Lateral OA reader 0.855 vs CoAtNet 0.776) do not carry to the LB —
+the same lesson as the uniform reader share. The public parts (both nartaa CoAtNets, the reader) are worth 0.950 whatever
+their per-finding weights.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
