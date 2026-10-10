@@ -1,31 +1,24 @@
-# À soumettre (mis à jour le 09/10 à 19 h)
+# À soumettre (mis à jour le 10/10 à 12 h)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
-Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18, 19, 20 ni 21** (cassées).
+Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 28** (18–21 cassées ; 22–28 utilisent le modèle de
+heliosli, retiré par son auteur le 09/10).
 
-Scores du 09/10 : knee-blend 9, 11, 14 et 16 → **0,950** (= la base publique seule) · 15 → 0,949. Notre meilleur score au
-classement passe de 0,944 à 0,950 (328e sur 5 576).
+Scores du 09/10 : knee-blend 9, 11, 14 et 16 → **0,950** (= la base publique seule) · 15 → 0,949. Rien n'a été soumis le
+10/10 au matin : les 5 soumissions du jour sont encore libres jusqu'à 2 h du matin.
 
-## ⚠️ Changement de liste : ne pas soumettre les versions 22 à 28
+## Le 10/10 : base publique à 0,950 (modèles publics, toujours disponibles), poids par anomalie revus
 
-heliosli a retiré son modèle à 13 h 50 aujourd'hui. Son jeu de données dit maintenant : « les versions précédentes ont été
-retirées et ne sont plus accessibles ». Les versions 22 à 28 utilisent notre copie privée de ce modèle. Le règlement exige
-que les modèles externes restent accessibles à tous, et l'auteur ne veut plus qu'on s'en serve : je ne les soumettrais pas,
-et on ne pourra de toute façon pas les garder pour la sélection finale. C'est à toi de décider.
+Un notebook public (rabari9999, « LB 0.954 ») n'utilise que les deux modèles publics de notre base et le 2e modèle de
+nartaa, avec plus de poids au lecteur sur 7 anomalies (surtout l'arthrose latérale). La version 33 reprend ses réglages.
 
-## Le 10/10 (5 soumissions, à partir de 2 h du matin) : base publique à 0,950, rien de retiré
+| Ordre | Notebook | Version | Contenu | Question |
+|---|---|---|---|---|
+| 1 | knee-blend | **31** | base 0,950, lecteur à 50 % sur l'arthrose latérale, + 2e modèle de nartaa | proche du 0,954 public ? |
+| 2 | knee-blend | **29** | base 0,950, lecteur à 50 % sur l'arthrose latérale seulement | l'arthrose latérale seule |
+| 3 | knee-blend | **32** | comme 29, plus nos modèles | nos modèles aident-ils ? |
+| 4 | knee-blend | **30** | comme 29, plus contusion 50 % et LCA 40 % | et ces deux-là ? |
+| 5 | knee-blend | **33** | les réglages exacts du notebook à 0,954 | refait-on son 0,954 ? |
 
-La base à 0,950 mélange deux modèles publics, toujours disponibles : le modèle à 0,949 (nartaa) et un « lecteur »
-(goodpjw2008), avec un poids fixé à la main pour chaque anomalie. Sur l'arthrose latérale, le modèle à 0,949 est faible
-(0,78 sur nos 58 examens, contre 0,86 pour le lecteur), mais le lecteur n'y pèse que 8 %. Un autre participant teste la même
-idée sans score publié pour l'instant.
-
-| Notebook | Version | Contenu | Question |
-|---|---|---|---|
-| knee-blend | **29** | base 0,950, lecteur à 50 % sur l'arthrose latérale (au lieu de 8 %) | le lecteur aide-t-il là ? |
-| knee-blend | **30** | comme 29, plus lecteur à 50 % sur la contusion et 40 % sur le LCA | et sur ces deux-là ? |
-| knee-blend | **31** | comme 29, plus le 2e modèle public de nartaa (224 px) | ce 2e modèle apporte-t-il ? |
-| knee-blend | **32** | comme 29, plus nos modèles | nos modèles aident-ils ici ? |
-| knee-blend | **17** | base 0,950 + le 2e modèle de nartaa, sans autre changement | idem, sur la base seule |
-
-Les 5 sont vérifiées sur les 3 examens de test visibles (19 h) : chacune applique bien ses poids.
+Les versions 29 à 32 sont vérifiées (09/10, 19 h). La 33 est en cours de vérification : je confirme ici. La 34 (= 33 + nos
+modèles) sera pour demain.

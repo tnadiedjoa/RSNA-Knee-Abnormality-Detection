@@ -2206,6 +2206,21 @@ E94 (E60's ConvNeXt-small on the round-6 own targets) running on the 3090, 23 mi
 and blend 32 (ours inside the 2.5D shares, with the Lateral OA change) is the 10-10 test of whether more of them is worth
 GPU time.
 
+**10-10 morning: new session** (interactive job 1033306 on nodemm01, from 11:39, 24 h). The previous job ended early
+(~08:40): E94 complete; E95 had networks 0–1 and was at fold 2 epoch 6 of 12, restarted from its start
+(`slurm/runs/e95_f2_interactive.sh`, `logs/e95_f2_interactive.log`, ~2.8 h). The score watcher died with the session;
+nothing was submitted on 10-10 yet (the five slots stay open until 02:00).
+
+**Public notebooks, 10-10 morning**: rabari9999 `rsna-knee-sota-tri-reader-pipeline-lb-0-954` ("Official LB 0.954";
+emresariduman republished it) uses only public assets — nartaa's two CoAtNets (384 px SWA and the 224 px crop, the latter
+at 0.30 of the CoAtNet arm) and goodpjw2008's reader — with reader shares raised on seven findings: Lateral OA 0.50 (V3
+0.08), Baker's 0.42 (0.35), Contusion 0.36 (0.30), ACL 0.30 (0.25), Medial OA 0.28 (0.25), MCL 0.25 (0.20), Medial
+Meniscus 0.22 (0.20). romantamrazov: "Lateral OA 0.52-reader V16 is our latest successful control". Our blends 29–32
+test the same lever (31 is the closest: Lateral OA 0.5 + the 224 px arm at 0.33). **knee-blend 33** = rabari9999's
+weights and 224 px share exactly, on our build (`--finding-v` with the seven findings, `--extra-w 0.30`); **34** = 33 +
+ours at half of every 2.5D share (E75, E86, E85, E56, E64; 24 windows). **10-10 list**: 31, 29, 32, 30, 33 (17 dropped:
+the 224 px arm without the Lateral OA change says less now).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
