@@ -2244,6 +2244,17 @@ pipeline's score, and the gold-58 per-finding gaps (Lateral OA reader 0.855 vs C
 the same lesson as the uniform reader share. The public parts (both nartaa CoAtNets, the reader) are worth 0.950 whatever
 their per-finding weights.
 
+Auto (2026-10-10 14:54, scripts/auto_followup.py): Kaggle: ref 57038729 (knee-blend version 32) scored 0.950.
+
+**knee-blend 32 = 0.950** (14:54): ours inside every reader share, with the Lateral OA change — all five of 10-10 at 0.950.
+**E95 complete** (~14:50). The 3090 went to **E96 / E97** (`slurm/runs/e96_e97_interactive.sh`, log
+`logs/e96_e97_interactive.log`, ~6.5 h): a tighter, sharper view, the central 100 mm of the cached 150 mm field at 384 px
+(`--zoom 1.5`, 0.26 mm/px instead of 0.39), 4 epochs continued from E75's networks (E75's targets) and from E64's (own
+round-6 targets). Reason: the public parts are worth 0.950 whatever their weights and our 150 mm members add nothing to
+them, while heliosli's compact model, the one model that added to the CoAtNet (+0.002), was a ConvNeXt-small like ours
+whose input differed (anatomy-anchored 352 px crops). Tomorrow's slots go to members with a different view: zoom 130 mm
+(E91–E93, packaged) and zoom 100 mm (E96–E97, packaged tonight with E94 and E95).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
