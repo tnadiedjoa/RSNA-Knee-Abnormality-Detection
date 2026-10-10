@@ -2221,6 +2221,11 @@ weights and 224 px share exactly, on our build (`--finding-v` with the seven fin
 ours at half of every 2.5D share (E75, E86, E85, E56, E64; 24 windows). **10-10 list**: 31, 29, 32, 30, 33 (17 dropped:
 the 224 px arm without the Lateral OA change says less now).
 
+Auto (2026-10-10 11:53, scripts/auto_followup.py): Kaggle: new submission ref 57038715 (knee-blend, scriptVersionId 356814573); new submission ref 57038722 (knee-blend, scriptVersionId 356812532); new submission ref 57038729 (knee-blend, scriptVersionId 356815505); new submission ref 57038732 (knee-blend, scriptVersionId 356813660); new submission ref 57038739 (knee-blend, scriptVersionId 357008023).
+
+**Submitted 10-10 ~11:50** (user, list order): knee-blend 31, 29, 32, 30, 33 (refs 57038715, 57038722, 57038729, 57038732,
+57038739); versions matched through `scriptVersionId` (push order 29 < 30 < 31 < 32 < 33), consistent with the submission order.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
