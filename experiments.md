@@ -2263,6 +2263,14 @@ E91, E92, E93 at half of every reader share (V3 weights); **36** = 0.950 base 0.
 P100s (jobs 1033529–1033531, running 15:31, `slurm/runs/e98_01.txt`, `e99_01.txt`, `e98n2_e99n2.txt`, ~9 h): E86 and E84
 continued 4 epochs on the central 100 mm, more members of that view in case it adds.
 
+**Blends 35 / 36 checked** (visible test: E91, E92, E93 "3 fold networks done", "our ensemble: ok", BLEND written — per finding
+at half of each reader share for 35, public 0.80 + ours 0.20 for 36). **E96 / E97 complete** (~20:25); **knee-models packaged**
+with 33 runs (`logs/package_1010.out`, 20:31–20:48, models.zip 11 GB; `logs/day14_runs.txt`: day13e + E94, E95, E96, E97).
+The 3090 went to **E100 / E101** (`slurm/runs/e100_e101_interactive.sh`, from ~20:55, ~6.5 h): E85's and E95's networks
+continued 4 epochs on the central 100 mm (E75's targets / own round-6 targets). **Blends 37–39** (pushed from ~20:55,
+`logs/push_blend37_39.out`): 37 = base + E96, E97 (100 mm) at half of every reader share; 38 = base + the five zoomed members
+(E91, E92, E93, E96, E97) the same way; 39 = base 0.8 + the five at 0.2, uniform. **10-11 list**: 35, 37, 38, 36, 39.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
