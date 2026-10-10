@@ -2271,6 +2271,14 @@ continued 4 epochs on the central 100 mm (E75's targets / own round-6 targets). 
 `logs/push_blend37_39.out`): 37 = base + E96, E97 (100 mm) at half of every reader share; 38 = base + the five zoomed members
 (E91, E92, E93, E96, E97) the same way; 39 = base 0.8 + the five at 0.2, uniform. **10-11 list**: 35, 37, 38, 36, 39.
 
+**knee-blend 38 stuck on Kaggle**: pushed 20:55, still RUNNING at 00:08 (the others of the evening took 2–3 min on the
+visible test). Not our code: a local test was inconclusive (GPU taken by E101: out of memory; CPU too slow), but **39**,
+with the same five models and the same two input groups (zoom 1.154 and 1.5), ran in 2.5 min (pushed 00:25, all five
+"3 fold networks done", public 0.80 + ours 0.20), and **40** = 38's notebook byte for byte, pushed 00:33, ran in 2.5 min
+(per finding, ours at half of each reader share): a Kaggle-side stall. 38 is never to be submitted. (Process note:
+`pkill -f "<pattern>"` from the Bash tool kills the tool's own shell when its command line contains the pattern — kill by
+PID.) **10-11 list**: 35, 37, 40, 36, 39.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
