@@ -20,5 +20,5 @@ nartaa, avec plus de poids au lecteur sur 7 anomalies (surtout l'arthrose latér
 | 4 | knee-blend | **30** | comme 29, plus contusion 50 % et LCA 40 % | et ces deux-là ? |
 | 5 | knee-blend | **33** | les réglages exacts du notebook à 0,954 | refait-on son 0,954 ? |
 
-Les versions 29 à 32 sont vérifiées (09/10, 19 h). La 33 est en cours de vérification : je confirme ici. La 34 (= 33 + nos
+Les versions 29 à 32 sont vérifiées (09/10, 19 h). La 33 est vérifiée (10/10, 11 h 49). La 34 (= 33 + nos
 modèles) sera pour demain.
