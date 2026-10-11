@@ -1,24 +1,24 @@
-# À soumettre (mis à jour le 11/10 à 0 h 40)
+# À soumettre (mis à jour le 11/10 à 22 h)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
-Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 28** (18–21 cassées ; 22–28 utilisent le modèle de
-heliosli, retiré par son auteur le 09/10), ni knee-blend **38** (restée bloquée sur Kaggle, sans fichier de sortie).
+Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 21** (cassées), ni **38** (bloquée, sans sortie).
 
-Scores du 10/10 : knee-blend 29, 30, 31, 32 et 33 → **0,950** (= la base publique seule). Changer les poids des modèles
-publics ou ajouter le 2e modèle de nartaa ne bouge rien ; le « 0,954 » public venait de modèles privés de son auteur.
+Scores du 11/10 : knee-blend **39 → 0,951** (base 0,950 à 80 % + nos 5 modèles zoomés à 20 %), 35, 36, 37, 40 → 0,950.
+Classement : 651e sur 5 748.
 
-## Le 11/10 (5 soumissions, à partir de 2 h du matin) : la base à 0,950 + nos modèles « zoomés »
+## Le 12/10 (5 soumissions, à partir de 2 h du matin) : la base publique à 0,954 de heliosli + nos modèles zoomés
 
-Le seul modèle qui a fait monter le score public (celui de heliosli, +0,002) était du même type que les nôtres mais regardait
-des zooms centrés sur le genou. On teste la même idée : nos modèles entraînés sur les 13 cm ou les 10 cm centraux de l'image
-au lieu de 15 cm.
+heliosli a remis en ligne son modèle S6 le 10/10 au soir : son notebook (modèle à 0,949 de nartaa 70 % + S6 30 %) fait
+**0,954**, et 334 équipes l'ont soumis. On le reprend comme base, avec nos 13 modèles zoomés en 3e partie (la recette du
+0,951 d'hier).
 
-| Ordre | Notebook | Version | Contenu | Question |
+| Ordre | Notebook | Version | Modèle 0,949 / S6 de heliosli / nos modèles | Question |
 |---|---|---|---|---|
-| 1 | knee-blend | **35** | base 0,950 + nos modèles à 13 cm (E91, E92, E93), mêlés au lecteur | le zoom 13 cm aide-t-il ? |
-| 2 | knee-blend | **37** | base 0,950 + nos modèles à 10 cm (E96, E97), mêlés au lecteur | et le zoom 10 cm ? |
-| 3 | knee-blend | **40** | base 0,950 + les deux cadrages (5 modèles), mêlés au lecteur | les deux ensemble ? |
-| 4 | knee-blend | **36** | base 0,950 à 80 % + nos modèles à 13 cm à 20 % | avec un poids fixe ? |
-| 5 | knee-blend | **39** | base 0,950 à 80 % + les deux cadrages à 20 % | idem, les deux ensemble |
+| 1 | knee-blend | **42** | 56 % / 24 % / 20 % | nos modèles font-ils monter le 0,954 ? |
+| 2 | knee-blend | **45** | 70 % / 30 % / — (son notebook seul) | on récupère 0,954 à coup sûr |
+| 3 | knee-blend | **43** | 59,5 % / 25,5 % / 15 % | moins de nos modèles |
+| 4 | knee-blend | **44** | 52,5 % / 22,5 % / 25 % | plus de nos modèles |
+| 5 | knee-blend | **46** | 40 % / 40 % / 20 % | plus de S6 |
 
-Les 5 sont vérifiées sur les 3 examens de test visibles (35–37 le 10/10 au soir, 39 et 40 le 11/10 à 0 h 30).
+Les 5 sont vérifiées sur les 3 examens de test visibles (11/10, 18 h – 22 h) : son mélange est bien reproduit, nos modèles
+tournent, le mélange final est écrit. La 41 (base 0,950 + 10 modèles à 10 cm) n'est plus utile.

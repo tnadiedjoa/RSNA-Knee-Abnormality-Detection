@@ -2356,6 +2356,12 @@ in that priority order for the time budget; 24 windows) as a third part:
 Knee-blend 41 (0.950 base + the ten 100 mm members at 0.2) was pushed at 16:22 and sat QUEUED on Kaggle; 42–45 built on the
 0.950 base were not pushed (kept in `kaggle/unpushed_1011/`), their numbers going to the heliosli-based ones.
 
+**Blends 42–46 checked** (pushed 17:13–21:5x; each waited 1–1.5 h in Kaggle's GPU queue): "heliosli blend recomputed: min
+rank correlation 1.0000", our 13 zoomed members "our ensemble: ok" (291–313 s on the 3 visible studies), BLEND written with
+the intended parts (45: ours skipped, his 0.7 / 0.3). **E106 / E107 complete** (75 mm, ~21:50); packaging knee-models with
+43 runs (`logs/day18_runs.txt`, `logs/package_1011c.out`). The second 3090's job ends 10-12 01:23: no new run started
+(a continuation takes ~3.3 h). **10-12 list**: 42, 45, 43, 44, 46.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
