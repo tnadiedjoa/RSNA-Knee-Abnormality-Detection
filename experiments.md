@@ -2370,6 +2370,23 @@ E79 + E46 (scratchpad `zoom_cv.py`); (2) two more 75 mm full-data members on P10
 `slurm/runs/e110_01.txt`, `e111_01.txt`, `e110n2_e111n2.txt`, ~9 h): **E110** = E86, **E111** = E84, continued on the central
 75 mm.
 
+**Zoom CV test, fold 0** (00:03; 882 studies; E79 = E41's fold-0 network continued at 384 px, zoom 1):
+
+| fold 0 | silver | gold(fold) | rank corr. with E79 | added to E79 + E46 at 0.2 (silver / gold) |
+|---|---|---|---|---|
+| E79, 150 mm | 0.9597 | 0.932 | — | |
+| **E108**, 100 mm (zoom 1.5) | 0.9571 | 0.935 | 0.944 | +0.0002 / 0.942 (base 0.938) |
+| **E109**, 75 mm (zoom 2.0) | 0.9454 | 0.921 | 0.898 | −0.0002 / 0.945 |
+| E42 (384 px from scratch, same labels) | 0.9577 | 0.920 | 0.915 | +0.0006 / 0.938 |
+| E46 | 0.9612 | 0.943 | 0.910 | |
+
+(The script's "E41" row matched E79's folder name, which contains `_e41_`: ignored.) Offline, the tighter views are not
+special: 100 mm is close to the 150 mm model (correlation 0.944) and adds about nothing to E79 + E46 on silver; 75 mm is more
+different (0.898) but weaker alone and adds nothing on silver; another plain 384 px run (E42) adds more. Gold (11 studies
+in this fold) moves the other way (+0.004 / +0.007) but is too small to count. So blend 39's +0.001 on the LB is not backed
+by CV: it may be noise at the LB's resolution, or a gain the silver labels cannot see. The 10-12 LB (42–44, 46 vs 45) is the
+next check. Fold 1 of E108 runs until ~00:55 (E109's fold 1 will not fit before the job ends at 01:23).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
