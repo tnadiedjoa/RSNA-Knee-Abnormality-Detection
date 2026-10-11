@@ -2362,6 +2362,14 @@ the intended parts (45: ours skipped, his 0.7 / 0.3). **E106 / E107 complete** (
 43 runs (`logs/day18_runs.txt`, `logs/package_1011c.out`). The second 3090's job ends 10-12 01:23: no new run started
 (a continuation takes ~3.3 h). **10-12 list**: 42, 45, 43, 44, 46.
 
+**Tests started 22:10** (user: "teste des trucs"): (1) a **CV test of the tighter views** on the second 3090
+(`slurm/runs/e108_e109_cv_interactive.sh`, log `logs/e108_e109_cv.log`, until the job ends at 01:23): E79's recipe (E41's
+fold networks continued 4 epochs at 384 px) with `--zoom 1.5` (**E108**) and `--zoom 2.0` (**E109**), folds 0 then 1, to
+measure offline what the LB hinted (blend 39): silver/gold, rank correlation with E79 / E42 / E46 and the gain when added to
+E79 + E46 (scratchpad `zoom_cv.py`); (2) two more 75 mm full-data members on P100s (jobs 1034552–1034554,
+`slurm/runs/e110_01.txt`, `e111_01.txt`, `e110n2_e111n2.txt`, ~9 h): **E110** = E86, **E111** = E84, continued on the central
+75 mm.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
