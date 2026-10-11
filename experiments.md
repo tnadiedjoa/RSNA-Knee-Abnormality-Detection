@@ -2299,6 +2299,10 @@ rewritten script) was killed at 01:33; one chain is left. Current plan:
 - `logs/night_1011b.sh` (this session's version): after E101, starts E103/E104 and packages knee-models with
   `logs/day15_runs.txt` (37 runs: + E98, E99, E100, E101).
 
+**E101 complete** (02:25); **knee-models packaged** with 37 runs (02:25–02:45, `logs/push_1011_0225`, models.zip 12 GB;
+`logs/day15_runs.txt`: + E98, E99, E100, E101). E103 started on the first 3090 (fold 0 at 14.6 min per epoch), E102 at
+fold 0 epoch 3 on the second (21.6 min per epoch, ConvNeXt-small).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
