@@ -2387,6 +2387,12 @@ in this fold) moves the other way (+0.004 / +0.007) but is too small to count. S
 by CV: it may be noise at the LB's resolution, or a gain the silver labels cannot see. The 10-12 LB (42–44, 46 vs 45) is the
 next check. Fold 1 of E108 runs until ~00:55 (E109's fold 1 will not fit before the job ends at 01:23).
 
+**Zoom CV test, fold 1** (00:52): E108 (100 mm) silver 0.9552 vs E79 0.9580, rank correlation with E79 0.942, added to E79 +
+E46 at 0.2: +0.0001 silver (gold 0.922 vs 0.926); E42 adds +0.0006 again. Both folds agree: the 100 mm view behaves like
+another 150 mm run of the same line, minus a little accuracy; it is no source of diversity offline. E109's fold 1 cannot
+finish before the job ends. **E112** queued as a 3090 batch job (1034780, `slurm/runs/e112_3090.txt`): E75's recipe from
+scratch, seed 242 (~9 h), a plain member of the best line, since a plain 384 px run is what adds in CV.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
