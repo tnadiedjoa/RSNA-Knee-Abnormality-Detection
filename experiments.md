@@ -2333,6 +2333,29 @@ Next: **E106 / E107** on the second 3090 (`slurm/runs/e106_e107_interactive.sh`,
 from E75's and E64's networks. knee-models packaged again with E105 (41 runs, `logs/day17_runs.txt`). **10-12 list** to
 build on 39: more 100 mm members (ten now: E96–E105) and the weight (0.15 / 0.2 / 0.25 / 0.3).
 
+**A public 0.954 base (found 10-11 ~17:10, user's question "a public notebook leaked?").** The board moved: 334 teams at
+0.954 on 10-11 vs 15 on 10-09. heliosli restored `heliosli/rsna-knee-compact-v1` (10-10 19:50: the S6 bundle
+209a32c8b50a6b1c, four `E_lrprior` folds, `side_cls.pt`, `state_spec.json`) and published
+`heliosli/rsna-knee-blend-gold-dataset-restored` (nartaa's Raptor 0.7 + S6 0.3: LB 0.954), then
+`heliosli/blend-mine-in-private-lb-luck-to-all-upvoters` (the same files copied to `rsna-knee-compact-r6cnxfsss`, 0.5 / 0.5):
+he means them to be used, so S6 is public again and our 10-09 concern is gone. goodpjw2008's "CoAtNet + S6 + 2.5D MIL"
+adds a private third reader for "0.954, ranked higher". 
+
+**knee-blend 42–46** on that base (`scripts/build_blend_nb.py <restored notebook> --helios-mix`, docker image of the notebook,
+Python 3.13: our cp313 decoder wheels are in knee-models since 10-09): our 13 zoomed members (E96, E97, E91, E92, E93, E98–E105,
+in that priority order for the time budget; 24 windows) as a third part:
+
+| knee-blend | Raptor / S6 / ours |
+|---|---|
+| 42 | 0.56 / 0.24 / 0.20 (blend 39's 20 % on the 0.954 base) |
+| 43 | 0.595 / 0.255 / 0.15 |
+| 44 | 0.525 / 0.225 / 0.25 |
+| 45 | 0.7 / 0.3 (heliosli's blend alone, control) |
+| 46 | 0.4 / 0.4 / 0.2 (on his 0.5 / 0.5 variant) |
+
+Knee-blend 41 (0.950 base + the ten 100 mm members at 0.2) was pushed at 16:22 and sat QUEUED on Kaggle; 42–45 built on the
+0.950 base were not pushed (kept in `kaggle/unpushed_1011/`), their numbers going to the heliosli-based ones.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
