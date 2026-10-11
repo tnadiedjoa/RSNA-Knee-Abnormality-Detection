@@ -2303,6 +2303,14 @@ rewritten script) was killed at 01:33; one chain is left. Current plan:
 `logs/day15_runs.txt`: + E98, E99, E100, E101). E103 started on the first 3090 (fold 0 at 14.6 min per epoch), E102 at
 fold 0 epoch 3 on the second (21.6 min per epoch, ConvNeXt-small).
 
+Auto (2026-10-11 12:33, scripts/auto_followup.py): Kaggle: new submission ref 57071177 (knee-blend, scriptVersionId 357068901); new submission ref 57071181 (knee-blend, scriptVersionId 357139516); new submission ref 57071184 (knee-blend, scriptVersionId 357178182); new submission ref 57071189 (knee-blend, scriptVersionId 357070017); new submission ref 57071191 (knee-blend, scriptVersionId 357177441).
+
+**E102, E103, E104 complete** (E102 ~06:30 on the second 3090; E103 / E104 ~09:15 on the first, before job 1033306 ended
+at ~11:40). **Submitted 10-11 ~12:30** (user, list order): knee-blend 35, 37, 40, 36, 39 (refs 57071177, 57071181,
+57071184, 57071189, 57071191; versions matched through scriptVersionId, consistent with the order). The second 3090 sat idle
+06:30–12:40 (seen late); it now runs **E105** (E90 → 100 mm, `slurm/runs/e105_interactive.sh`, ~3.3 h). knee-models
+packaging with 40 runs started (`logs/day16_runs.txt`: + E102, E103, E104; `logs/package_1011.out`).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
