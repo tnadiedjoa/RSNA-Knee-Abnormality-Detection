@@ -2311,6 +2311,28 @@ at ~11:40). **Submitted 10-11 ~12:30** (user, list order): knee-blend 35, 37, 40
 06:30–12:40 (seen late); it now runs **E105** (E90 → 100 mm, `slurm/runs/e105_interactive.sh`, ~3.3 h). knee-models
 packaging with 40 runs started (`logs/day16_runs.txt`: + E102, E103, E104; `logs/package_1011.out`).
 
+Auto (2026-10-11 14:48, scripts/auto_followup.py): Kaggle: ref 57071181 (knee-blend version 37) scored 0.950.
+
+Auto (2026-10-11 14:58, scripts/auto_followup.py): Kaggle: ref 57071177 (knee-blend version 35) scored 0.950.
+
+Auto (2026-10-11 15:18, scripts/auto_followup.py): Kaggle: ref 57071189 (knee-blend version 36) scored 0.950.
+
+Auto (2026-10-11 15:38, scripts/auto_followup.py): Kaggle: ref 57071184 (knee-blend version 40) scored 0.950.
+
+Auto (2026-10-11 15:48, scripts/auto_followup.py): Kaggle: ref 57071191 (knee-blend version 39) scored 0.951.
+
+**LB of 10-11** (scored 13:3x–15:48): knee-blend **39 = 0.951** (0.950 base 0.80 + the five zoomed members E91, E92, E93
+(130 mm) and E96, E97 (100 mm) 0.20, uniform rank average) — our first score above the public parts' 0.950; 35 (130 mm,
+inside the reader shares), 37 (100 mm, inside), 40 (the five, inside) and 36 (130 mm only, uniform 0.2) = 0.950. Our 150 mm
+sets at uniform 0.15 (blends 9, 11) stayed at 0.950. Reading (one tick, at the LB's resolution): the tighter views add
+when they get their own uniform share (not inside the reader's small per-finding shares), and the 130 mm members alone
+are not enough. Leaderboard 15:5x: **651st of 5,748** (0.951; 547 teams above, top 0.965; 0.950 is now ~1,000th — the board
+moved since 10-09).
+
+Next: **E106 / E107** on the second 3090 (`slurm/runs/e106_e107_interactive.sh`, from 15:56): the central 75 mm (`--zoom 2.0`)
+from E75's and E64's networks. knee-models packaged again with E105 (41 runs, `logs/day17_runs.txt`). **10-12 list** to
+build on 39: more 100 mm members (ten now: E96–E105) and the weight (0.15 / 0.2 / 0.25 / 0.3).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
