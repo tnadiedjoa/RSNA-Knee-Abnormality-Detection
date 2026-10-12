@@ -2420,6 +2420,22 @@ difference 0. **E114** (CV test, 3090 batch job 1036404 on nodemm01, `slurm/runs
 epochs, bs 4 × 2, E41 / E79's labels, folds 0 then 1, to compare with E79, E42, E46 (silver / gold, correlation, gain).
 E113 (E75 recipe, ConvNeXt-small from scratch) on the interactive 3090: 21.8 min per epoch, ~4.4 h per network.
 
+**E114 (3D) first epoch**: silver 0.8567, gold(fold) 0.805, 25.6 min per epoch (bs 2 × 4 after an out-of-memory at bs 4;
+16.9 GB) — fold 0 done ~02:45, fold 1 ~07:05. **Blends 47–51 for 10-13** (sources now kept in `kaggle/sources/`, git-ignored
+notebooks: the scratchpad lives in a node's /tmp and was lost with the move to nodemm05; `heliosli_restored_0954.ipynb` =
+blend 42's public cells, `matterhorn_0950.ipynb` = blend 14's):
+
+| knee-blend | on heliosli's 0.954 base |
+|---|---|
+| 47 | + goodpjw2008's reader fused per finding at the V3 weights (matterhorn's cells, as blend 23 did on S5) |
+| 48 | 47 + our 13 zoomed members 0.2 (uniform rank average over the fused submission) |
+| 49 | 47 + the same 0.3 |
+| 50 | Raptor 0.455 / S6 0.195 / zoomed members 0.35 |
+| 51 | Raptor 0.56 / S6 0.24 / 0.2 of 16 members: E75, E86, E112 + the 13 zoomed |
+
+`logs/chain_1012.sh`: knee-models packaged with E110, E111, E112 (46 runs, `logs/day19_runs.txt`), then 47–51 pushed and
+checked (`logs/chain_1012.out`).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

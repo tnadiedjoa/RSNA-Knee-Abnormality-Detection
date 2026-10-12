@@ -32,3 +32,4 @@ kaggle/blend_v1[4-9]/*.ipynb
 kaggle/blend_v[2-9][0-9]/*.ipynb
 kaggle/blend_v18/public_src_pinned.ipynb
 kaggle/unpushed_*/*/*.ipynb
+kaggle/sources/*.ipynb

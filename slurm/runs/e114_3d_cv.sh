@@ -7,5 +7,5 @@
 cd ~/RSNA-Knee-Abnormality-Detection
 LAB="--labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --bootstrap-run 2026-10-03_1220_teacher_r4_oof_mean --bootstrap-alpha 0.5"
 for f in 0 1; do
-  .venv/bin/python -m scripts.train --name e114_r2p1d_f$f --run-dir 2026-10-12_2230_e114_cv_r2plus1d18_stack24_224 $LAB --backbone r2plus1d_18 --stack-slices 24 --img-size 224 --epochs 10 --bs 4 --accum 2 --grad-ckpt --raw-dir /tmp/knee_raw384 --workers 4 --folds $f
+  .venv/bin/python -m scripts.train --name e114_r2p1d_f$f --run-dir 2026-10-12_2230_e114_cv_r2plus1d18_stack24_224 $LAB --backbone r2plus1d_18 --stack-slices 24 --img-size 224 --epochs 10 --bs 2 --accum 4 --grad-ckpt --raw-dir /tmp/knee_raw384 --workers 4 --folds $f
 done
