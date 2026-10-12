@@ -2407,6 +2407,19 @@ Ledger rows filled (versions by scriptVersionId; the user submitted 42, 43, 44, 
 Runs finished meanwhile: E110, E111 (75 mm, P100s) and E112 (E75 recipe, seed 242, 3090 batch). New session: interactive
 job 1036315 on **nodemm05** (from 19:27, 24 h; no 384 px raw cache on that node's /tmp yet).
 
+**A 3D model** (user, 10-12 evening: "why not real changes, a 3D or 2D model instead of 2.5D?"). The public parts are
+CoAtNet / ConvNeXt 2D readers, and so are all our members; a 3D reader is the largest change of input we can make.
+`knee/model.py`: `VIDEO_BACKBONES` (torchvision `r2plus1d_18`, `r3d_18`, `mc3_18`, Kinetics-400 weights) and `Video3D` —
+with `--stack-slices D` (E80's data path: D slices spread over each series' span) every series is one clip
+(N, 3, D, H, W) (grey normalised with the Kinetics statistics, broadcast to 3 channels); the network's stem and four stages
+run, averaged over height and width only, so the depth axis (D / 8 positions) stays as tokens for the same transformer,
+slot embeddings and finding queries; gradient checkpointing per stage. `KneeNet.to()` ignores `channels_last` for these
+(5D weights; train.py and infer.py ask for it). CPU smoke test: forward / backward ok, reloaded from its config with max
+difference 0. **E114** (CV test, 3090 batch job 1036404 on nodemm01, `slurm/runs/e114_3d_cv.sh` via the new
+`slurm/train_3090_raw.sbatch` that unpacks the cache into the job's /tmp first): R(2+1)D-18, 24 slices at 224 px, 10
+epochs, bs 4 × 2, E41 / E79's labels, folds 0 then 1, to compare with E79, E42, E46 (silver / gold, correlation, gain).
+E113 (E75 recipe, ConvNeXt-small from scratch) on the interactive 3090: 21.8 min per epoch, ~4.4 h per network.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

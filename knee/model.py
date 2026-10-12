@@ -1,4 +1,4 @@
-"""2.5D multi-series model: a shared 2D backbone embeds every window, a small transformer mixes
+"""2.5D multi-series model (or 3D, VIDEO_BACKBONES): a shared 2D backbone embeds every window, a small transformer mixes
 the windows of all series, and one learned query per finding pools the tokens it needs
 (e.g. sagittal windows for the ACL, coronal ones for the MCL)."""
 
@@ -29,6 +29,37 @@ def make_backbone(name: str, pretrained: bool, **kwargs) -> nn.Module:
     return model
 
 
+# torchvision video ResNets pretrained on Kinetics-400: a whole series as one clip (3D convolutions), instead of 2D windows
+VIDEO_BACKBONES = ("r2plus1d_18", "r3d_18", "mc3_18")
+K_MEAN = torch.tensor([0.43216, 0.394666, 0.37645]).view(1, 3, 1, 1, 1)
+K_STD = torch.tensor([0.22803, 0.22145, 0.216989]).view(1, 3, 1, 1, 1)
+
+
+class Video3D(nn.Module):
+    """(N, 3, D, H, W) clip -> (N, 512, D / 8): the video ResNet's stem and four stages, averaged over height and width
+    only, so that the depth axis stays as tokens for the transformer."""
+
+    def __init__(self, name: str, pretrained: bool):
+        super().__init__()
+        import torchvision.models.video as tvv
+        weights = {"r2plus1d_18": tvv.R2Plus1D_18_Weights, "r3d_18": tvv.R3D_18_Weights, "mc3_18": tvv.MC3_18_Weights}[name]
+        net = getattr(tvv, name)(weights=weights.KINETICS400_V1 if pretrained else None)
+        self.stem, self.stages = net.stem, nn.ModuleList([net.layer1, net.layer2, net.layer3, net.layer4])
+        self.num_features, self.grad_ckpt = 512, False
+
+    def set_grad_checkpointing(self, enable: bool = True):
+        self.grad_ckpt = enable
+
+    def forward(self, x):
+        x = self.stem(x)
+        for stage in self.stages:
+            if self.grad_ckpt and self.training:
+                x = torch.utils.checkpoint.checkpoint(stage, x, use_reentrant=False)
+            else:
+                x = stage(x)
+        return x.mean((3, 4))
+
+
 class KneeNet(nn.Module):
     def __init__(self, backbone: str = "resnet34", pretrained: bool = True, dim: int = 256, depth: int = 2,
                  heads: int = 8, dropout: float = 0.1, drop_path: float = 0.1, pool: str = "avg",
@@ -39,7 +70,8 @@ class KneeNet(nn.Module):
             kwargs["in_chans"] = in_chans
         if backbone.startswith("vit_"):  # ViTs (e.g. DINOv2) were pretrained at another size: resample positions
             kwargs["dynamic_img_size"] = True
-        self.backbone = make_backbone(backbone, pretrained, **kwargs)
+        self.is3d = backbone in VIDEO_BACKBONES  # with stacked slices (knee/data.py, stack): one clip per series
+        self.backbone = Video3D(backbone, pretrained) if self.is3d else make_backbone(backbone, pretrained, **kwargs)
         # pool inside each window: "avg" (the backbone's own head) or "avgmax" (+ max over the feature map,
         # through the head's norm when it has one: a small lesion is diluted by the average)
         self.pool_type = pool
@@ -74,6 +106,13 @@ class KneeNet(nn.Module):
             self.sp_out_norm, self.sp_head = nn.LayerNorm(dim), nn.Linear(dim, 1)
             nn.init.zeros_(self.sp_head.weight)
             nn.init.zeros_(self.sp_head.bias)
+
+    def to(self, *args, **kwargs):
+        # the callers ask for channels_last (2D backbones); 3D convolution weights are 5D and have no such format
+        if getattr(self, "is3d", False) and kwargs.get("memory_format") is torch.channels_last:
+            kwargs.pop("memory_format")
+            return super().to(*args, **kwargs) if args or kwargs else self
+        return super().to(*args, **kwargs)
 
     @classmethod
     def from_config(cls, cfg: dict) -> "KneeNet":
@@ -115,13 +154,22 @@ class KneeNet(nn.Module):
     def forward(self, x, pos, mask, seq=None, return_pooled=False):
         # x: (B, S, T, C, H, W) uint8 (C = 3 adjacent slices, or the stacked slices); pos: (B, S, T); mask: (B, S); seq: (B, S) SEQ_CLASSES indices
         b, s, t = x.shape[:3]
-        imgs = x.flatten(0, 2).float()
-        if imgs.shape[1] == 3:
-            imgs = (imgs - MEAN.to(imgs.device)) / STD.to(imgs.device)
-        else:  # stacked grey slices: the ImageNet statistics averaged over colours
-            imgs = (imgs - MEAN.mean()) / STD.mean()
-        win_feats, fmap = self.embed(imgs.contiguous(memory_format=torch.channels_last), keep_map=self.sp_queries is not None)
-        feats = self.proj(win_feats).view(b, s, t, -1)
+        fmap = None
+        if self.is3d:  # x: (B, S, 1, D, H, W) stacked grey slices -> one clip per series, its depth axis kept as tokens
+            vol = x[:, :, 0].flatten(0, 1).float().unsqueeze(1) / 255  # (B*S, 1, D, H, W)
+            vol = (vol - K_MEAN.to(vol.device)) / K_STD.to(vol.device)  # broadcast to the 3 colour channels
+            f = self.backbone(vol).transpose(1, 2)  # (B*S, D', 512)
+            t = f.shape[1]
+            feats = self.proj(f).view(b, s, t, -1)
+            pos = torch.linspace(0, 1, t, device=x.device).expand(b, s, t)
+        else:
+            imgs = x.flatten(0, 2).float()
+            if imgs.shape[1] == 3:
+                imgs = (imgs - MEAN.to(imgs.device)) / STD.to(imgs.device)
+            else:  # stacked grey slices: the ImageNet statistics averaged over colours
+                imgs = (imgs - MEAN.mean()) / STD.mean()
+            win_feats, fmap = self.embed(imgs.contiguous(memory_format=torch.channels_last), keep_map=self.sp_queries is not None)
+            feats = self.proj(win_feats).view(b, s, t, -1)
         tokens = feats + self.slot_emb[None, :, None] + self.pos_emb(pos.unsqueeze(-1))
         if self.seq_emb is not None:
             tokens = tokens + self.seq_emb(seq)[:, :, None]
