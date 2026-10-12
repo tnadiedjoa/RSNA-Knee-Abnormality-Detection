@@ -2393,6 +2393,20 @@ another 150 mm run of the same line, minus a little accuracy; it is no source of
 finish before the job ends. **E112** queued as a 3090 batch job (1034780, `slurm/runs/e112_3090.txt`): E75's recipe from
 scratch, seed 242 (~9 h), a plain member of the best line, since a plain 384 px run is what adds in CV.
 
+Auto (2026-10-12 19:31, scripts/auto_followup.py): Kaggle: new submission ref 57097485 (knee-blend, scriptVersionId 357384343) scored 0.954; new submission ref 57097491 (knee-blend, scriptVersionId 357409521) scored 0.954; new submission ref 57097495 (knee-blend, scriptVersionId 357411492) scored 0.954; new submission ref 57097499 (knee-blend, scriptVersionId 357413245) scored 0.954; new submission ref 57097506 (knee-blend, scriptVersionId 357414636) scored 0.954.
+
+**LB of 10-12** (submitted 08:03, all scored by the evening): knee-blend **42, 43, 44, 45, 46 = 0.954** — heliosli's blend
+alone (45) and with our 13 zoomed members at 15 / 20 / 25 % (43 / 42 / 44) or on his 0.5 / 0.5 variant (46): no difference
+at three decimals. Leaderboard 19:3x: **363rd of 5,844** (0.954; top 0.966). The 0.954 group holds 744 teams (ranks
+211–954), ordered by the digits Kaggle does not show (dmitriykolmikov's notebook "is +0.001 on public LB real?": medal
+lines on 10-12 at rank 21 gold, 290 silver, 581 bronze, all inside or near that group; public set ~30 % of ~1,300 studies).
+338 of the 591 teams ranked below us in that group last submitted before our 06:03 UTC submission, so the tie is not broken
+by time: our best submission sits above a large part of the group — probably one with ours on top of heliosli's blend
+(above the plain copies), but the API gives three decimals only (`public_score` '0.954'), so which one cannot be told.
+Ledger rows filled (versions by scriptVersionId; the user submitted 42, 43, 44, 45, 46 in that order).
+Runs finished meanwhile: E110, E111 (75 mm, P100s) and E112 (E75 recipe, seed 242, 3090 batch). New session: interactive
+job 1036315 on **nodemm05** (from 19:27, 24 h; no 384 px raw cache on that node's /tmp yet).
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
