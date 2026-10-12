@@ -1,24 +1,21 @@
-# À soumettre (mis à jour le 11/10 à 22 h)
+# À soumettre (mis à jour le 13/10 à 0 h 30)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 21** (cassées), ni **38** (bloquée, sans sortie).
 
-Scores du 11/10 : knee-blend **39 → 0,951** (base 0,950 à 80 % + nos 5 modèles zoomés à 20 %), 35, 36, 37, 40 → 0,950.
-Classement : 651e sur 5 748.
+Scores du 12/10 : knee-blend 42, 43, 44, 45, 46 → **0,954** (la base de heliosli seule ou avec nos modèles : pareil à 3
+décimales). Classement : **363e sur 5 844** (744 équipes à 0,954, départagées par les décimales cachées : on est devant
+environ 590 d'entre elles).
 
-## Le 12/10 (5 soumissions, à partir de 2 h du matin) : la base publique à 0,954 de heliosli + nos modèles zoomés
+## Le 13/10 (5 soumissions) : la base à 0,954 + le lecteur public, ou plus de nos modèles
 
-heliosli a remis en ligne son modèle S6 le 10/10 au soir : son notebook (modèle à 0,949 de nartaa 70 % + S6 30 %) fait
-**0,954**, et 334 équipes l'ont soumis. On le reprend comme base, avec nos 13 modèles zoomés en 3e partie (la recette du
-0,951 d'hier).
+| Ordre | Notebook | Version | Contenu |
+|---|---|---|---|
+| 1 | knee-blend | **47** | base 0,954 + le lecteur public de goodpjw2008, avec un poids par anomalie |
+| 2 | knee-blend | **48** | 47 + nos 13 modèles zoomés à 20 % |
+| 3 | knee-blend | **49** | 47 + nos 13 modèles zoomés à 30 % |
+| 4 | knee-blend | **50** | base 0,954 + nos 13 modèles zoomés à 35 % |
+| 5 | knee-blend | **51** | base 0,954 + 16 de nos modèles (les 13 zoomés + E75, E86, E112) à 20 % |
 
-| Ordre | Notebook | Version | Modèle 0,949 / S6 de heliosli / nos modèles | Question |
-|---|---|---|---|---|
-| 1 | knee-blend | **42** | 56 % / 24 % / 20 % | nos modèles font-ils monter le 0,954 ? |
-| 2 | knee-blend | **45** | 70 % / 30 % / — (son notebook seul) | on récupère 0,954 à coup sûr |
-| 3 | knee-blend | **43** | 59,5 % / 25,5 % / 15 % | moins de nos modèles |
-| 4 | knee-blend | **44** | 52,5 % / 22,5 % / 25 % | plus de nos modèles |
-| 5 | knee-blend | **46** | 40 % / 40 % / 20 % | plus de S6 |
-
-Les 5 sont vérifiées sur les 3 examens de test visibles (11/10, 18 h – 22 h) : son mélange est bien reproduit, nos modèles
-tournent, le mélange final est écrit. La 41 (base 0,950 + 10 modèles à 10 cm) n'est plus utile.
+Les 5 sont vérifiées sur les 3 examens de test visibles (12/10, 23 h 20 – 13/10, 0 h 25) : le lecteur est bien fusionné
+(47–49), nos modèles tournent (13 ou 16), le mélange final est écrit.

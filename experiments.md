@@ -2436,6 +2436,11 @@ blend 42's public cells, `matterhorn_0950.ipynb` = blend 14's):
 `logs/chain_1012.sh`: knee-models packaged with E110, E111, E112 (46 runs, `logs/day19_runs.txt`), then 47–51 pushed and
 checked (`logs/chain_1012.out`).
 
+**Blends 47–51 checked** (knee-models packaged with 46 runs at 23:19, `logs/push_1012_2255`; pushes 23:19–00:25): 47 "[Apex
+Fusion SUCCESS] Successfully fused SOTA 0.949 + ConvNeXt 2.5D Reader" (the reader fused per finding into heliosli's
+submission, V3 weights), 48 / 49 the same + "public 0.80 + ours 0.20" / "0.70 + 0.30" (13 networks sets done), 50 heliosli
+parts with ours 0.35, 51 with 16 members. **10-13 list**: 47, 48, 49, 50, 51.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
