@@ -2468,6 +2468,19 @@ LB before the others finish): 52 = heliosli's parts Raptor 0.56 / S6 0.24 / E115
 reader fused per finding (as 47) + E115 0.20. knee-models packaged with E115's network 0 (47 runs, `logs/day20_runs.txt`),
 then 52 / 53 pushed (`logs/chain_1013.sh`). They replace 50 and 51 in the 10-13 list if the user has not submitted yet.
 
+Auto (2026-10-13 09:43, scripts/auto_followup.py): Kaggle: new submission ref 57132573 (knee-blend, scriptVersionId 357794713); new submission ref 57132577 (knee-blend, scriptVersionId 357795573); new submission ref 57132581 (knee-blend, scriptVersionId 357796915).
+
+**knee-models stuck at the 10-12 version.** The 10-13 package (47 runs, models.zip 15 GB, uploaded 07:51–~08:10) never
+became a dataset version: at 09:23 the API still served the 46-run version (199 files, `lastUpdated` 10-12 21:11 UTC), so
+blends **52 / 53** (pushed 09:10, after `push_version.sh`'s 60 min wait — its file listing is cut at 200 files and never
+showed the new run) found no E115 ("MODELS patterns matched nothing") and wrote heliosli's parts / heliosli + reader only:
+never to be submitted. Likely a size or storage limit after ~20 versions of 7–15 GB (not checked; nothing deleted).
+Fix: a new small private dataset **`theophilenadiedjoa/knee-models-3d`** (`scripts/package_kaggle.py --dataset`, new
+option): current `knee/` code (with Video3D), the wheels, E115 — 116 MB, ready within a minute. **knee-blend 54** (= 52) and
+**55** (= 53) read it instead of knee-models: on the visible test "E115: 1 fold networks done" (torchvision is in the docker
+image), BLEND written (54: heliosli parts 0.56 / 0.24 / 0.20; 55: reader fused, then public 0.80 + ours 0.20).
+The user submitted 47, 48, 49 (~09:40; refs 57132573, 57132577, 57132581); 54 and 55 complete the day.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

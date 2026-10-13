@@ -23,6 +23,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("runs", nargs="+")
     p.add_argument("--message", default="update")
+    p.add_argument("--dataset", default=DATASET, help="owner/slug (default: knee-models)")
     # staging copy (~14 GB): node-local disk, not the 100 GB home (kaggle/_dataset until 2026-10-07)
     p.add_argument("--out", default=f"/tmp/knee_dataset_{os.environ.get('USER', 'user')}")
     args = p.parse_args()
@@ -42,11 +43,11 @@ def main():
         for ckpt in sorted((run / "checkpoints").glob("fold*.pt")):
             shutil.copy(ckpt, dst / ckpt.name)
         print(run.name, [c.name for c in (run / "checkpoints").glob("fold*.pt")])
-    meta = {"title": "knee-models", "id": DATASET, "licenses": [{"name": "CC-BY-NC-4.0"}]}
+    meta = {"title": args.dataset.split("/")[1], "id": args.dataset, "licenses": [{"name": "CC-BY-NC-4.0"}]}
     (out / "dataset-metadata.json").write_text(json.dumps(meta))
 
     kaggle = str(ROOT_DIR / ".venv" / "bin" / "kaggle")
-    exists = subprocess.run([kaggle, "datasets", "status", DATASET], capture_output=True, text=True).returncode == 0
+    exists = subprocess.run([kaggle, "datasets", "status", args.dataset], capture_output=True, text=True).returncode == 0
     cmd = ([kaggle, "datasets", "version", "-p", str(out), "-m", args.message, "--dir-mode", "zip"] if exists
            else [kaggle, "datasets", "create", "-p", str(out), "--dir-mode", "zip"])
     print(subprocess.run(cmd, capture_output=True, text=True).stdout[-500:])
