@@ -2460,6 +2460,14 @@ partition is full, other users' jobs pending).
 6 clips × 24 × 224², exit 137) exhausted the job's memory; the interactive 3090 then sat idle until 02:52. Lesson: smoke-test
 with tiny tensors, never beside a training in the same job.
 
+**E114 fold 1 confirms** (07:05): alone silver 0.9535 (E79 0.9580), rank correlation 0.866 / 0.863 with E79 / E46, added to
+E79 + E46: **+0.0016 / +0.0020** silver at 0.2 / 0.33 (E42 +0.0006, E108 +0.0001); gold −0.004 on this fold's 12 studies
+(+0.003 on fold 0). **E115 network 0 done** (07:50, 31 min per epoch on all the data); network 1 running in the batch job
+(from ~07:20), network 2 on the interactive 3090 (from 07:50), both done ~13:00. **Blends 52 / 53** (the 3D model on the
+LB before the others finish): 52 = heliosli's parts Raptor 0.56 / S6 0.24 / E115 (one network) 0.20; 53 = heliosli + the
+reader fused per finding (as 47) + E115 0.20. knee-models packaged with E115's network 0 (47 runs, `logs/day20_runs.txt`),
+then 52 / 53 pushed (`logs/chain_1013.sh`). They replace 50 and 51 in the 10-13 list if the user has not submitted yet.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
