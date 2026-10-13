@@ -2441,6 +2441,25 @@ Fusion SUCCESS] Successfully fused SOTA 0.949 + ConvNeXt 2.5D Reader" (the reade
 submission, V3 weights), 48 / 49 the same + "public 0.80 + ours 0.20" / "0.70 + 0.30" (13 networks sets done), 50 heliosli
 parts with ours 0.35, 51 with 16 members. **10-13 list**: 47, 48, 49, 50, 51.
 
+**E114 (3D), fold 0 — the most diverse member so far** (02:44, `python -m scripts.cv_compare e114 e108 --folds 0`):
+
+| fold 0 (882 studies) | silver | gold(fold) | rank corr. with E79 / E46 | added to E79 + E46 at 0.2 / 0.33 (silver) |
+|---|---|---|---|---|
+| E114, R(2+1)D-18, 24 slices × 224 px, 10 epochs | 0.9573 | 0.909 | **0.875 / 0.874** | **+0.0016 / +0.0019** |
+| E42, 2.5D ConvNeXt-T 384 px | 0.9577 | 0.920 | 0.915 / 0.918 | +0.0006 / +0.0003 |
+| E108, 2.5D, 100 mm | 0.9571 | 0.935 | 0.944 / 0.904 | +0.0002 / −0.0001 |
+
+Silver by epoch: 0.857, …, 0.9535 (6), 0.9569, 0.9582 (8), 0.9574, 0.9573. As accurate alone as a 2.5D 384 px run, much less
+correlated with our 2.5D members, and three times the blend gain of another 2.5D run: the first change of input that
+clearly adds. **E115 = the 3D model on all the data** (`slurm/runs/e115_3d_full.sh`, E75's targets, same settings): networks
+0 then 2 on the interactive 3090 (from 02:52, ~5.5 h each), network 1 appended to E114's job script so that the batch job
+runs it right after E114's fold-1 CV run (~07:05; bash reads the script as it goes), so no new queue wait (the 3090
+partition is full, other users' jobs pending).
+
+**E113 lost**: killed at ~22:15 by the kernel's out-of-memory killer, when the CPU smoke test of the 3D model (2 studies ×
+6 clips × 24 × 224², exit 137) exhausted the job's memory; the interactive 3090 then sat idle until 02:52. Lesson: smoke-test
+with tiny tensors, never beside a training in the same job.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never

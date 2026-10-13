@@ -9,3 +9,6 @@ LAB="--labels qwen36_27b_v1 --mix-public pilkwang_v2 steven_v2 lixin_sol56 --boo
 for f in 0 1; do
   .venv/bin/python -m scripts.train --name e114_r2p1d_f$f --run-dir 2026-10-12_2230_e114_cv_r2plus1d18_stack24_224 $LAB --backbone r2plus1d_18 --stack-slices 24 --img-size 224 --epochs 10 --bs 2 --accum 4 --grad-ckpt --raw-dir /tmp/knee_raw384 --workers 4 --folds $f
 done
+
+# appended 2026-10-13 02:50, read by this job after its fold-1 CV run: the 3D model's full-data network 1 (E115)
+bash slurm/runs/e115_3d_full.sh 1 > logs/e115_n1.log 2>&1
