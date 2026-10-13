@@ -1,23 +1,18 @@
-# À soumettre (mis à jour le 13/10 à 9 h 45)
+# À soumettre (mis à jour le 13/10 à 20 h)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 21** (cassées), ni **38** (bloquée, sans sortie), ni **50 à 53** (remplacées ; 52 et 53 ont tourné sans le modèle 3D).
+**Ne plus soumettre 54, 55, 56** : elles partent de l'ancienne base à 0,954, dépassée depuis le 13/10.
 
-Scores du 12/10 : knee-blend 42, 43, 44, 45, 46 → **0,954** (la base de heliosli seule ou avec nos modèles : pareil à 3
-décimales). Classement : **363e sur 5 844** (744 équipes à 0,954, départagées par les décimales cachées : on est devant
-environ 590 d'entre elles).
+Scores du 13/10 : knee-blend 47 → **0,954** ; 48 et 49 → **0,953** (nos modèles zoomés ajoutés à la base + lecteur font
+baisser). Classement le 13/10 au soir : **848e sur 5 932** (le nouveau modèle public R7 de heliosli a fait passer
+environ 550 équipes à 0,956 dans la journée).
 
-## Le 13/10 (5 soumissions) : la base à 0,954 + le lecteur public, ou plus de nos modèles
+## Le 13/10 au soir (les 2 soumissions qui restent, avant 2 h du matin) : la nouvelle base R7 à 0,956
 
 | Ordre | Notebook | Version | Contenu |
 |---|---|---|---|
-| 1 | knee-blend | **47** | base 0,954 + le lecteur public de goodpjw2008, avec un poids par anomalie |
-| 2 | knee-blend | **48** | 47 + nos 13 modèles zoomés à 20 % |
-| 3 | knee-blend | **49** | 47 + nos 13 modèles zoomés à 30 % |
-| 4 | knee-blend | **54** | base 0,954 + le modèle 3D (1er réseau) à 20 % |
-| 5 | knee-blend | **55** | 47 (base + lecteur) + le modèle 3D (1er réseau) à 20 % |
+| 1 | knee-blend | **57** | base R7 (heliosli R7 + Raptor + le modèle 224 de nartaa, notebook public de varshithakolupuri) + nos 3 réseaux 3D à 20 % |
+| 2 | knee-blend | **58** | la même base R7 seule (repère : environ 0,956) |
 
-Les 5 sont vérifiées sur les 3 examens de test visibles (12/10, 23 h 20 – 13/10, 0 h 25) : le lecteur est bien fusionné
-(47–49), nos modèles tournent (13 ou 16), le mélange final est écrit.
-
-54 et 55 vérifiées le 13/10 à 9 h 30 – 9 h 45 (le modèle 3D tourne sur Kaggle). 47, 48, 49 soumises le 13/10 au matin.
+57 et 58 sont en vérification sur Kaggle (lancées à 19 h 55) : attendre ma confirmation.

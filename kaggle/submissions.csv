@@ -60,3 +60,6 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 57097495,2026-10-12 06:03,knee-blend,44,"heliosli 0.954 base (nartaa Raptor CoAtNet + heliosli compact S6, restored): 0.525 / 0.225 / 13 zoomed members (E96, E97, E91-E93, E98-E105; 24 windows) 0.25; scriptVersionId 357411492",0.954,
 57097499,2026-10-12 06:03,knee-blend,45,"heliosli 0.954 base (nartaa Raptor CoAtNet + heliosli compact S6, restored): 0.7 / 0.3, his blend alone; scriptVersionId 357413245",0.954,
 57097506,2026-10-12 06:03,knee-blend,46,"heliosli 0.954 base (nartaa Raptor CoAtNet + heliosli compact S6, restored): 0.4 / 0.4 / 13 zoomed members (E96, E97, E91-E93, E98-E105; 24 windows) 0.20; scriptVersionId 357414636",0.954,
+57132573,2026-10-13 05:58,knee-blend,47,"heliosli 0.954 base + goodpjw2008 2.5D reader fused per finding (V3 weights); scriptVersionId 357794713",0.954,
+57132577,2026-10-13 05:59,knee-blend,48,"47 + 13 zoomed members (E96, E97, E91-E93, E98-E105) 0.20; scriptVersionId 357795573",0.953,
+57132581,2026-10-13 05:59,knee-blend,49,"47 + 13 zoomed members 0.30; scriptVersionId 357796915",0.953,

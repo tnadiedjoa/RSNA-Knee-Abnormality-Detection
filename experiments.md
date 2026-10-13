@@ -2481,8 +2481,32 @@ option): current `knee/` code (with Video3D), the wheels, E115 — 116 MB, ready
 image), BLEND written (54: heliosli parts 0.56 / 0.24 / 0.20; 55: reader fused, then public 0.80 + ours 0.20).
 The user submitted 47, 48, 49 (~09:40; refs 57132573, 57132577, 57132581); 54 and 55 complete the day.
 
+Auto (2026-10-13 19:17, scripts/auto_followup.py): Kaggle: ref 57132573 (knee-blend version ?) scored 0.954; ref 57132577 (knee-blend version ?) scored 0.953; ref 57132581 (knee-blend version ?) scored 0.953.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
 versioned: rule on redistribution): `python -m scripts.eval_oof runs/<run>` on the cluster, from the
 committed out-of-fold predictions.
+
+**10-13 scores**: knee-blend **47** (heliosli 0.954 base + the reader fused per finding) **0.954**; **48 / 49** (47 + our 13
+zoomed members at 0.2 / 0.3) **0.953**: on the reader-fused base our 2.5D members lower the score. 54 / 55 not submitted.
+**E115 networks 1 and 2 done** (12:01 and 12:55; the GPUs then sat idle until 19:25 — no watcher had been set after the
+session moved: the three 3090 jobs below now each have one).
+
+**New public base: heliosli's R7** (`heliosli/rsna-knee-compact-r7cnxfsss`, notebook
+`heliosli/0-957-latest-dataset-score-in-one-click`, 10-11 20:01): his compact ConvNeXt-small release 7 (four folds, crop 352,
+fastMRI auxiliary training, refitted Effusion / Baker stackers) and nartaa's Raptor CoAtNet 384, ranks 0.5 / 0.5. LB 0.956;
+on 10-13 ~550 teams copied it (leaderboard 10-13 19:30: 552 teams at 0.956, 146 above, top 0.966; us **848th of 5,932**
+with 0.954). `varshithakolupuri/rsna-knee-one-unused-checkpoint-lifts-the-0-956` adds nartaa's second public checkpoint
+(224 px, 0.8 centre crop, 0.945 alone) as 35 % of the Raptor slot: same 0.956 shown, rank 233 → 156 by the author's account.
+Copies of both sources in `kaggle/sources/` (git-ignored).
+
+**knee-models-3d** now holds E115's three networks (348 MB, 10-13 19:20). **knee-blend 56** = heliosli 0.954 parts 0.49 /
+0.21 + E115 (3 networks) 0.30, pushed 19:22 before the R7 base was found: obsolete, kept only as a record (the 0.2 twin was
+not pushed: `kaggle/unpushed_1013/`). **knee-blend 57** = varshitha's R7 + Raptor + 224 notebook (verbatim) 0.8 + E115
+(3 networks) 0.2, uniform rank blend (`scripts/build_blend_nb.py kaggle/sources/varshitha_r7_224_0956.ipynb --weight 0.2
+--models "['*_e115_*']" --windows 24`); **58** = the same with weight 0 (the public R7 + 224 notebook alone, anchor for 57).
+
+**3D runs (3090 batch jobs, 19:25)**: E115 networks 3 and 4 (jobs 1038112, 1038113: the 3D member then averages 5
+networks), E116 = E114's fold-0 CV test with R3D-18 (job 1038114: a second 3D backbone, `slurm/runs/e116_r3d_cv.sh`).
