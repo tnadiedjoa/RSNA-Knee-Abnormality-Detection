@@ -63,3 +63,8 @@ ref,submitted_utc,notebook,version,content,public_lb,note
 57132573,2026-10-13 05:58,knee-blend,47,"heliosli 0.954 base + goodpjw2008 2.5D reader fused per finding (V3 weights); scriptVersionId 357794713",0.954,
 57132577,2026-10-13 05:59,knee-blend,48,"47 + 13 zoomed members (E96, E97, E91-E93, E98-E105) 0.20; scriptVersionId 357795573",0.953,
 57132581,2026-10-13 05:59,knee-blend,49,"47 + 13 zoomed members 0.30; scriptVersionId 357796915",0.953,
+57186645,2026-10-14 15:08,knee-blend,57,"R7 + Raptor 384 + 224 public notebook (varshithakolupuri, no mirror on 224) 0.8 + E115 3D (3 networks) 0.2; scriptVersionId 358076073",0.956,
+57188526,2026-10-14 16:18,knee-blend,59,"R7 + Raptor 384 + 224 public notebook with mirror TTA on 224 (varshithakolupuri 'one free flip') alone; scriptVersionId 358378667",0.956,
+57188530,2026-10-14 16:18,knee-blend,60,"59's base 0.8 + E115 3D (5 networks) 0.2; scriptVersionId 358381753",0.956,
+57188534,2026-10-14 16:19,knee-blend,61,"59's base 0.7 + E115 3D (5 networks) 0.3; scriptVersionId 358384355",0.956,
+57188539,2026-10-14 16:19,knee-blend,62,"59's base 0.6 + E115 3D (5 networks) 0.4; scriptVersionId 358387764",0.956,

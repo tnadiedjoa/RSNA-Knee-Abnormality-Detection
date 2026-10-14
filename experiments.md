@@ -2483,6 +2483,8 @@ The user submitted 47, 48, 49 (~09:40; refs 57132573, 57132577, 57132581); 54 an
 
 Auto (2026-10-13 19:17, scripts/auto_followup.py): Kaggle: ref 57132573 (knee-blend version ?) scored 0.954; ref 57132577 (knee-blend version ?) scored 0.953; ref 57132581 (knee-blend version ?) scored 0.953.
 
+Auto (2026-10-14 23:56, scripts/auto_followup.py): Kaggle: new submission ref 57186645 (knee-blend, scriptVersionId 358076073) scored 0.956; new submission ref 57188526 (knee-blend, scriptVersionId 358378667) scored 0.956; new submission ref 57188530 (knee-blend, scriptVersionId 358381753) scored 0.956; new submission ref 57188534 (knee-blend, scriptVersionId 358384355) scored 0.956; new submission ref 57188539 (knee-blend, scriptVersionId 358387764) scored 0.956.
+
 `kaggle/submissions.csv` (2026-10-02 16:30): ledger of every Kaggle submission (API ref, date, notebook
 version, models, public score), so the LB scores quoted here can be checked against the Kaggle page.
 The AUCs in this journal can only be recomputed where the competition data lives (`data/` is never
@@ -2544,3 +2546,12 @@ keeps the public submission alone; 60 / 61 / 62 "E115: 5 fold networks done", pu
 +0.0016): 224 px stays the best of 160 / 224 / 320. **E122** (queued 19:25) = 256 px at E114's bs 2 × 4, to separate the
 resolution from E117's batch of 1. E121 (R3D-18 full data) restarted 18:02 on the new interactive 3090 (job 1040224):
 the first interactive job ended with the session and killed it.
+
+**10-14 scores**: knee-blend **57, 59, 60, 61, 62 → all 0.956** (R7 + Raptor + 224 public base, alone or with our 3D
+model at 0.2 / 0.3 / 0.4: no drop even at 0.4, no 0.957 either). Leaderboard 10-14 23:55: **369th of 6,010** (from
+1,139th): 234 teams at 0.957 or more, 892 at 0.956 (ranks 235–1,126), top 0.967.
+**E118 (32 slices, fold 0)**: alone silver **0.9583** (24 slices: 0.9573), added to E79 + E46: +0.0017 / **+0.0021** at
+0.2 / 0.33, +0.0008 over E79 + E46 + E114: the best 3D test. **E119 (MC3-18)**: 0.9478, −0.0007 over the base with E114:
+dropped. E119 ended 20:01 and E118 22:47: one batch slot idle 20:01–00:00, the other 22:47–00:00 (their waiter died with
+the session). **E123** = E115 with 32 slices on all the data, networks 0 and 1 (batch jobs 1040610 / 1040611, ~7 h each).
+E121 (R3D-18 full data): network 0 done, network 1 at epoch 5 (interactive job 1040224).
