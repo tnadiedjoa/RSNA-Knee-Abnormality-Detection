@@ -2536,3 +2536,6 @@ unpushed (`kaggle/unpushed_1014/`) for the flip base: **59** = flip notebook alo
 **E121** = full-data R3D-18 (E115 recipe), networks 0 and 1, on the interactive 3090 (job 1040129).
 Push scripts and run waiters now run as tracked background tasks of the session (a `setsid` copy is what survived and
 pushed twice in the past).
+
+**knee-blend 58–62 checked** (17:10–17:50, visible test): every stage ran (Raptor, R7 PASS, R224 with mirror ok=True); 59
+keeps the public submission alone; 60 / 61 / 62 "E115: 5 fold networks done", public 0.80 / 0.70 / 0.60 + ours.

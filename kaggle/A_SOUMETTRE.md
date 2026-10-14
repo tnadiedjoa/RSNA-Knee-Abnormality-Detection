@@ -1,4 +1,4 @@
-# À soumettre (mis à jour le 14/10 à 18 h)
+# À soumettre (mis à jour le 14/10 à 17 h 55)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 21** (cassées), ni **38** (bloquée, sans sortie), ni **50 à 53** (remplacées ; 52 et 53 ont tourné sans le modèle 3D).
@@ -11,10 +11,10 @@ Classement le 14/10 à 17 h 30 : **1 139e sur 5 983** (836 équipes à 0,956, 10
 
 | Ordre | Notebook | Version | Contenu | État |
 |---|---|---|---|---|
-| 1 | knee-blend | **57** | base R7 (sans miroir) + nos 3 réseaux 3D à 20 % | vérifiée, **à soumettre maintenant** |
-| 2 | knee-blend | **59** | base R7 avec miroir (notebook public de varshithakolupuri, « one free flip ») seule : le repère | en vérification |
-| 3 | knee-blend | **60** | 59 + nos 5 réseaux 3D à 20 % | en vérification |
-| 4 | knee-blend | **61** | 59 + nos 5 réseaux 3D à 30 % | en vérification |
-| 5 | knee-blend | **62** | 59 + nos 5 réseaux 3D à 40 % | en vérification |
+| 1 | knee-blend | **57** | base R7 (sans miroir) + nos 3 réseaux 3D à 20 % | vérifiée |
+| 2 | knee-blend | **59** | base R7 avec miroir (notebook public de varshithakolupuri, « one free flip ») seule : le repère | vérifiée |
+| 3 | knee-blend | **60** | 59 + nos 5 réseaux 3D à 20 % | vérifiée |
+| 4 | knee-blend | **61** | 59 + nos 5 réseaux 3D à 30 % | vérifiée |
+| 5 | knee-blend | **62** | 59 + nos 5 réseaux 3D à 40 % | vérifiée |
 
-59 à 62 : attendre ma confirmation (vérifications Kaggle lancées à 17 h 50, environ 1 h 30 en tout).
+Les 5 sont vérifiées sur les 3 examens de test visibles (14/10, 17 h 10 – 17 h 50) : Raptor, R7 et le modèle 224 tournent, nos 3 ou 5 réseaux 3D aussi, le mélange final est écrit (59 : la base seule).
