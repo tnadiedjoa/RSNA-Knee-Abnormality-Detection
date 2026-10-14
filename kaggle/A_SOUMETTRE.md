@@ -1,13 +1,15 @@
-# À soumettre (mis à jour le 14/10 à 17 h 55)
+# À soumettre (mis à jour le 15/10 à 0 h 05)
 
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 21** (cassées), ni **38** (bloquée, sans sortie), ni **50 à 53** (remplacées ; 52 et 53 ont tourné sans le modèle 3D).
 **Ne plus soumettre 54, 55, 56, 58** : 54 à 56 partent de l'ancienne base à 0,954 ; 58 est la base R7 sans le miroir (remplacée par 59).
 
-Scores du 13/10 : knee-blend 47 → **0,954** ; 48 et 49 → **0,953**. Rien n'a été soumis le 13/10 au soir.
-Classement le 14/10 à 17 h 30 : **1 139e sur 5 983** (836 équipes à 0,956, 103 à 0,957 : le modèle public R7 de heliosli).
+Scores du 14/10 : knee-blend 57, 59, 60, 61, 62 → **toutes 0,956** (la base R7 seule ou avec notre 3D à 20, 30 ou 40 % :
+pareil à 3 décimales). Classement le 14/10 à 23 h 55 : **369e sur 6 010** (1 139e avant ; 234 équipes à 0,957 ou plus).
 
-## Le 14/10 (5 soumissions, avant 2 h du matin) : la base R7 publique, seule ou avec notre modèle 3D
+Les versions du 15/10 seront prêtes dans la matinée (les nouveaux réseaux 3D finissent vers 7 h 30).
+
+## Le 14/10 (soumises) : la base R7 publique, seule ou avec notre modèle 3D
 
 | Ordre | Notebook | Version | Contenu | État |
 |---|---|---|---|---|
