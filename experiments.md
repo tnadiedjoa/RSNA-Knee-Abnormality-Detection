@@ -2510,3 +2510,29 @@ not pushed: `kaggle/unpushed_1013/`). **knee-blend 57** = varshitha's R7 + Rapto
 
 **3D runs (3090 batch jobs, 19:25)**: E115 networks 3 and 4 (jobs 1038112, 1038113: the 3D member then averages 5
 networks), E116 = E114's fold-0 CV test with R3D-18 (job 1038114: a second 3D backbone, `slurm/runs/e116_r3d_cv.sh`).
+
+**10-13 evening → 10-14 17:00 (session cut).** The push of knee-blend 58 never happened (the push script died with the
+session after pushing 57), so nothing was submitted on 10-13 evening. **57 checked** on the visible test: Raptor, R7,
+the 224 stage, then "E115: 3 fold networks done", "BLEND written: public 0.80 + ours 0.20". The four 3090 jobs ended
+overnight (no watcher survived the session cut: GPUs idle from ~04:30 to 17:30):
+- **E115 networks 3 and 4** done (00:27) → knee-models-3d now holds the five networks (581 MB, 10-14 17:15).
+- **E116 (R3D-18, fold 0)**: alone silver 0.9553 / gold 0.927; added to E79 + E46: +0.0014 at 0.2; added to E79 + E46 +
+  E114: **+0.0005** (corr 0.884 with E114). A small second 3D backbone gain.
+- **E117 (R(2+1)D-18 at 320 px, bs 1 × 8)**: alone **0.9381** (224 px: 0.9573), +0.0001 at 0.2: worse. Likely cause: the
+  Kinetics weights were learnt on 112 px clips; going further from that scale hurts (E120 tests 160 px).
+
+**New public sources (10-14)**: `varshithakolupuri/rsna-0-956-one-free-flip-68-ranks-up` = the R7 + Raptor + 224 notebook
+with nartaa's anatomical mirror TTA on the 224 checkpoint too (cell 9 only; the author's rank 357 → 289 at 0.956);
+`rjings/rsna-knee-four-public-models-rank-blend-20261014` (R7 + S6 in the ConvNeXt slot, 0.956); `mayankraaz/...` (R7 +
+Raptor + the 2.5D reader at 0.25, unscored). Leaderboard 10-14 17:30: 836 teams at 0.956, 103 at 0.957, top 0.966;
+us 1,139th of 5,983.
+
+**knee-blend 58** (non-flip R7 + 224 alone) pushed 17:20; the non-flip 59–61 (+ 5 networks at 0.2 / 0.3 / 0.4) set aside
+unpushed (`kaggle/unpushed_1014/`) for the flip base: **59** = flip notebook alone, **60 / 61 / 62** = flip notebook + E115
+(5 networks) at 0.2 / 0.3 / 0.4, uniform rank blend (`build_blend_nb.py kaggle/sources/varshitha_r7_224flip_0956.ipynb`).
+10-14 list: 57, 59, 60, 61, 62.
+
+**GPU runs (10-14 17:30)**: 3D CV tests on fold 0 (3090 batch): **E118** 32 slices, **E119** MC3-18, **E120** 160 px;
+**E121** = full-data R3D-18 (E115 recipe), networks 0 and 1, on the interactive 3090 (job 1040129).
+Push scripts and run waiters now run as tracked background tasks of the session (a `setsid` copy is what survived and
+pushed twice in the past).
