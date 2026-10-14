@@ -2539,3 +2539,8 @@ pushed twice in the past).
 
 **knee-blend 58–62 checked** (17:10–17:50, visible test): every stage ran (Raptor, R7 PASS, R224 with mirror ok=True); 59
 keeps the public submission alone; 60 / 61 / 62 "E115: 5 fold networks done", public 0.80 / 0.70 / 0.60 + ours.
+
+**E120 (3D at 160 px, fold 0)**: alone silver 0.9540 / gold 0.888, +0.0011 at 0.2 over E79 + E46 (E114 at 224 px: 0.9573,
++0.0016): 224 px stays the best of 160 / 224 / 320. **E122** (queued 19:25) = 256 px at E114's bs 2 × 4, to separate the
+resolution from E117's batch of 1. E121 (R3D-18 full data) restarted 18:02 on the new interactive 3090 (job 1040224):
+the first interactive job ended with the session and killed it.
