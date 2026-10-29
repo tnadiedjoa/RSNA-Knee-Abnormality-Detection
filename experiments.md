@@ -9,6 +9,9 @@ on our own folds unless marked **LB** (Kaggle public leaderboard):
 - **gold AUC** — macro AUC against the 58 expert-labelled studies, out-of-fold (each gold study is
   scored by the fold that did not train on it). Only 58 studies: ±0.03 is noise.
 
+**Final result**: 0.941 private / 0.956 public (knee-blend 57–62); best own-only model 0.928 private / 0.940 public
+(E75). See [Close](#close-2026-10-15--2026-10-22-written-2026-10-29) at the end.
+
 ## Summary
 
 | ID | Date | Change | Result | Kept |
@@ -2555,3 +2558,22 @@ model at 0.2 / 0.3 / 0.4: no drop even at 0.4, no 0.957 either). Leaderboard 10-
 dropped. E119 ended 20:01 and E118 22:47: one batch slot idle 20:01–00:00, the other 22:47–00:00 (their waiter died with
 the session). **E123** = E115 with 32 slices on all the data, networks 0 and 1 (batch jobs 1040610 / 1040611, ~7 h each).
 E121 (R3D-18 full data): network 0 done, network 1 at epoch 5 (interactive job 1040224).
+
+## Close (2026-10-15 → 2026-10-22, written 2026-10-29)
+
+**Last runs (10-15)**, all finished, none packaged or submitted (the last submission is from 10-14 16:19):
+- **E121** (R3D-18, E115 recipe, full data): networks 0 and 1 done 10-14 21:07 / 10-15 00:08 (18.7 min/epoch on a 3090).
+- **E123** (E115 with 32 slices, full data): networks 0 and 1 done 10-15 08:46 / 10:20 (41.5 min/epoch).
+- **E122** (3D at 256 px, bs 2 × 4, fold 0): alone silver 0.9551 / gold 0.895 (E114 at 224 px: 0.9573) → at the same batch as
+  E114, 256 px is still below 224 px: the E117 drop at 320 px was the resolution, not the batch of 1. 224 px stays the best 3D size.
+
+**Final scores** (API, 10-29; `private_lb` column added to `kaggle/submissions.csv` for all 68 submissions):
+- The five 10-14 candidates (knee-blend 57, 59, 60, 61, 62: R7 + Raptor + 224 public base, alone or with our E115 3D
+  model at 0.2 / 0.3 / 0.4) all score **0.941 private** (0.956 public): our 3D model neither helped nor hurt on the private
+  split either.
+- Best own-only submission: knee-submit 41 (E75 alone, 384 px) **0.928 private** (0.940 public).
+- Public → private drop 0.009–0.019 (mean 0.014) on every submission; Spearman 0.988 between public and private over the 67
+  scored submissions → the public leaderboard ranked our submissions correctly, no overfitting to it.
+- Final public leaderboard export (10-29): 2,043rd of 6,299 at 0.956 (top 0.970; we were 369th on 10-14 and stopped
+  submitting after that). The API exports only the public leaderboard: the private rank and the two selected submissions
+  are on the competition website.

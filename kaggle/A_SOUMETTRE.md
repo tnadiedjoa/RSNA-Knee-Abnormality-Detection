@@ -1,5 +1,9 @@
 # À soumettre (mis à jour le 15/10 à 0 h 05)
 
+> **Compétition terminée le 22/10 : plus rien à soumettre.** Scores finaux (API, 29/10) : knee-blend 57, 59, 60, 61, 62 →
+> **0,941 en privé** (0,956 en public) ; meilleur modèle à nous seul : knee-submit 41 (E75) 0,928 en privé. Détails à la fin
+> d'`experiments.md` et dans la colonne `private_lb` de `submissions.csv`. La suite de cette page est l'historique.
+
 Sur Kaggle : Submit → choisir le notebook → **choisir la version dans le menu** (Kaggle propose la dernière par défaut).
 Ne jamais soumettre knee-submit **30 ni 31**, ni knee-blend **18 à 21** (cassées), ni **38** (bloquée, sans sortie), ni **50 à 53** (remplacées ; 52 et 53 ont tourné sans le modèle 3D).
 **Ne plus soumettre 54, 55, 56, 58** : 54 à 56 partent de l'ancienne base à 0,954 ; 58 est la base R7 sans le miroir (remplacée par 59).
